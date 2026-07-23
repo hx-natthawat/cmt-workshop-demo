@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Customer Dashboard — Glow Beauty</title>
+<style>
+  /* โทนเดียวกับ utm_builder / roi_calculator — ตัวเลขทั้งหมดคำนวณจาก customer_data.csv (300 ราย) */
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  .viz-root {
+    color-scheme: light;
+    --surface-1: #fcfcfb;
+    --surface-2: #ffffff;
+    --border: #e5e7eb;
+    --text-primary: #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted: #9ca3af;
+    --series-1: #2a78d6;   /* น้ำเงิน — แท่งข้อมูลหลักทุกชาร์ต (ชุดเดียวต่อชาร์ต) */
+    --good-bg: #f0fdf4; --good-border: #bbf7d0; --good-text: #166534;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) .viz-root {
+      color-scheme: dark;
+      --surface-1: #1a1a19; --surface-2: #232322; --border: #3a3a38;
+      --text-primary: #ffffff; --text-secondary: #c3c2b7; --text-muted: #8a897f;
+      --series-1: #3987e5;
+      --good-bg: #14261a; --good-border: #1e4d2b; --good-text: #86efac;
+    }
+  }
+  body.viz-root {
+    font-family: -apple-system, "Segoe UI", "Noto Sans Thai", sans-serif;
+    background: var(--surface-1); color: var(--text-primary);
+    display: flex; justify-content: center; padding: 32px 16px;
+  }
+  .wrap { width: 100%; max-width: 920px; }
+  h1 { font-size: 1.4rem; }
+  .subtitle { color: var(--text-secondary); font-size: .9rem; margin: 4px 0 20px; }
+
+  /* ── stat tiles ── */
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+  .tile {
+    background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px;
+    padding: 16px 18px;
+  }
+  .tile .name { font-size: .78rem; color: var(--text-secondary); }
+  .tile .value { font-size: 1.5rem; font-weight: 700; margin-top: 2px; }
+  .tile .sub { font-size: .74rem; color: var(--text-muted); margin-top: 2px; }
+
+  /* ── insight callout ── */
+  .insight {
+    margin-top: 14px; padding: 12px 16px; border-radius: 10px; font-size: .9rem;
+    background: var(--good-bg); border: 1px solid var(--good-border); color: var(--good-text);
+  }
+
+  /* ── chart card + แท่งนอน ── */
+  .charts { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
+  .chart-card {
+    background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px;
+    padding: 18px;
+  }
+  .chart-card.full { grid-column: 1 / -1; }
+  .chart-card h2 { font-size: .95rem; margin-bottom: 2px; }
+  .chart-card .hint { font-size: .74rem; color: var(--text-muted); margin-bottom: 12px; }
+  .row { display: grid; grid-template-columns: 110px 1fr 84px; align-items: center; gap: 8px; margin: 7px 0; }
+  .row .lbl { font-size: .8rem; color: var(--text-secondary); text-align: right; }
+  .track { height: 16px; border-radius: 0 4px 4px 0; background: transparent; position: relative; }
+  .bar {
+    height: 100%; border-radius: 0 4px 4px 0; background: var(--series-1);
+    min-width: 2px; transition: opacity .15s;
+  }
+  .row:hover .bar { opacity: .75; }
+  .row .val { font-size: .78rem; font-weight: 600; color: var(--text-primary); }
+  details { margin-top: 10px; }
+  summary { font-size: .76rem; color: var(--text-muted); cursor: pointer; }
+  table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: .78rem; }
+  th, td { text-align: left; padding: 4px 6px; border-bottom: 1px solid var(--border); }
+  th { color: var(--text-secondary); font-weight: 600; }
+  td.num, th.num { text-align: right; }
+
+  /* ── tooltip ── */
+  #tip {
+    position: fixed; pointer-events: none; z-index: 10; display: none;
+    background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px;
+    padding: 8px 10px; font-size: .78rem; box-shadow: 0 4px 14px rgba(0,0,0,.12);
+    max-width: 240px;
+  }
+  #tip b { display: block; margin-bottom: 2px; }
+  @media (max-width: 640px) { .charts { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body class="viz-root">
+<div class="wrap">
+  <h1>🧴 Customer Dashboard — Glow Beauty</h1>
+  <p class="subtitle">ภาพรวมลูกค้า 300 ราย จาก customer_data.csv · อัปเดตข้อมูลถึงวันนี้</p>
+
+  <div class="tiles">
+    <div class="tile"><div class="name">ลูกค้าทั้งหมด</div><div class="value">300 ราย</div><div class="sub">หญิง 65% · ชาย 28%</div></div>
+    <div class="tile"><div class="name">ยอดขายรวม</div><div class="value">฿4.66M</div><div class="sub">เฉลี่ย ฿15,531/ราย</div></div>
+    <div class="tile"><div class="name">ยินยอม PDPA การตลาด</div><div class="value">83%</div><div class="sub">250 จาก 300 ราย</div></div>
+    <div class="tile"><div class="name">สมาชิก LINE OA</div><div class="value">53%</div><div class="sub">159 จาก 300 ราย</div></div>
+  </div>
+
+  <div class="insight">💡 ลูกค้าช่องทาง LINE OA มีแค่ 40 ราย (13%) แต่ยอดซื้อเฉลี่ยสูงสุดถึง ฿27,843/ราย — เกือบ 2 เท่าของค่าเฉลี่ยรวม</div>
+
+  <div class="charts">
+    <div class="chart-card" id="chartChannel">
+      <h2>ยอดขายตามช่องทางหลัก</h2>
+      <p class="hint">บาท · ชี้ที่แท่งเพื่อดูจำนวนลูกค้าและค่าเฉลี่ย</p>
+    </div>
+
+    <div class="chart-card" id="chartCategory">
+      <h2>ยอดขายตามหมวดสินค้า</h2>
+      <p class="hint">บาท · ชี้ที่แท่งเพื่อดูจำนวนลูกค้าและค่าเฉลี่ย</p>
+    </div>
+
+    <div class="chart-card full" id="chartSegment">
+      <h2>RFM Segments — ยอดขายต่อกลุ่ม</h2>
+      <p class="hint">แบ่งจาก recency / จำนวนออเดอร์ / ยอดใช้จ่าย · กลุ่ม "แชมป์ตัวจริง" คือ 28% ของลูกค้า แต่สร้างยอดขาย 80%</p>
+    </div>
+  </div>
+</div>
+
+<div id="tip"></div>
+
+<script>
+  // ── ตัวเลขสรุปคำนวณล่วงหน้าจาก customer_data.csv (300 แถว) ──
+  const CHANNELS = [
+    { name: 'Shopee',      spend: 1260633, n: 90 },
+    { name: 'Website',     spend: 1209213, n: 53 },
+    { name: 'LINE OA',     spend: 1113718, n: 40 },
+    { name: 'TikTok Shop', spend:  543634, n: 56 },
+    { name: 'Lazada',      spend:  532027, n: 61 },
+  ];
+  const CATEGORIES = [
+    { name: 'Skincare',    spend: 1472258, n: 89 },
+    { name: 'Makeup',      spend: 1176457, n: 70 },
+    { name: 'Haircare',    spend:  928708, n: 57 },
+    { name: 'Supplements', spend:  543870, n: 50 },
+    { name: 'Fragrance',   spend:  537932, n: 34 },
+  ];
+  // เกณฑ์แบ่ง: แชมป์ = ซื้อใน 60 วัน + ≥10 ออเดอร์ · ขาประจำ = 90 วัน + ≥5 · หน้าใหม่ = 60 วัน + ≤2 · หลับไหล = เกิน 180 วัน · ที่เหลือ = เสี่ยงหลุด
+  const SEGMENTS = [
+    { name: 'แชมป์ตัวจริง', spend: 3706777, n: 84, extra: 'LINE OA 61% · consent 85%' },
+    { name: 'ขาประจำ',     spend:  365716, n: 52, extra: 'LINE OA 56% · consent 87%' },
+    { name: 'เสี่ยงหลุด',   spend:  325404, n: 61, extra: 'LINE OA 46% · consent 77%' },
+    { name: 'หลับไหล',     spend:  230992, n: 68, extra: 'LINE OA 50% · consent 87%' },
+    { name: 'หน้าใหม่',     spend:   30336, n: 35, extra: 'LINE OA 49% · consent 80%' },
+  ];
+
+  const fmt = (n) => n.toLocaleString('th-TH');
+  const tip = document.getElementById('tip');
+
+  // วาดชาร์ตแท่งนอน 1 ชุดข้อมูลต่อการ์ด + tooltip + ตารางข้อมูลสำรอง
+  function renderBars(cardId, data) {
+    const card = document.getElementById(cardId);
+    const max = Math.max(...data.map((d) => d.spend));
+
+    data.forEach((d) => {
+      const row = document.createElement('div');
+      row.className = 'row';
+      row.innerHTML =
+        `<span class="lbl">${d.name}</span>` +
+        `<div class="track"><div class="bar" style="width:${(d.spend / max) * 100}%"></div></div>` +
+        `<span class="val">฿${fmt(Math.round(d.spend / 1000))}K</span>`;
+      row.addEventListener('mousemove', (e) => {
+        tip.style.display = 'block';
+        tip.innerHTML = `<b>${d.name}</b>ยอดขาย ฿${fmt(d.spend)}<br>ลูกค้า ${d.n} ราย · เฉลี่ย ฿${fmt(Math.round(d.spend / d.n))}/ราย` +
+          (d.extra ? `<br>${d.extra}` : '');
+        tip.style.left = Math.min(e.clientX + 14, innerWidth - 260) + 'px';
+        tip.style.top = (e.clientY + 14) + 'px';
+      });
+      row.addEventListener('mouseleave', () => { tip.style.display = 'none'; });
+      card.appendChild(row);
+    });
+
+    // ตารางข้อมูล (accessibility / เผื่อ print)
+    const det = document.createElement('details');
+    det.innerHTML = '<summary>ดูตารางข้อมูล</summary>' +
+      '<table><tr><th>กลุ่ม</th><th class="num">ลูกค้า (ราย)</th><th class="num">ยอดขาย (บาท)</th><th class="num">เฉลี่ย/ราย</th></tr>' +
+      data.map((d) => `<tr><td>${d.name}</td><td class="num">${d.n}</td><td class="num">${fmt(d.spend)}</td><td class="num">${fmt(Math.round(d.spend / d.n))}</td></tr>`).join('') +
+      '</table>';
+    card.appendChild(det);
+  }
+
+  renderBars('chartChannel', CHANNELS);
+  renderBars('chartCategory', CATEGORIES);
+  renderBars('chartSegment', SEGMENTS);
+</script>
+</body>
+</html>
