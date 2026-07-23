@@ -1,11 +1,85 @@
-# s2-mcp/remote — ยังไม่ได้สร้าง (งาน D-10)
+# s2-mcp/remote — Remote MCP Server บน Cloudflare Workers (D2.2)
 
-สร้างด้วย Claude Code ตาม playbook หัวข้อ D2.2:
+Port มาจาก `s2-mcp/local` ครบทั้ง 3 tools + `products.json` พฤติกรรมเหมือนเดิมทุกตัว รวม audit log
+เพิ่มการตรวจ API key จาก env `DEMO_API_KEY` (transport: Streamable HTTP ที่ path `/mcp`)
+
+สร้างจาก template `cloudflare/ai/demos/remote-mcp-authless`
+
+## Tools
+
+| Tool | หน้าที่ |
+|---|---|
+| `search_products` | ค้นหาสินค้าจากคำค้น (ชื่อ, ประเภทผิว, จุดเด่น) |
+| `check_stock` | ตรวจสต็อกคงเหลือจาก SKU เช่น GB-001 |
+| `get_promotions` | โปรโมชันปัจจุบัน + เงื่อนไข + การจัดส่ง |
+
+ทุก tool เรียก `audit()` — ดู log ได้จาก terminal ที่รัน `wrangler dev` หรือ `npx wrangler tail` บน production
+
+## การตรวจ API key
+
+ทุกคำขอไปที่ `/mcp` ต้องส่ง key ที่ตรงกับ secret `DEMO_API_KEY` ไม่งั้นโดน `401`:
+
+- `Authorization: Bearer <key>` (แนะนำ) หรือ
+- `X-API-Key: <key>`
+
+ถ้ายังไม่ได้ตั้ง `DEMO_API_KEY` server จะปฏิเสธทุกคำขอ
+
+## รันทดสอบในเครื่อง
 
 ```bash
-npm create cloudflare@latest s2-mcp-remote -- --template=cloudflare/ai/demos/remote-mcp-authless
+npm install
 ```
 
-แล้วสั่ง Claude Code:
+ตั้ง key สำหรับ dev — เลือกอย่างใดอย่างหนึ่ง:
 
-> "port ทั้ง 3 tools กับ products.json จาก s2-mcp/local มาให้ครบ พฤติกรรมเหมือนเดิมทุก tool รวม audit log จากนั้นเพิ่มการตรวจ API key จาก env DEMO_API_KEY แล้วบอกขั้นตอน deploy"
+1. คัดลอก `.dev.vars.example` เป็น `.dev.vars` แล้วใส่ค่าจริง (ห้าม commit) จากนั้น `npm start`
+2. หรือส่งผ่าน CLI ไม่ต้องสร้างไฟล์:
+
+```bash
+./node_modules/.bin/wrangler dev --port 8787 --var DEMO_API_KEY:<key-ของท่าน>
+```
+
+ทดสอบด้วย curl (ต้องได้ `401`):
+
+```bash
+curl -i -X POST http://localhost:8787/mcp -H 'content-type: application/json' -H 'accept: application/json, text/event-stream' -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"curl","version":"1.0"}}}'
+```
+
+แล้วลองใหม่พร้อม header `-H 'authorization: Bearer <key>'` — ต้องได้ `serverInfo.name = glow-beauty-products`
+
+หรือทดสอบผ่าน MCP Inspector:
+
+```bash
+npx @modelcontextprotocol/inspector
+```
+
+เลือก transport เป็น Streamable HTTP, URL `http://localhost:8787/mcp` แล้วเพิ่ม header `Authorization: Bearer <key>`
+
+## ขั้นตอน Deploy
+
+```bash
+npx wrangler login
+```
+
+```bash
+npx wrangler secret put DEMO_API_KEY
+```
+
+(พิมพ์ key กลางของห้องเรียนตอนถูกถาม — ไม่ปรากฏบนจอ ใช้ key ที่ revoke ได้หลังจบงานตามกฎเหล็กข้อ 4)
+
+```bash
+npm run deploy
+```
+
+ได้ URL รูปแบบ `https://glow-beauty-mcp.<subdomain>.workers.dev` → endpoint คือ `https://.../mcp`
+
+ทดสอบจากเครื่องที่สอง (งาน D-3): ใช้ curl ชุดเดียวกับด้านบน เปลี่ยน URL เป็นของจริง
+ต้องผ่านทั้ง 2 กรณี: key ถูก → ตอบปกติ, key ผิด/ไม่ส่ง → `401`
+
+## เชื่อมกับ Claude
+
+เพิ่มใน Claude Desktop / Claude Code เป็น remote MCP server:
+
+```bash
+claude mcp add --transport http glow-beauty https://glow-beauty-mcp.<subdomain>.workers.dev/mcp --header "Authorization: Bearer <key>"
+```
