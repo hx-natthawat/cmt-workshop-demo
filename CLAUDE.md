@@ -7,9 +7,10 @@ Repo เตรียม live demo สำหรับ 3 workshops ดูแผน
 - `s1-martech/line-bot` — LINE bot (Express + @line/bot-sdk + Anthropic SDK) · รัน: `npm start` · tunnel: `npx cloudflared tunnel --url http://localhost:3000`
 - `s1-martech/vibe` — ผลลัพธ์ Mini-Lab ตัวอย่าง (utm_builder.html ฯลฯ)
 - `s2-mcp/local` — MCP server stdio (@modelcontextprotocol/sdk) · รัน: `npm start` · ทดสอบ: `npm run inspect`
-- `s2-mcp/remote` — Cloudflare Workers (Streamable HTTP) · deploy: `npx wrangler deploy` — ยังไม่ได้สร้าง ดูงาน D-10 ใน playbook
+- `s2-mcp/remote` — Cloudflare Workers (Streamable HTTP ที่ `/mcp`) · dev: `npm start` · deploy: `npm run deploy` — ต้องตั้ง secret `DEMO_API_KEY` ก่อน (ดู README)
 - `s3-economy` — prompt สำหรับ Agent-Readiness Audit ไม่มีโค้ด
 - `recordings` — วิดีโอสำรองทุก demo (ไม่ commit)
+- `smoke-test.sh` — ตรวจทุก demo ก่อนวันงานในคำสั่งเดียว (line-bot / MCP local / MCP remote)
 
 ## กติกา
 
