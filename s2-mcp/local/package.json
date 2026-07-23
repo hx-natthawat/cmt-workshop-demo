@@ -1,0 +1,16 @@
+{
+  "name": "mcp-server-starter",
+  "version": "1.0.0",
+  "description": "MCP Server starter for Advanced MCP Workshop (HarmonyX)",
+  "type": "module",
+  "main": "server.mjs",
+  "scripts": {
+    "start": "node server.mjs",
+    "inspect": "npx @modelcontextprotocol/inspector node server.mjs",
+    "deploy": "npx wrangler deploy"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "zod": "^3.23.0"
+  }
+}

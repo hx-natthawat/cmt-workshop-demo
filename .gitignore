@@ -1,0 +1,6 @@
+.env
+node_modules/
+recordings/*.mp4
+recordings/*.mov
+.DS_Store
+.wrangler/
