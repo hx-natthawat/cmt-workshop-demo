@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UTM Builder — Glow Beauty</title>
+<style>
+  /* โทนเรียบ อ่านง่าย — เหมาะกับทีมการตลาดที่ไม่ใช่สายเทคนิค */
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, "Segoe UI", "Noto Sans Thai", sans-serif;
+    background: #f4f5f7; color: #1f2430;
+    display: flex; justify-content: center; padding: 40px 16px;
+  }
+  .card {
+    background: #fff; border-radius: 14px; padding: 32px;
+    width: 100%; max-width: 560px;
+    box-shadow: 0 2px 12px rgba(20, 30, 60, .08);
+  }
+  h1 { font-size: 1.35rem; margin-bottom: 4px; }
+  .subtitle { color: #6b7280; font-size: .9rem; margin-bottom: 24px; }
+  label { display: block; font-weight: 600; font-size: .85rem; margin: 14px 0 4px; }
+  label small { font-weight: 400; color: #9ca3af; }
+  input, select {
+    width: 100%; padding: 10px 12px; font-size: .95rem;
+    border: 1px solid #d1d5db; border-radius: 8px; background: #fff;
+  }
+  input:focus, select:focus { outline: 2px solid #4f6ef7; border-color: transparent; }
+  button {
+    margin-top: 22px; width: 100%; padding: 12px;
+    font-size: 1rem; font-weight: 600; color: #fff;
+    background: #4f6ef7; /* สีหลักของปุ่ม */
+    border: none; border-radius: 8px; cursor: pointer;
+  }
+  button:hover { background: #3d5ae0; }
+  .result {
+    margin-top: 20px; padding: 14px; border-radius: 8px;
+    background: #f0f4ff; border: 1px dashed #4f6ef7;
+    font-family: ui-monospace, Menlo, monospace; font-size: .82rem;
+    word-break: break-all; display: none;
+  }
+  .result.show { display: block; }
+  .copy-hint { margin-top: 8px; font-size: .8rem; color: #16a34a; visibility: hidden; }
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>🔗 UTM Builder</h1>
+  <p class="subtitle">สร้างลิงก์ติดตามแคมเปญสำหรับทีมการตลาด Glow Beauty</p>
+
+  <label for="url">URL ปลายทาง <small>(จำเป็น)</small></label>
+  <input id="url" type="url" placeholder="https://glowbeauty.co.th/promotion" required>
+
+  <label for="source">utm_source — มาจากที่ไหน <small>(จำเป็น)</small></label>
+  <select id="source">
+    <option value="facebook">facebook</option>
+    <option value="instagram">instagram</option>
+    <option value="line">line</option>
+    <option value="tiktok">tiktok</option>
+    <option value="google">google</option>
+    <option value="email">email</option>
+  </select>
+
+  <label for="medium">utm_medium — ผ่านช่องทางแบบไหน <small>(จำเป็น)</small></label>
+  <select id="medium">
+    <option value="social">social</option>
+    <option value="cpc">cpc (โฆษณาจ่ายเงิน)</option>
+    <option value="email">email</option>
+    <option value="broadcast">broadcast (LINE OA)</option>
+    <option value="referral">referral</option>
+  </select>
+
+  <label for="campaign">utm_campaign — ชื่อแคมเปญ <small>(จำเป็น เช่น rainy-sale-2026)</small></label>
+  <input id="campaign" type="text" placeholder="rainy-sale-2026">
+
+  <label for="content">utm_content — แยกชิ้นงาน <small>(ไม่บังคับ เช่น banner-a)</small></label>
+  <input id="content" type="text" placeholder="banner-a">
+
+  <button id="build">สร้างลิงก์ UTM</button>
+
+  <div class="result" id="result"></div>
+  <p class="copy-hint" id="copyHint">✓ คัดลอกลิงก์แล้ว</p>
+</div>
+
+<script>
+  // สร้างลิงก์ UTM จากค่าที่กรอก แล้วคลิกที่กล่องผลลัพธ์เพื่อคัดลอก
+  const $ = (id) => document.getElementById(id);
+
+  $('build').addEventListener('click', () => {
+    const url = $('url').value.trim();
+    const campaign = $('campaign').value.trim();
+
+    // ตรวจข้อมูลจำเป็นก่อนสร้างลิงก์
+    if (!url) { alert('กรุณากรอก URL ปลายทาง'); $('url').focus(); return; }
+    if (!/^https?:\/\//i.test(url)) { alert('URL ต้องขึ้นต้นด้วย http:// หรือ https://'); $('url').focus(); return; }
+    if (!campaign) { alert('กรุณาตั้งชื่อแคมเปญ (utm_campaign)'); $('campaign').focus(); return; }
+
+    const params = new URLSearchParams({
+      utm_source: $('source').value,
+      utm_medium: $('medium').value,
+      // แปลงชื่อแคมเปญให้เป็นรูปแบบมาตรฐาน: ตัวเล็ก + ขีดกลาง
+      utm_campaign: campaign.toLowerCase().replace(/\s+/g, '-'),
+    });
+    const content = $('content').value.trim();
+    if (content) params.set('utm_content', content.toLowerCase().replace(/\s+/g, '-'));
+
+    const finalUrl = url + (url.includes('?') ? '&' : '?') + params.toString();
+    const box = $('result');
+    box.textContent = finalUrl;
+    box.classList.add('show');
+  });
+
+  // คลิกกล่องผลลัพธ์ = คัดลอกเข้า clipboard
+  $('result').addEventListener('click', async () => {
+    await navigator.clipboard.writeText($('result').textContent);
+    const hint = $('copyHint');
+    hint.style.visibility = 'visible';
+    setTimeout(() => { hint.style.visibility = 'hidden'; }, 1500);
+  });
+</script>
+</body>
+</html>

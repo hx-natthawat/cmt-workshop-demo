@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ROI Calculator — Glow Beauty</title>
+<style>
+  /* โทนเดียวกับ utm_builder.html เพื่อความต่อเนื่องของชุด Mini-Lab */
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, "Segoe UI", "Noto Sans Thai", sans-serif;
+    background: #f4f5f7; color: #1f2430;
+    display: flex; justify-content: center; padding: 40px 16px;
+  }
+  .card {
+    background: #fff; border-radius: 14px; padding: 32px;
+    width: 100%; max-width: 560px;
+    box-shadow: 0 2px 12px rgba(20, 30, 60, .08);
+  }
+  h1 { font-size: 1.35rem; margin-bottom: 4px; }
+  .subtitle { color: #6b7280; font-size: .9rem; margin-bottom: 24px; }
+  label { display: block; font-weight: 600; font-size: .85rem; margin: 14px 0 4px; }
+  label small { font-weight: 400; color: #9ca3af; }
+  input {
+    width: 100%; padding: 10px 12px; font-size: .95rem;
+    border: 1px solid #d1d5db; border-radius: 8px;
+  }
+  input:focus { outline: 2px solid #4f6ef7; border-color: transparent; }
+  .metrics { margin-top: 26px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .metric {
+    background: #f8fafc; border: 1px solid #e5e7eb; border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .metric .name { font-size: .78rem; color: #6b7280; margin-bottom: 4px; }
+  .metric .value { font-size: 1.25rem; font-weight: 700; }
+  .metric .desc { font-size: .72rem; color: #9ca3af; margin-top: 4px; }
+  .good { color: #16a34a; }
+  .bad { color: #dc2626; }
+  .verdict {
+    margin-top: 16px; padding: 12px 16px; border-radius: 10px;
+    font-size: .9rem; display: none;
+  }
+  .verdict.show { display: block; }
+  .verdict.ok { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; }
+  .verdict.warn { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>📈 ROI Calculator</h1>
+  <p class="subtitle">ประเมินผลตอบแทนแคมเปญโฆษณาของ Glow Beauty</p>
+
+  <label for="spend">งบโฆษณาที่ใช้ (บาท) <small>(จำเป็น)</small></label>
+  <input id="spend" type="number" min="0" placeholder="10000">
+
+  <label for="revenue">ยอดขายที่เกิดจากแคมเปญ (บาท) <small>(จำเป็น)</small></label>
+  <input id="revenue" type="number" min="0" placeholder="35000">
+
+  <label for="orders">จำนวนออเดอร์ <small>(ไม่บังคับ — ใช้คำนวณต้นทุนต่อออเดอร์)</small></label>
+  <input id="orders" type="number" min="0" placeholder="50">
+
+  <label for="margin">กำไรขั้นต้นของสินค้า (%) <small>(ไม่บังคับ — ค่าเริ่มต้น 60% ตามหมวด beauty)</small></label>
+  <input id="margin" type="number" min="0" max="100" placeholder="60">
+
+  <div class="metrics">
+    <div class="metric">
+      <div class="name">ROAS</div>
+      <div class="value" id="roas">—</div>
+      <div class="desc">ยอดขาย ÷ งบโฆษณา (เท่า)</div>
+    </div>
+    <div class="metric">
+      <div class="name">ROI (จากกำไรขั้นต้น)</div>
+      <div class="value" id="roi">—</div>
+      <div class="desc">(กำไรขั้นต้น − งบโฆษณา) ÷ งบโฆษณา</div>
+    </div>
+    <div class="metric">
+      <div class="name">ต้นทุนต่อออเดอร์ (CPO)</div>
+      <div class="value" id="cpo">—</div>
+      <div class="desc">งบโฆษณา ÷ จำนวนออเดอร์</div>
+    </div>
+    <div class="metric">
+      <div class="name">จุดคุ้มทุน (Break-even ROAS)</div>
+      <div class="value" id="breakeven">—</div>
+      <div class="desc">ต้อง ROAS เกินค่านี้ถึงมีกำไร</div>
+    </div>
+  </div>
+
+  <div class="verdict" id="verdict"></div>
+</div>
+
+<script>
+  // คำนวณสดทุกครั้งที่พิมพ์ — ไม่ต้องกดปุ่ม
+  const $ = (id) => document.getElementById(id);
+  const fmt = (n, digits = 2) =>
+    n.toLocaleString('th-TH', { maximumFractionDigits: digits });
+
+  function calc() {
+    const spend = parseFloat($('spend').value);
+    const revenue = parseFloat($('revenue').value);
+    const orders = parseFloat($('orders').value);
+    // ไม่กรอกกำไรขั้นต้น → ใช้ 60% (ค่ากลางของสินค้า beauty)
+    const margin = ($('margin').value === '' ? 60 : parseFloat($('margin').value)) / 100;
+
+    const ready = spend > 0 && revenue >= 0;
+    if (!ready) {
+      ['roas', 'roi', 'cpo', 'breakeven'].forEach((id) => { $(id).textContent = '—'; $(id).className = 'value'; });
+      $('verdict').className = 'verdict';
+      return;
+    }
+
+    // ROAS: ยอดขายต่อ 1 บาทที่จ่ายค่าโฆษณา
+    const roas = revenue / spend;
+    $('roas').textContent = fmt(roas) + 'x';
+
+    // ROI คิดจากกำไรขั้นต้นจริง ไม่ใช่ยอดขาย — จุดที่ทีมการตลาดพลาดบ่อย
+    const grossProfit = revenue * margin;
+    const roi = ((grossProfit - spend) / spend) * 100;
+    $('roi').textContent = fmt(roi, 1) + '%';
+    $('roi').className = 'value ' + (roi >= 0 ? 'good' : 'bad');
+
+    // CPO แสดงเมื่อกรอกจำนวนออเดอร์
+    $('cpo').textContent = orders > 0 ? fmt(spend / orders) + ' บาท' : '—';
+
+    // จุดคุ้มทุน: ROAS ขั้นต่ำที่ทำให้กำไรขั้นต้นเท่ากับงบโฆษณาพอดี
+    const breakeven = 1 / margin;
+    $('breakeven').textContent = fmt(breakeven) + 'x';
+
+    // สรุปผลเป็นภาษาคน
+    const v = $('verdict');
+    if (roi >= 0) {
+      v.className = 'verdict show ok';
+      v.textContent = `✓ แคมเปญนี้กำไร — ทุก 1 บาทที่จ่าย ได้ยอดขายกลับมา ${fmt(roas)} บาท (ต้องเกิน ${fmt(breakeven)} บาทถึงคุ้มทุน)`;
+    } else {
+      v.className = 'verdict show warn';
+      v.textContent = `✗ แคมเปญนี้ขาดทุน — ROAS ${fmt(roas)}x ยังไม่ถึงจุดคุ้มทุนที่ ${fmt(breakeven)}x ลองลดงบหรือเพิ่ม conversion`;
+    }
+  }
+
+  ['spend', 'revenue', 'orders', 'margin'].forEach((id) =>
+    $(id).addEventListener('input', calc));
+</script>
+</body>
+</html>
