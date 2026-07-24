@@ -87,9 +87,13 @@ npm run deploy
 
 ## Session 3 · Agent Economy
 
-### ▌Agent-Readiness Audit (`s3-economy`)
-- [ ] เติมตารางแบรนด์ใน `s3-economy/audit-prompts.md` ก่อนวันงาน (≥3 แบรนด์)
+### ▌Lab 1 — Agent-Readiness Audit (`s3-economy/audit-prompts.md`)
+- [ ] เติมตารางแบรนด์ก่อนวันงาน (≥3 แบรนด์) พร้อมคะแนน 4 ประตู /20
 - [ ] ⚠️ อย่าใช้แบรนด์ของผู้เรียนเป็นตัวอย่าง "แย่" บนจอ
+
+### ▌Lab 2 — Agent Commerce Journey (`s3-economy/lab2-journey-canvas.md`)
+- [ ] canvas 4 ช่อง + journey 5 ขั้น + 3 Mandates + Readiness Ladder พร้อมใช้
+- [ ] ซ้อมอธิบาย journey เชื่อม MCP (ขั้น 3) กับ Advanced MCP ที่เรียนมา
 
 ---
 
