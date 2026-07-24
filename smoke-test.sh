@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 # smoke-test.sh — ตรวจทุก demo ก่อนวันงานในคำสั่งเดียว (งาน D-7 ตาม playbook)
 #
-# ตรวจ 3 ด่าน:
-#   1. line-bot   : GET / + POST /webhook จำลอง (คำนวณ x-line-signature จริงจาก .env)
-#   2. MCP local  : initialize + tools/list ผ่าน stdio ต้องเจอครบ 3 tools
-#   3. MCP remote : key ผิดต้องโดน 401 · key ถูกต้องได้ serverInfo
+# ตรวจ 4 ด่าน:
+#   1. line-bot     : GET / + POST /webhook จำลอง (คำนวณ x-line-signature จริงจาก .env)
+#   2. MCP local    : initialize + tools/list ผ่าน stdio ต้องเจอครบ 3 tools
+#   3. MCP showcase : tools/list ครบ 4 + resource store://policy + prompt after_sales_reply
+#   4. MCP remote   : key ผิดต้องโดน 401 · key ถูกต้องได้ serverInfo
 #
 # วิธีรัน:
 #   ./smoke-test.sh
@@ -80,9 +81,31 @@ else
   fi
 fi
 
-# ── 3) MCP remote (Cloudflare Workers) ───────────────────────
+# ── 3) MCP showcase (stdio · tools + resource + prompt) ──────
 echo ""
-echo "▌3. MCP remote"
+echo "▌3. MCP showcase (s2-mcp/showcase · stdio)"
+if [ ! -d s2-mcp/showcase/node_modules ]; then
+  bad "ยังไม่ได้ npm install" "รันก่อน: cd s2-mcp/showcase && npm install"
+else
+  OUT=$( (printf '%s\n' \
+    '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"smoke","version":"1.0"}}}' \
+    '{"jsonrpc":"2.0","method":"notifications/initialized"}' \
+    '{"jsonrpc":"2.0","id":2,"method":"tools/list"}' \
+    '{"jsonrpc":"2.0","id":3,"method":"resources/list"}' \
+    '{"jsonrpc":"2.0","id":4,"method":"prompts/list"}'; sleep 2) \
+    | (cd s2-mcp/showcase && node server.mjs 2>/dev/null) )
+  MISSING=""
+  for t in recommend_for_skin track_order create_draft_order get_bestsellers; do
+    echo "$OUT" | grep -q "\"$t\"" || MISSING="$MISSING $t"
+  done
+  [ -z "$MISSING" ] && ok "tools/list ครบ 4 tools" || bad "tools/list ขาด:$MISSING" "เช็ค showcase/server.mjs"
+  echo "$OUT" | grep -q 'store://policy' && ok "resource store://policy พร้อม" || bad "ไม่พบ resource store://policy"
+  echo "$OUT" | grep -q 'after_sales_reply' && ok "prompt after_sales_reply พร้อม" || bad "ไม่พบ prompt after_sales_reply"
+fi
+
+# ── 4) MCP remote (Cloudflare Workers) ───────────────────────
+echo ""
+echo "▌4. MCP remote"
 KEY="${DEMO_API_KEY:-$(read_env s2-mcp/remote/.dev.vars DEMO_API_KEY)}"
 if [ -z "$REMOTE_MCP_URL" ]; then
   skip "ข้าม — ยังไม่ได้ตั้ง REMOTE_MCP_URL" "หลัง deploy: REMOTE_MCP_URL=https://.../mcp ./smoke-test.sh"
