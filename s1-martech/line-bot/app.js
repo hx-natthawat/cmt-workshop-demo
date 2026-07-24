@@ -7,7 +7,7 @@
  */
 require('dotenv').config();
 const express = require('express');
-const { middleware, Client } = require('@line/bot-sdk');
+const { middleware, messagingApi } = require('@line/bot-sdk');
 const Anthropic = require('@anthropic-ai/sdk');
 const fs = require('fs');
 
@@ -16,7 +16,10 @@ const lineConfig = {
   channelAccessToken: process.env.LINE_CHANNEL_ACCESS_TOKEN,
   channelSecret: process.env.LINE_CHANNEL_SECRET,
 };
-const line = new Client(lineConfig);
+// @line/bot-sdk v10+ เปลี่ยนมาใช้ MessagingApiClient แทน Client เดิม
+const line = new messagingApi.MessagingApiClient({
+  channelAccessToken: lineConfig.channelAccessToken,
+});
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 // ---------- 2) Context builder: โหลดข้อมูลสินค้า/โปรโมชัน ----------
@@ -56,7 +59,11 @@ app.post('/webhook', middleware(lineConfig), async (req, res) => {
     if (event.type !== 'message' || event.message.type !== 'text') continue;
     try {
       const answer = await askClaude(event.message.text);
-      await line.replyMessage(event.replyToken, { type: 'text', text: answer });
+      // v10+: replyMessage รับ object เดียว { replyToken, messages: [...] }
+      await line.replyMessage({
+        replyToken: event.replyToken,
+        messages: [{ type: 'text', text: answer }],
+      });
       // TODO (Challenge): บันทึกบทสนทนาลงไฟล์/ฐานข้อมูล เพื่อวิเคราะห์ VoC ต่อ
       // หมายเหตุ PDPA: การเก็บ log ต้องแจ้งในนโยบายความเป็นส่วนตัวของ OA
     } catch (err) {
