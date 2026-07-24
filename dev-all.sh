@@ -26,7 +26,7 @@ cleanup() {
 }
 trap cleanup INT TERM
 
-read_env() { [ -f "$1" ] && grep -E "^$2=" "$1" | head -1 | cut -d= -f2- | tr -d '"' || true; }
+read_env() { [ -f "$1" ] && grep -E "^$2=" "$1" | head -1 | cut -d= -f2- | sed 's/^[[:space:]]*//; s/[[:space:]]*$//' | tr -d '"' || true; }
 
 echo "═══ เริ่มทุก demo แยกพอร์ต ═══"
 

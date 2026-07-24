@@ -25,8 +25,10 @@ bad()  { echo "  ❌ $1"; [ -n "${2:-}" ] && echo "     → $2"; FAIL=$((FAIL+1)
 skip() { echo "  ⏭️  $1"; [ -n "${2:-}" ] && echo "     → $2"; SKIP=$((SKIP+1)); }
 
 # อ่านค่าจากไฟล์ env แบบระบุ key (ไม่ source ทั้งไฟล์)
+# ตัด whitespace นำ/ตาม + quotes ให้เหมือนที่ dotenv/wrangler โหลด (เช่น "KEY= value" → "value")
 read_env() { # $1=file $2=key
-  [ -f "$1" ] && grep -E "^$2=" "$1" | head -1 | cut -d= -f2- | tr -d '"' || true
+  [ -f "$1" ] && grep -E "^$2=" "$1" | head -1 | cut -d= -f2- \
+    | sed 's/^[[:space:]]*//; s/[[:space:]]*$//' | tr -d '"' || true
 }
 
 echo "═══ Smoke Test — CMT Workshop Demos ═══"
