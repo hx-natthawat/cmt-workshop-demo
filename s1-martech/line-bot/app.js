@@ -43,11 +43,17 @@ ${JSON.stringify(products, null, 2)}
 async function askClaude(userText) {
   const res = await anthropic.messages.create({
     model: 'claude-sonnet-5',
-    max_tokens: 500,
+    max_tokens: 1024, // เผื่อคำตอบที่มีรายละเอียดสินค้า+โปรฯ ไม่ให้ถูกตัดกลางประโยค
+
+    // ปิด thinking: บอทตอบสั้น 4-5 ประโยค ไม่ต้องใช้ + Sonnet 5 เปิด adaptive thinking
+    // อัตโนมัติถ้าไม่ระบุ ทำให้ content[0] เป็น block thinking (text ว่าง) แทนคำตอบ
+    thinking: { type: 'disabled' },
     system: SYSTEM_PROMPT,
     messages: [{ role: 'user', content: userText }],
   });
-  return res.content[0].text;
+  // หยิบ block ประเภท text โดยเฉพาะ (กันกรณีมี block อื่นนำหน้า)
+  const textBlock = res.content.find((b) => b.type === 'text');
+  return textBlock?.text ?? 'ขออภัยค่ะ เดี๋ยวให้เจ้าหน้าที่ติดต่อกลับนะคะ';
 }
 
 // ---------- 4) Webhook ----------
