@@ -107,4 +107,5 @@ const server = http.createServer(async (req, res) => {
   res.writeHead(404); res.end('Not found');
 });
 
-server.listen(3100, '127.0.0.1', () => console.log('📣 Broadcast Console: http://localhost:3100 (localhost เท่านั้น)'));
+// พอร์ต 3150 (Marketing Console ใช้ 3100) — รันพร้อมกันได้
+server.listen(3150, '127.0.0.1', () => console.log('📣 Broadcast Console: http://localhost:3150 (localhost เท่านั้น · เครื่องมือครบกว่า: npm run console → :3100)'));

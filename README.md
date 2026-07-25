@@ -1,9 +1,26 @@
 # CMT Workshop Demos — HarmonyX AI × MarTech Series
 
-โค้ดและวัสดุสำหรับ live demo ของ workshop 3 sessions: **AI for MarTech** · **Advanced MCP** · **Agent Economy**
-ทุก demo ผ่านการรันจริง + `smoke-test.sh` 6/6 · line-bot ทดสอบกับ LINE จริงแล้ว
+โค้ดและวัสดุ live demo สำหรับ workshop 3 sessions: **AI for MarTech** · **Advanced MCP** · **Agent Economy**
+ทุก demo ผ่านการรันจริง + `smoke-test.sh` · LINE bot ทดสอบกับ LINE จริงแล้ว
 
-> วางแผนเต็มดูใน [Demo_Prep_Playbook.md](Demo_Prep_Playbook.md) · run-of-show วันงานใน [REHEARSAL.md](REHEARSAL.md) · กติกาสำหรับ Claude Code ใน [CLAUDE.md](CLAUDE.md)
+> แผนเต็ม: [Demo_Prep_Playbook.md](Demo_Prep_Playbook.md) · run-of-show วันงาน: [REHEARSAL.md](REHEARSAL.md) · กติกา Claude Code: [CLAUDE.md](CLAUDE.md)
+
+---
+
+## เริ่มเร็ว
+
+```bash
+./dev-all.sh        # สตาร์ตทุก demo แยกพอร์ต (vibe :8080 · line-bot :3000 · remote MCP :8787)
+./smoke-test.sh     # ตรวจทุก demo ก่อนวันงานในคำสั่งเดียว
+```
+
+| พอร์ต | บริการ | เปิด |
+|---|---|---|
+| `8080` | Mini-Lab tools (static) | [utm_builder](http://localhost:8080/utm_builder.html) · [roi_calculator](http://localhost:8080/roi_calculator.html) · [mini_dashboard](http://localhost:8080/mini_dashboard.html) |
+| `3000` | LINE bot (เลือกได้ 3 ระดับ — ดูตารางล่าง) | http://localhost:3000 |
+| `3100` | Marketing Console (operator UI) | http://localhost:3100 |
+| `3200` | Web Chat widget | http://localhost:3200 |
+| `8787` | Remote MCP (`/mcp`) | wrangler dev |
 
 ---
 
@@ -11,21 +28,118 @@
 
 ```
 cmt-workshop-demo/
-├── s1-martech/              # Session 1 · AI for MarTech
-│   ├── line-bot/            #   LINE bot (Express + @line/bot-sdk + Claude API)
-│   ├── vibe/                #   เฉลย Mini-Lab: utm_builder / roi_calculator / mini_dashboard
-│   ├── customer_data.csv    #   ชุดข้อมูลลูกค้า 300 ราย (ใช้ใน Lab 1 + dashboard)
-│   └── prompts.md           #   3 prompts (Explore / Analyze / Recommend)
-├── s2-mcp/                  # Session 2 · Advanced MCP
-│   ├── local/               #   MCP server stdio (@modelcontextprotocol/sdk + zod)
-│   └── remote/              #   MCP server บน Cloudflare Workers (Streamable HTTP + API key)
-├── s3-economy/              # Session 3 · Agent Economy (วัสดุ ไม่มีโค้ด)
-│   ├── audit-prompts.md     #   Lab 1: Agent-Readiness Audit + worksheet 4 ประตู
-│   └── lab2-journey-canvas.md #  Lab 2: Agent Commerce Journey canvas
-├── dev-all.sh              # สตาร์ตทุก demo แยกพอร์ตในคำสั่งเดียว
-├── smoke-test.sh          # ตรวจทุก demo ก่อนวันงานในคำสั่งเดียว
-└── recordings/            # วิดีโอสำรองทุก demo (ไม่ commit)
+├── s1-martech/                 # Session 1 · AI for MarTech
+│   ├── line-bot/               #   Lab 3 — bot พื้นฐาน (context ใน system prompt)
+│   ├── line-bot-mcp/           #   bot ที่เรียก MCP tools จริง
+│   ├── line-bot-rich/          #   ⭐ flagship — Flex/Postback/RichMenu + engagement layer + Console
+│   ├── vibe/                   #   เฉลย Mini-Lab A/B/C (utm · roi · dashboard)
+│   ├── customer_data.csv       #   ลูกค้า 300 ราย (Lab 1 + RFM segments)
+│   └── prompts.md              #   3 prompts (Explore / Analyze / Recommend)
+├── s2-mcp/                     # Session 2 · Advanced MCP
+│   ├── local/                  #   Lab MCP-1 — stdio server (3 tools)
+│   ├── remote/                 #   Lab MCP-2 — Cloudflare Workers + API key
+│   └── showcase/               #   ⭐ MCP โลกจริง (6 tools + resource + prompt)
+├── s3-economy/                 # Session 3 · Agent Economy (วัสดุ ไม่มีโค้ด)
+├── dev-all.sh · smoke-test.sh  # เครื่องมือซ้อม
+└── recordings/                 # วิดีโอสำรอง (ไม่ commit)
 ```
+
+---
+
+## Session 1 · AI for MarTech
+
+### Mini-Lab (Vibe Coding) — `s1-martech/vibe/`
+เปิดในเบราว์เซอร์ได้เลย ไม่ต้องรัน server: `utm_builder.html` · `roi_calculator.html` · `mini_dashboard.html`
+> `utm_builder` ตั้งใจให้ปุ่มยัง**ไม่เป็นสีเขียว** และ**ไม่มีปุ่ม reset** — เพื่อให้ live demo D1.2 ("เปลี่ยนสีปุ่ม + เพิ่ม reset") เห็นผลชัด
+
+### Lab 1 — Customer Data Analysis
+อัปโหลด `customer_data.csv` เข้า Claude แล้วรัน 3 prompts ใน [prompts.md](s1-martech/prompts.md)
+
+### Lab 3 — LINE Bot (มี 3 ระดับ — เล่าเป็น progression ได้)
+
+| โฟลเดอร์ | ข้อมูล | ความสามารถ | ใช้ตอน |
+|---|---|---|---|
+| [`line-bot`](s1-martech/line-bot) | context ใน system prompt | ตอบสินค้า/โปร | **Lab 3 พื้นฐาน** |
+| [`line-bot-mcp`](s1-martech/line-bot-mcp) | เรียก MCP tools จริง | + แนะนำตามผิว · เช็คออเดอร์ · ร่างออเดอร์ | เชื่อม S1↔S2 |
+| [`line-bot-rich`](s1-martech/line-bot-rich) ⭐ | MCP + presentation layer | + **Flex · Quick Reply · ปุ่มยืนยัน · Rich Menu** | flagship |
+
+```bash
+cd s1-martech/line-bot && npm install && cp .env.example .env   # ใส่ LINE token + ANTHROPIC_API_KEY (sk-ant-)
+npm start && npx cloudflared tunnel --url http://localhost:3000
+```
+นำ `<tunnel>/webhook` ไปตั้งใน LINE Console → Verify → เปิด Use webhook → **ปิด auto-reply ใน OA Manager**
+
+ทดสอบ 4 คำถามบังคับ: `ครีมกันแดดผิวมัน` · `มีโปรอะไร` · `โฟมล้างหน้ามีของไหม` (ต้องตอบว่าหมด) · `ขายรองเท้าไหม` (ต้องไม่เดา)
+
+### Engagement layer (`line-bot-rich`) — แพลตฟอร์มการตลาด
+
+| คำสั่ง | ได้อะไร |
+|---|---|
+| `npm run console` | 🏢 **Marketing Console** (:3100) — Overview · Broadcast · Segments · Restock · Analytics |
+| `npm run webchat` | 🌐 **Web Chat** (:3200) — MCP tools ชุดเดียวกับ LINE (omnichannel) |
+| `npm run voc-report` | 📊 **VoC Dashboard** — funnel + tool usage (data loop → วัด ROI) |
+| `npm run broadcast` | 📣 broadcast โปร (dry-run default) |
+| `npm run restock-notify GB-004` | 🔔 แจ้งลูกค้าเมื่อของกลับมา |
+| `npm run broadcast-segment "แชมป์ตัวจริง"` | 🎯 targeting ตาม RFM |
+
+> ⚠️ action ที่ส่งจริงมี **governance** ทุกจุด (dry-run default / ยืนยัน 2 ชั้นใน UI) · หน้า operator รัน localhost เท่านั้น
+
+---
+
+## Session 2 · Advanced MCP
+
+### Lab MCP-1 — Build (stdio) — [`s2-mcp/local`](s2-mcp/local)
+```bash
+cd s2-mcp/local && npm install && npm start   # 3 tools: search_products · check_stock · get_promotions
+npm run inspect                                # MCP Inspector
+```
+
+### Lab MCP-2 — Deploy (Cloudflare Workers) — [`s2-mcp/remote`](s2-mcp/remote)
+```bash
+cd s2-mcp/remote && npm install && npm start   # ทดสอบ local
+npx wrangler login && npx wrangler secret put DEMO_API_KEY && npm run deploy
+```
+Streamable HTTP ที่ `/mcp` + ตรวจ API key (key ผิด → `401`)
+
+### Lab MCP-3 (bonus) — MCP โลกจริง — [`s2-mcp/showcase`](s2-mcp/showcase)
+ครบทั้ง 3 primitives · [คู่มือ lab](s2-mcp/EXTENDED-LAB.md)
+
+| Tool | Pattern โลกจริง |
+|---|---|
+| `recommend_for_skin` | Personalization |
+| `track_order` | เชื่อมระบบหลังบ้าน |
+| `create_draft_order` → `confirm_order` | **Governed action** (รออนุมัติ → execute หลังลูกค้ายืนยัน) |
+| `get_bestsellers` · `get_promotions` | Analytics · ข้อมูลโปร |
+
+\+ **Resource** `store://policy` · **Prompt** `after_sales_reply`
+
+---
+
+## Session 3 · Agent Economy
+
+วัสดุ facilitation (ไม่มีโค้ด):
+- [audit-prompts.md](s3-economy/audit-prompts.md) — Lab 1: Agent-Readiness Audit + worksheet 4 ประตู
+- [lab2-journey-canvas.md](s3-economy/lab2-journey-canvas.md) — Lab 2: Journey canvas + AP2 Mandates + Readiness Ladder
+
+---
+
+## Labs เสริม (bonus)
+
+| Lab | ไฟล์ |
+|---|---|
+| MCP-3 · MCP in the Real World | [s2-mcp/EXTENDED-LAB.md](s2-mcp/EXTENDED-LAB.md) |
+| 3-Rich · LINE Rich UI + governance | [s1-martech/LAB3-RICH.md](s1-martech/LAB3-RICH.md) |
+| Marketing Console · operator UI | [s1-martech/LAB-MARKETING-CONSOLE.md](s1-martech/LAB-MARKETING-CONSOLE.md) |
+
+---
+
+## ทดสอบก่อนวันงาน
+
+```bash
+./smoke-test.sh                                     # local ทั้งหมด
+REMOTE_MCP_URL=https://.../mcp ./smoke-test.sh      # รวม remote หลัง deploy
+```
+4 ด่าน: line-bot (webhook + signature) · MCP local (3 tools) · MCP showcase (6 tools + resource + prompt) · MCP remote (auth) · exit ≠ 0 ถ้ามีด่านพัง
 
 ---
 
@@ -33,121 +147,30 @@ cmt-workshop-demo/
 
 - **Node.js 18+** (แนะนำ 20+ สำหรับ Cloudflare Workers)
 - **Anthropic API key** — `sk-ant-...` จาก [console.anthropic.com](https://console.anthropic.com)
-- **LINE Developers account** + Messaging API channel (เฉพาะ Lab 3)
+- **LINE Developers** + Messaging API channel (เฉพาะ Lab 3)
 - **Cloudflare account** (ฟรี) — เฉพาะ deploy MCP remote
 
-> ⚠️ `.env` และ `.dev.vars` ถูก gitignore — ห้าม commit · เพิ่มตัวแปรใหม่ที่ `.env.example`/`.dev.vars.example` เท่านั้น
-
----
-
-## เริ่มเร็ว — รันทุก demo พร้อมกัน
-
-```bash
-./dev-all.sh
-```
-
-สตาร์ตพร้อมกัน (ใช้ `.env`/`.dev.vars` จริงถ้ามี · Ctrl-C ปิดทุกตัว):
-
-| พอร์ต | Demo | เปิดดู |
-|---|---|---|
-| `8080` | Mini-Lab tools (static) | http://localhost:8080/utm_builder.html |
-| `3000` | LINE bot | http://localhost:3000/ |
-| `8787` | Remote MCP | http://localhost:8787/mcp |
-| stdio | Local MCP | `cd s2-mcp/local && npm run inspect` |
-
----
-
-## Session 1 · AI for MarTech
-
-### Mini-Lab (Vibe Coding) — `s1-martech/vibe/`
-ไฟล์ HTML เดี่ยว เปิดในเบราว์เซอร์ได้เลย ไม่ต้องรัน server:
-- **`utm_builder.html`** — สร้างลิงก์ UTM (โทน `#345589` ตรง prompt starter ในสไลด์)
-- **`roi_calculator.html`** — ROAS / ROI (จากกำไรขั้นต้น) / CPO / break-even คำนวณสด
-- **`mini_dashboard.html`** — แดชบอร์ดจาก `customer_data.csv` 300 ราย (RFM 5 กลุ่ม + กราฟช่องทาง)
-
-### Lab 1 — Customer Data Analysis
-อัปโหลด `customer_data.csv` เข้า Claude แล้วรัน 3 prompts ตามลำดับใน [prompts.md](s1-martech/prompts.md) (Explore → Analyze RFM → Recommend + dashboard)
-
-### Lab 3 — LINE Bot
-```bash
-cd s1-martech/line-bot
-npm install
-cp .env.example .env        # ใส่ LINE_CHANNEL_ACCESS_TOKEN, LINE_CHANNEL_SECRET, ANTHROPIC_API_KEY (sk-ant-)
-npm start                    # http://localhost:3000
-```
-
-เปิด public URL แล้วตั้ง webhook:
-```bash
-npx cloudflared tunnel --url http://localhost:3000
-```
-นำ `<tunnel-url>/webhook` ไปตั้งใน LINE Developers Console → **Verify** → เปิด **Use webhook** → **ปิด auto-reply ใน OA Manager** (จุดที่ลืมบ่อยสุด)
-
-ทดสอบ 4 คำถามบังคับ: `ครีมกันแดดผิวมัน` · `มีโปรอะไร` · `โฟมล้างหน้ามีของไหม` (ต้องตอบว่าหมด) · `ขายรองเท้าไหม` (ต้องไม่เดา)
-
-> รายละเอียดการทดสอบกับ LINE จริงดูใน [s1-martech/line-bot/README.md](s1-martech/line-bot/README.md)
-
----
-
-## Session 2 · Advanced MCP
-
-### Lab MCP-1 — Build (stdio) — `s2-mcp/local/`
-```bash
-cd s2-mcp/local
-npm install
-npm start           # MCP server stdio พร้อม 3 tools
-npm run inspect     # ทดสอบด้วย MCP Inspector
-```
-3 tools: `search_products` · `check_stock` · `get_promotions` (แต่ละตัวมีคำอธิบายภาษาไทย + zod validation + `audit()`)
-
-### Lab MCP-2 — Deploy remote (Cloudflare Workers) — `s2-mcp/remote/`
-```bash
-cd s2-mcp/remote
-npm install
-npm start                              # ทดสอบ local (wrangler dev)
-npx wrangler login
-npx wrangler secret put DEMO_API_KEY   # ตั้ง key (ไม่ขึ้นจอ)
-npm run deploy
-```
-port 3 tools เดิมมาเป็น Streamable HTTP ที่ `/mcp` + ตรวจ API key (`Authorization: Bearer` หรือ `X-API-Key`) — key ผิด → `401`
-
-> รายละเอียด deploy + ทดสอบจากเครื่องที่สองใน [s2-mcp/remote/README.md](s2-mcp/remote/README.md)
-
----
-
-## Session 3 · Agent Economy
-
-วัสดุ facilitation (ไม่มีโค้ด):
-- **[audit-prompts.md](s3-economy/audit-prompts.md)** — Lab 1: prompt starter + worksheet ให้คะแนน 4 ประตู (Structured Data / AEO / MCP / Agent Card)
-- **[lab2-journey-canvas.md](s3-economy/lab2-journey-canvas.md)** — Lab 2: canvas 4 ช่อง + journey 5 ขั้น + AP2 3 Mandates + Readiness Ladder
-
----
-
-## ทดสอบก่อนวันงาน
-
-```bash
-./smoke-test.sh                                        # ตรวจ local ทั้งหมด
-REMOTE_MCP_URL=https://.../mcp ./smoke-test.sh         # รวม remote หลัง deploy
-```
-
-ตรวจ 3 ด่าน: line-bot (webhook + signature) · MCP local (`tools/list` ครบ 3) · MCP remote (key ผิด → 401, key ถูก → serverInfo) · exit ≠ 0 ถ้ามีด่านพัง
+> ⚠️ `.env` / `.dev.vars` ถูก gitignore — ห้าม commit · เพิ่มตัวแปรใหม่ที่ `.env.example` เท่านั้น
 
 ---
 
 ## Tech stack
 
-| โปรเจกต์ | หลัก |
+| ส่วน | หลัก |
 |---|---|
-| line-bot | Express 5 · @line/bot-sdk 11 · @anthropic-ai/sdk (โมเดล `claude-sonnet-5`) |
-| mcp local | @modelcontextprotocol/sdk · zod 4 · stdio transport |
-| mcp remote | Cloudflare Workers · agents 0.19 · TypeScript 7 · wrangler |
+| LINE bots | Express 5 · @line/bot-sdk 11 · @anthropic-ai/sdk (`claude-sonnet-5`) |
+| MCP local/showcase | @modelcontextprotocol/sdk · zod 4 · stdio |
+| MCP remote | Cloudflare Workers · agents 0.19 · TypeScript 7 |
+| UI | IBM Plex Sans Thai · design tokens + dark mode · inline SVG icons |
 
 ---
 
 ## กติกาการพัฒนา
 
 - ห้ามแตะ/commit `.env` · ห้าม hardcode API key/token
-- tool MCP ใหม่ทุกตัว: คำอธิบายภาษาไทยที่ AI เดาการใช้ได้ + zod validation + เรียก `audit()`
+- tool MCP ใหม่: คำอธิบายภาษาไทยที่ AI เดาการใช้ได้ + zod validation + เรียก `audit()`
+- action ที่กระทบภายนอก (broadcast/ตัดสต็อก) ต้องมี **human-in-the-loop**
 - ไม่อัปเกรด dependency ข้าม major โดยไม่อธิบายเหตุผล
 - ตอบและคอมเมนต์โค้ดเป็นภาษาไทย
 
-> ⚠️ **กับดักที่เจอ:** `claude-sonnet-5` เปิด adaptive thinking อัตโนมัติ → `response.content[0]` เป็น block `thinking` ไม่ใช่คำตอบ · ต้องหยิบ text block ตรงๆ (`content.find(b => b.type === 'text')`) ไม่ใช่ `content[0].text`
+> ⚠️ **กับดัก Sonnet 5:** เปิด adaptive thinking อัตโนมัติ → `response.content[0]` เป็น block `thinking` ไม่ใช่คำตอบ · ต้องหยิบ text block ตรงๆ (`content.find(b => b.type === 'text')`) ไม่ใช่ `content[0].text`

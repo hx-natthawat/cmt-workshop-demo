@@ -64,10 +64,10 @@ npm run setup-richmenu
 
 ```bash
 npm run broadcast            # CLI: พรีวิว (dry-run) · เพิ่ม -- --send เพื่อส่งจริง
-npm run admin                # UI: เปิด http://localhost:3100 (operator console)
+npm run admin                # UI เดี่ยว: http://localhost:3150 (broadcast อย่างเดียว)
 ```
 
-**Operator Console (`npm run admin`)** — หน้าเว็บ localhost:3100 สำหรับทีมการตลาด:
+**Broadcast Console เดี่ยว (`npm run admin`)** — หน้าเว็บ localhost:3150 (เครื่องมือครบกว่าใช้ `npm run console` :3100):
 - เห็นโควตา + พรีวิวการ์ดโปรที่จะส่ง
 - **ประตู governance:** ต้องติ๊ก "เข้าใจว่าจะส่งถึงทุกคน" + พิมพ์ `SEND` ก่อนปุ่มจะทำงาน
 - รัน localhost เท่านั้น (ไม่เปิดผ่าน tunnel)
@@ -99,7 +99,8 @@ npm run admin                # UI: เปิด http://localhost:3100 (operator 
 | `voc-report.mjs` · `restock-notify.mjs` · `broadcast-segment.mjs` | engagement tools |
 | `flex.js` | presentation layer — Flex builders + Quick Reply + orderSummary |
 | `broadcast.mjs` | CLI ส่งโปรเชิงรุกถึงผู้ติดตามทั้งหมด (dry-run default) |
-| `admin.mjs` | Operator Console (หน้าเว็บ localhost:3100) broadcast + ประตูยืนยัน |
+| `console.mjs` · `console.html` · `console-data.mjs` | **Marketing Console** (localhost:3100) — enterprise UI 5 views |
+| `admin.mjs` | Broadcast Console เดี่ยว (localhost:3150) + ประตูยืนยัน |
 | `setup-richmenu.mjs` | สร้าง rich menu ผ่าน LINE API |
 | `richmenu-template.html` | เทมเพลตรูปพื้นหลัง 2500×843 |
 
