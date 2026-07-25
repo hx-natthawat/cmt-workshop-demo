@@ -24,8 +24,10 @@ const buildMessages = () => [{ type: 'text', text: INTRO }, flex.promotionCarous
 
 const PAGE = `<!DOCTYPE html><html lang="th"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><title>Broadcast Console — Glow Beauty</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
- body{font-family:-apple-system,"Noto Sans Thai",sans-serif;background:#f4f5f7;color:#1f2430;max-width:640px;margin:0 auto;padding:24px}
+ body{font-family:"IBM Plex Sans Thai","Noto Sans Thai",-apple-system,sans-serif;background:#f4f5f7;color:#1f2430;max-width:640px;margin:0 auto;padding:24px;line-height:1.6;-webkit-font-smoothing:antialiased}
  h1{font-size:1.3rem} .sub{color:#6b7280;font-size:.9rem;margin-bottom:20px}
  .card{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:16px;margin-bottom:12px}
  .quota{font-size:.9rem} .promo{border-left:4px solid #345589;padding-left:12px;margin:10px 0}
