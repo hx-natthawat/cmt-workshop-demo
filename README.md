@@ -110,6 +110,13 @@ DISABLED_TOOLS=place_order node guarded-server.mjs   # kill switch
 ```
 tool poisoning demo (payload ไม่มีพิษ) · สแกนเนอร์ 7 กฎ · guarded server 5 การป้องกัน · [คู่มือ lab](s2-mcp/LAB-SECURITY.md)
 
+### Lab Orchestrate (bonus) — Claude เรียกหลาย MCP ต่อกันเอง — [`s2-mcp/multi`](s2-mcp/multi)
+```bash
+cd s2-mcp/multi && npm install
+npm start          # Claude ต่อ analytics + shop พร้อมกัน แล้วเลือกเรียกเองในคำสั่งเดียว
+```
+"บันได Enterprise ขั้นที่ 4" — analytics server (ตัวที่ 2, จาก CSV จริง) + showcase · แสดง trace ว่าเรียกข้าม server ไหน · [คู่มือ lab](s2-mcp/LAB-ORCHESTRATE.md)
+
 ### Lab MCP-3 (bonus) — MCP โลกจริง — [`s2-mcp/showcase`](s2-mcp/showcase)
 ครบทั้ง 3 primitives · [คู่มือ lab](s2-mcp/EXTENDED-LAB.md)
 
@@ -138,6 +145,7 @@ tool poisoning demo (payload ไม่มีพิษ) · สแกนเนอ�
 |---|---|
 | MCP-3 · MCP in the Real World | [s2-mcp/EXTENDED-LAB.md](s2-mcp/EXTENDED-LAB.md) |
 | Security · ภัยเฉพาะ MCP + ป้องกัน | [s2-mcp/LAB-SECURITY.md](s2-mcp/LAB-SECURITY.md) |
+| Orchestrate · multi-server | [s2-mcp/LAB-ORCHESTRATE.md](s2-mcp/LAB-ORCHESTRATE.md) |
 | 3-Rich · LINE Rich UI + governance | [s1-martech/LAB3-RICH.md](s1-martech/LAB3-RICH.md) |
 | Marketing Console · operator UI | [s1-martech/LAB-MARKETING-CONSOLE.md](s1-martech/LAB-MARKETING-CONSOLE.md) |
 
@@ -149,7 +157,7 @@ tool poisoning demo (payload ไม่มีพิษ) · สแกนเนอ�
 ./smoke-test.sh                                     # local ทั้งหมด
 REMOTE_MCP_URL=https://.../mcp ./smoke-test.sh      # รวม remote หลัง deploy
 ```
-5 ด่าน: line-bot (webhook + signature) · MCP local (3 tools) · MCP showcase (6 tools + resource + prompt) · MCP security (สแกนเนอร์จับ poisoning) · MCP remote (auth) · exit ≠ 0 ถ้ามีด่านพัง
+6 ด่าน: line-bot · MCP local · MCP showcase · MCP security (สแกนเนอร์) · MCP multi (analytics) · MCP remote (auth) · exit ≠ 0 ถ้ามีด่านพัง
 
 ---
 
