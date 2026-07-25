@@ -67,6 +67,8 @@ const channelStr = Object.entries(byChannel).map(([k, v]) => `${k} ${v}`).join('
 const html = `<!DOCTYPE html><html lang="th"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>VoC Dashboard — Glow Beauty</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#f4f5f7; --surface:#ffffff; --border:#e7e8ec; --shadow:0 1px 3px rgba(16,24,40,.06),0 1px 2px rgba(16,24,40,.04);
@@ -84,8 +86,8 @@ const html = `<!DOCTYPE html><html lang="th"><head>
   --brand:#6b9bd8; --brand-soft:#20293a; --good:#3ddc97; --good-soft:#16261f; --track:#262a31;
 }
 *{box-sizing:border-box;margin:0}
-body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans Thai",sans-serif;background:var(--bg);color:var(--text);
-  line-height:1.5;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
+body{font-family:"IBM Plex Sans Thai","Noto Sans Thai",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text);
+  line-height:1.6;font-size:15px;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;font-variant-numeric:tabular-nums;letter-spacing:.005em}
 .wrap{max-width:920px;margin:0 auto;padding:clamp(16px,4vw,32px)}
 header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-bottom:20px}
 .title h1{font-size:clamp(1.15rem,3vw,1.4rem);font-weight:700;letter-spacing:-.01em}

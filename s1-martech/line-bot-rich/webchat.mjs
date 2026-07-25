@@ -12,8 +12,10 @@ const agent = require('./agent.js');
 const store = require('./store.js');
 
 const PAGE = `<!DOCTYPE html><html lang="th"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Glow Beauty — Web Chat</title><style>
-body{font-family:-apple-system,"Noto Sans Thai",sans-serif;background:#f4f5f7;margin:0;display:flex;flex-direction:column;height:100vh}
+<title>Glow Beauty — Web Chat</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet"><style>
+body{font-family:"IBM Plex Sans Thai","Noto Sans Thai",-apple-system,sans-serif;background:#f4f5f7;margin:0;display:flex;flex-direction:column;height:100vh;line-height:1.6;-webkit-font-smoothing:antialiased}
 header{background:#345589;color:#fff;padding:14px 18px;font-weight:700}
 #log{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px}
 .msg{max-width:80%;padding:10px 14px;border-radius:14px;font-size:.92rem;line-height:1.5;white-space:pre-wrap}
