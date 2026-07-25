@@ -60,11 +60,18 @@ const PAGE = `<!DOCTYPE html><html lang="th"><head><meta charset="UTF-8">
  function check(){ $('send').disabled=!($('ack').checked && $('confirm').value.trim()==='SEND'); }
  $('ack').onchange=check; $('confirm').oninput=check;
  $('send').onclick=async()=>{
-  $('send').disabled=true; $('result').textContent='กำลังส่ง…';
-  const r=await fetch('/broadcast',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({confirm:'SEND'})});
-  const d=await r.json();
-  $('result').style.color=d.ok?'#16a34a':'#dc2626';
-  $('result').textContent=d.ok?'✅ ส่งแล้ว — ผู้ติดตามทุกคนจะได้รับโปรนี้':'❌ '+d.error;
+  $('send').disabled=true; $('result').style.color='#6b7280'; $('result').textContent='กำลังส่ง…';
+  try{
+   const r=await fetch('/broadcast',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({confirm:'SEND'})});
+   const d=await r.json();
+   $('result').style.color=d.ok?'#16a34a':'#dc2626';
+   $('result').textContent=d.ok?'✅ ส่งแล้ว — ผู้ติดตามทุกคนจะได้รับโปรนี้':'❌ '+d.error;
+  }catch(e){
+   $('result').style.color='#dc2626';
+   $('result').textContent='❌ เชื่อมต่อ server ไม่ได้ ('+e.message+') — เช็คว่า npm run admin ยังรันอยู่ แล้วรีเฟรชหน้า';
+  }finally{
+   check(); // เปิดปุ่มกลับถ้ายังยืนยันครบ (ให้ลองใหม่ได้)
+  }
  };
 </script></body></html>`;
 
