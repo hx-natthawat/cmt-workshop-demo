@@ -80,6 +80,7 @@ npm run admin                # UI: เปิด http://localhost:3100 (operator 
 
 | คำสั่ง | ทำอะไร |
 |---|---|
+| `npm run console` | 🏢 **Marketing Console** (localhost:3100) — enterprise SaaS UI รวมทุกงาน operator (Overview/Broadcast/Segments/Restock/Analytics) · real backend + governance · [Lab](../LAB-MARKETING-CONSOLE.md) |
 | `npm run webchat` | 🌐 **Web Chat** (localhost:3200) — ใช้ MCP tools ชุดเดียวกับ LINE (พิสูจน์ omnichannel) |
 | `npm run voc-report` | 📊 **VoC Dashboard** — สรุปบทสนทนา/tool/funnel จาก log (data loop, วัด ROI) |
 | `npm run restock-notify GB-004` | 🔔 **Restock** — แจ้งลูกค้าที่สนใจตอนของหมด (dry-run · `--send` ส่งจริง) |

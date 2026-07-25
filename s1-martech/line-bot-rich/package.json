@@ -12,7 +12,8 @@
     "webchat": "node webchat.mjs",
     "voc-report": "node voc-report.mjs",
     "restock-notify": "node restock-notify.mjs",
-    "broadcast-segment": "node broadcast-segment.mjs"
+    "broadcast-segment": "node broadcast-segment.mjs",
+    "console": "node console.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.113.0",
