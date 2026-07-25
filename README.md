@@ -20,6 +20,7 @@
 | `3000` | LINE bot (เลือกได้ 3 ระดับ — ดูตารางล่าง) | http://localhost:3000 |
 | `3100` | Marketing Console (operator UI) | http://localhost:3100 |
 | `3200` | Web Chat widget | http://localhost:3200 |
+| `8090` | Agent-Ready storefront | http://localhost:8090 |
 | `8787` | Remote MCP (`/mcp`) | wrangler dev |
 
 ---
@@ -39,7 +40,8 @@ cmt-workshop-demo/
 │   ├── local/                  #   Lab MCP-1 — stdio server (3 tools)
 │   ├── remote/                 #   Lab MCP-2 — Cloudflare Workers + API key
 │   └── showcase/               #   ⭐ MCP โลกจริง (6 tools + resource + prompt)
-├── s3-economy/                 # Session 3 · Agent Economy (วัสดุ ไม่มีโค้ด)
+├── s3-economy/                 # Session 3 · Agent Economy
+│   └── storefront/             #   Agent-Ready storefront + เครื่องตรวจ 4 ประตู
 ├── dev-all.sh · smoke-test.sh  # เครื่องมือซ้อม
 └── recordings/                 # วิดีโอสำรอง (ไม่ commit)
 ```
@@ -133,9 +135,17 @@ npm start          # Claude ต่อ analytics + shop พร้อมกัน 
 
 ## Session 3 · Agent Economy
 
-วัสดุ facilitation (ไม่มีโค้ด):
+วัสดุ facilitation:
 - [audit-prompts.md](s3-economy/audit-prompts.md) — Lab 1: Agent-Readiness Audit + worksheet 4 ประตู
 - [lab2-journey-canvas.md](s3-economy/lab2-journey-canvas.md) — Lab 2: Journey canvas + AP2 Mandates + Readiness Ladder
+
+### Lab Storefront (bonus) — แบรนด์ที่ agent มองเห็น — [`s3-economy/storefront`](s3-economy/storefront)
+```bash
+cd s3-economy/storefront && node serve.mjs    # → http://localhost:8090
+node audit-gates.mjs http://localhost:8090    # ตรวจ 4 ประตูอัตโนมัติ (17/20)
+node audit-gates.mjs https://brandของทีม      # ⭐ ตรวจแบรนด์จริง
+```
+Schema.org JSON-LD · `llms.txt` · `/.well-known/agent-card.json` (มี `x-negotiable`) · เครื่องตรวจ 4 ประตูให้คะแนน 0-5 · [คู่มือ lab](s3-economy/LAB-STOREFRONT.md)
 
 ---
 
@@ -148,6 +158,7 @@ npm start          # Claude ต่อ analytics + shop พร้อมกัน 
 | Orchestrate · multi-server | [s2-mcp/LAB-ORCHESTRATE.md](s2-mcp/LAB-ORCHESTRATE.md) |
 | 3-Rich · LINE Rich UI + governance | [s1-martech/LAB3-RICH.md](s1-martech/LAB3-RICH.md) |
 | Marketing Console · operator UI | [s1-martech/LAB-MARKETING-CONSOLE.md](s1-martech/LAB-MARKETING-CONSOLE.md) |
+| Storefront · Agent-Ready 4 ประตู | [s3-economy/LAB-STOREFRONT.md](s3-economy/LAB-STOREFRONT.md) |
 
 ---
 
@@ -157,7 +168,7 @@ npm start          # Claude ต่อ analytics + shop พร้อมกัน 
 ./smoke-test.sh                                     # local ทั้งหมด
 REMOTE_MCP_URL=https://.../mcp ./smoke-test.sh      # รวม remote หลัง deploy
 ```
-6 ด่าน: line-bot · MCP local · MCP showcase · MCP security (สแกนเนอร์) · MCP multi (analytics) · MCP remote (auth) · exit ≠ 0 ถ้ามีด่านพัง
+7 ด่าน: line-bot · MCP local · MCP showcase · MCP security · MCP multi · storefront (4 ประตู) · MCP remote · exit ≠ 0 ถ้ามีด่านพัง
 
 ---
 

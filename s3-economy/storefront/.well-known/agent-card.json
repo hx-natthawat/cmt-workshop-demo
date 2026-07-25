@@ -1,0 +1,77 @@
+{
+  "protocolVersion": "0.3.0",
+  "name": "Glow Beauty Shopping Agent",
+  "description": "เอเจนต์ของร้าน Glow Beauty Thailand — ตอบเรื่องสินค้า สต็อก โปรโมชัน สถานะออเดอร์ และรับคำขอสั่งซื้อ (ต้องมีการยืนยันจากมนุษย์ก่อนดำเนินการจริง)",
+  "url": "https://glowbeauty.example/a2a",
+  "preferredTransport": "JSONRPC",
+  "version": "1.0.0",
+  "provider": {
+    "organization": "Glow Beauty Thailand",
+    "url": "https://glowbeauty.example"
+  },
+  "documentationUrl": "https://glowbeauty.example/llms.txt",
+  "capabilities": {
+    "streaming": true,
+    "pushNotifications": false,
+    "stateTransitionHistory": true
+  },
+  "defaultInputModes": ["text/plain"],
+  "defaultOutputModes": ["text/plain", "application/json"],
+  "skills": [
+    {
+      "id": "product-search",
+      "name": "ค้นหาและแนะนำสินค้า",
+      "description": "ค้นหาสินค้าจากคำค้นหรือแนะนำตามสภาพผิว (ผิวมัน ผิวแห้ง ผิวผสม ผิวแพ้ง่าย ผิวหมองคล้ำ) พร้อมราคาและสต็อกปัจจุบัน",
+      "tags": ["ecommerce", "skincare", "recommendation"],
+      "examples": [
+        "ครีมกันแดดสำหรับผิวมันมีตัวไหนบ้าง",
+        "เซรั่มวิตามินซีราคาเท่าไร"
+      ]
+    },
+    {
+      "id": "stock-and-promotions",
+      "name": "เช็คสต็อกและโปรโมชัน",
+      "description": "ตรวจสอบจำนวนคงเหลือรายสินค้า (SKU) และเงื่อนไขโปรโมชันที่ใช้ได้ในขณะนี้ รวมค่าจัดส่ง",
+      "tags": ["inventory", "pricing"],
+      "examples": ["GB-002 เหลือกี่ชิ้น", "ตอนนี้มีโปรอะไร ส่งฟรีขั้นต่ำเท่าไร"]
+    },
+    {
+      "id": "order-status",
+      "name": "ติดตามสถานะคำสั่งซื้อ",
+      "description": "ตรวจสอบสถานะและเลขพัสดุจากเลขออเดอร์ (รูปแบบ ORD-xxxx)",
+      "tags": ["logistics"],
+      "examples": ["ออเดอร์ ORD-1001 ส่งถึงไหนแล้ว"]
+    },
+    {
+      "id": "draft-order",
+      "name": "สร้างร่างคำสั่งซื้อ",
+      "description": "สร้างร่างคำสั่งซื้อพร้อมคำนวณยอดรวม ค่าจัดส่ง และส่วนลดที่ใช้ได้ — คืนสถานะ 'รออนุมัติ' เท่านั้น ไม่ตัดสต็อกและไม่เรียกเก็บเงินจนกว่าจะได้รับการยืนยัน",
+      "tags": ["ecommerce", "human-in-the-loop"],
+      "examples": ["ขอสั่ง GB-002 จำนวน 2 ชิ้น"]
+    }
+  ],
+  "securitySchemes": {
+    "apiKey": {
+      "type": "apiKey",
+      "in": "header",
+      "name": "Authorization",
+      "description": "ต้องใช้ API key ที่ออกให้กับคู่ค้า — ติดต่อ partner@glowbeauty.example"
+    }
+  },
+  "security": [{ "apiKey": [] }],
+  "x-negotiable": {
+    "description": "ขอบเขตที่เอเจนต์ฝั่งแบรนด์เจรจาแทนได้ (นอกเหนือจากนี้ต้องให้มนุษย์ตัดสินใจ)",
+    "allowed": [
+      "ส่วนลดสมาชิกตามเงื่อนไขโปรโมชันที่ประกาศไว้",
+      "แนะนำสินค้าทดแทนเมื่อสินค้าที่ต้องการหมด",
+      "แจ้งกำหนดจัดส่งโดยประมาณตามนโยบายที่ประกาศ"
+    ],
+    "requiresHumanApproval": [
+      "การตัดสต็อกและเรียกเก็บเงินจริง",
+      "ส่วนลดนอกเหนือจากโปรโมชันที่ประกาศ",
+      "คำสั่งซื้อมูลค่าเกิน 10,000 บาท",
+      "การคืนเงินและการยกเลิกออเดอร์ที่จัดส่งแล้ว"
+    ]
+  },
+  "x-note": "ไฟล์นี้เป็นตัวอย่างวัสดุสอนสำหรับ Lab 1 (Agent-Readiness Audit · Session 3) ไม่ใช่เอเจนต์ที่ให้บริการจริง"
+}

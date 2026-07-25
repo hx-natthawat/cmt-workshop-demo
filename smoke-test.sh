@@ -1,13 +1,14 @@
 #!/usr/bin/env bash
 # smoke-test.sh — ตรวจทุก demo ก่อนวันงานในคำสั่งเดียว (งาน D-7 ตาม playbook)
 #
-# ตรวจ 6 ด่าน:
+# ตรวจ 7 ด่าน:
 #   1. line-bot     : GET / + POST /webhook จำลอง (คำนวณ x-line-signature จริงจาก .env)
 #   2. MCP local    : initialize + tools/list ผ่าน stdio ต้องเจอครบ 3 tools
 #   3. MCP showcase : tools/list ครบ 6 + resource store://policy + prompt after_sales_reply
 #   4. MCP security : สแกนเนอร์จับ tool poisoning ได้ + ไม่ false positive
 #   5. MCP multi    : analytics server (ตัวที่ 2) ตอบ tools/list ครบ
-#   6. MCP remote   : key ผิดต้องโดน 401 · key ถูกต้องได้ serverInfo
+#   6. storefront   : Agent-Ready 4 ประตู (Schema.org · llms.txt · MCP · Agent Card)
+#   7. MCP remote   : key ผิดต้องโดน 401 · key ถูกต้องได้ serverInfo
 #
 # วิธีรัน:
 #   ./smoke-test.sh
@@ -136,9 +137,21 @@ else
   [ -z "$MISSING" ] && ok "analytics tools/list ครบ 3 tools" || bad "analytics ขาด:$MISSING" "เช็ค multi/analytics-server.mjs"
 fi
 
-# ── 6) MCP remote (Cloudflare Workers) ───────────────────────
+# ── 6) Agent-Ready storefront (4 ประตู) ──────────────────────
 echo ""
-echo "▌6. MCP remote"
+echo "▌6. Agent-Ready storefront (s3-economy/storefront)"
+SCORE=$(cd s3-economy/storefront && node audit-gates.mjs 2>/dev/null | grep -oE 'คะแนนรวม: [0-9]+' | grep -oE '[0-9]+')
+if [ -z "$SCORE" ]; then
+  bad "รัน audit-gates.mjs ไม่ได้" "เช็ค s3-economy/storefront/audit-gates.mjs"
+elif [ "$SCORE" -ge 15 ]; then
+  ok "storefront ผ่าน 4 ประตู ($SCORE/20)"
+else
+  bad "storefront คะแนนต่ำ ($SCORE/20)" "ตรวจ index.html · llms.txt · agent-card.json"
+fi
+
+# ── 7) MCP remote (Cloudflare Workers) ───────────────────────
+echo ""
+echo "▌7. MCP remote"
 KEY="${DEMO_API_KEY:-$(read_env s2-mcp/remote/.dev.vars DEMO_API_KEY)}"
 if [ -z "$REMOTE_MCP_URL" ]; then
   skip "ข้าม — ยังไม่ได้ตั้ง REMOTE_MCP_URL" "หลัง deploy: REMOTE_MCP_URL=https://.../mcp ./smoke-test.sh"

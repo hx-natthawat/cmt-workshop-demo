@@ -43,4 +43,6 @@ Session 3 (Agent Economy) · Part 1 Discover · 30 นาที · ทีม 3-4
 
 ⚠️ อย่าใช้แบรนด์ของผู้เรียนในห้องเป็นตัวอย่าง "แย่" บนจอวิทยากร
 
+💡 อยากเห็นแบรนด์ที่ **ผ่านทั้ง 4 ประตู** หน้าตาเป็นอย่างไร + ตรวจอัตโนมัติ → [LAB-STOREFRONT.md](LAB-STOREFRONT.md) (`storefront/`)
+
 ➡️ ผล audit นี้เป็น input ของ **[[Lab 2]]** (`lab2-journey-canvas.md`) ช่อง Discover
