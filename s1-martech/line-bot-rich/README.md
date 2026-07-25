@@ -56,12 +56,23 @@ npm run setup-richmenu
 เมนู 4 ช่อง: แนะนำสินค้า / โปรโมชัน / เช็คออเดอร์ / เจ้าหน้าที่
 > ลบเมนู: `curl -X DELETE https://api.line.me/v2/bot/user/all/richmenu -H "Authorization: Bearer $TOKEN"` แล้วลบ rich menu id
 
+## Broadcast โปรโมชัน (รูปแบบ A: เชิงรุก)
+
+ต่างจาก bot ปกติ (reactive/รอทัก) — broadcast คือ**แบรนด์ push โปรหาผู้ติดตามทั้งหมดเอง** ใช้ Flex การ์ดโปรชุดเดียวกับที่ bot ตอบ
+
+```bash
+node broadcast.mjs           # พรีวิว (dry-run · ไม่ส่งจริง) + ดูโควตา
+node broadcast.mjs --send    # ส่งจริงถึงผู้ติดตามทุกคน
+```
+> ⚠️ **Governance:** broadcast กลับไม่ได้ + กินโควตา OA → default เป็น dry-run · ต้องใส่ `--send` เองอย่างตั้งใจ (human-in-the-loop) · เชื่อมแนวคิด "agent เป็นฝ่ายเริ่ม" ใน Agent Economy (Session 3)
+
 ## ไฟล์
 
 | ไฟล์ | หน้าที่ |
 |---|---|
 | `app.js` | webhook + Claude/MCP loop + postback + renderer routing |
 | `flex.js` | presentation layer — Flex builders + Quick Reply + orderSummary |
+| `broadcast.mjs` | ส่งโปรเชิงรุกถึงผู้ติดตามทั้งหมด (dry-run default) |
 | `setup-richmenu.mjs` | สร้าง rich menu ผ่าน LINE API |
 | `richmenu-template.html` | เทมเพลตรูปพื้นหลัง 2500×843 |
 
