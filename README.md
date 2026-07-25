@@ -101,6 +101,15 @@ npx wrangler login && npx wrangler secret put DEMO_API_KEY && npm run deploy
 ```
 Streamable HTTP ที่ `/mcp` + ตรวจ API key (key ผิด → `401`)
 
+### Lab Security (bonus) — ภัยเฉพาะ MCP + การป้องกัน — [`s2-mcp/security`](s2-mcp/security)
+```bash
+cd s2-mcp/security && npm install
+npm run scan:poisoned    # 🚨 สแกนเนอร์จับ tool poisoning (exit 1)
+npm run scan:guarded     # ✅ ผ่าน
+DISABLED_TOOLS=place_order node guarded-server.mjs   # kill switch
+```
+tool poisoning demo (payload ไม่มีพิษ) · สแกนเนอร์ 7 กฎ · guarded server 5 การป้องกัน · [คู่มือ lab](s2-mcp/LAB-SECURITY.md)
+
 ### Lab MCP-3 (bonus) — MCP โลกจริง — [`s2-mcp/showcase`](s2-mcp/showcase)
 ครบทั้ง 3 primitives · [คู่มือ lab](s2-mcp/EXTENDED-LAB.md)
 
@@ -128,6 +137,7 @@ Streamable HTTP ที่ `/mcp` + ตรวจ API key (key ผิด → `401`
 | Lab | ไฟล์ |
 |---|---|
 | MCP-3 · MCP in the Real World | [s2-mcp/EXTENDED-LAB.md](s2-mcp/EXTENDED-LAB.md) |
+| Security · ภัยเฉพาะ MCP + ป้องกัน | [s2-mcp/LAB-SECURITY.md](s2-mcp/LAB-SECURITY.md) |
 | 3-Rich · LINE Rich UI + governance | [s1-martech/LAB3-RICH.md](s1-martech/LAB3-RICH.md) |
 | Marketing Console · operator UI | [s1-martech/LAB-MARKETING-CONSOLE.md](s1-martech/LAB-MARKETING-CONSOLE.md) |
 
@@ -139,7 +149,7 @@ Streamable HTTP ที่ `/mcp` + ตรวจ API key (key ผิด → `401`
 ./smoke-test.sh                                     # local ทั้งหมด
 REMOTE_MCP_URL=https://.../mcp ./smoke-test.sh      # รวม remote หลัง deploy
 ```
-4 ด่าน: line-bot (webhook + signature) · MCP local (3 tools) · MCP showcase (6 tools + resource + prompt) · MCP remote (auth) · exit ≠ 0 ถ้ามีด่านพัง
+5 ด่าน: line-bot (webhook + signature) · MCP local (3 tools) · MCP showcase (6 tools + resource + prompt) · MCP security (สแกนเนอร์จับ poisoning) · MCP remote (auth) · exit ≠ 0 ถ้ามีด่านพัง
 
 ---
 

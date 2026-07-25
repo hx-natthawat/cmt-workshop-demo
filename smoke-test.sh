@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 # smoke-test.sh — ตรวจทุก demo ก่อนวันงานในคำสั่งเดียว (งาน D-7 ตาม playbook)
 #
-# ตรวจ 4 ด่าน:
+# ตรวจ 5 ด่าน:
 #   1. line-bot     : GET / + POST /webhook จำลอง (คำนวณ x-line-signature จริงจาก .env)
 #   2. MCP local    : initialize + tools/list ผ่าน stdio ต้องเจอครบ 3 tools
 #   3. MCP showcase : tools/list ครบ 6 + resource store://policy + prompt after_sales_reply
-#   4. MCP remote   : key ผิดต้องโดน 401 · key ถูกต้องได้ serverInfo
+#   4. MCP security : สแกนเนอร์จับ tool poisoning ได้ + ไม่ false positive
+#   5. MCP remote   : key ผิดต้องโดน 401 · key ถูกต้องได้ serverInfo
 #
 # วิธีรัน:
 #   ./smoke-test.sh
@@ -103,9 +104,22 @@ else
   echo "$OUT" | grep -q 'after_sales_reply' && ok "prompt after_sales_reply พร้อม" || bad "ไม่พบ prompt after_sales_reply"
 fi
 
-# ── 4) MCP remote (Cloudflare Workers) ───────────────────────
+# ── 4) MCP security (สแกน tool description) ──────────────────
 echo ""
-echo "▌4. MCP remote"
+echo "▌4. MCP security (s2-mcp/security · tool poisoning scanner)"
+if [ ! -d s2-mcp/security/node_modules ]; then
+  skip "ยังไม่ได้ npm install" "รันก่อน: cd s2-mcp/security && npm install"
+else
+  # สแกนเนอร์ต้องจับ poisoned ได้ (exit 1) และไม่ false positive กับ showcase (exit 0)
+  (cd s2-mcp/security && node scan-tools.mjs ./poisoned-server.mjs >/dev/null 2>&1)
+  [ $? -eq 1 ] && ok "สแกนเนอร์จับ poisoned-server ได้ (exit 1)" || bad "สแกนเนอร์ไม่จับ poisoned-server" "เช็คกฎใน scan-tools.mjs"
+  (cd s2-mcp/security && node scan-tools.mjs ../showcase/server.mjs >/dev/null 2>&1)
+  [ $? -eq 0 ] && ok "showcase ผ่านการสแกน (ไม่ false positive)" || bad "showcase ไม่ผ่านการสแกน" "ตรวจคำอธิบาย tool ใน showcase/server.mjs"
+fi
+
+# ── 5) MCP remote (Cloudflare Workers) ───────────────────────
+echo ""
+echo "▌5. MCP remote"
 KEY="${DEMO_API_KEY:-$(read_env s2-mcp/remote/.dev.vars DEMO_API_KEY)}"
 if [ -z "$REMOTE_MCP_URL" ]; then
   skip "ข้าม — ยังไม่ได้ตั้ง REMOTE_MCP_URL" "หลัง deploy: REMOTE_MCP_URL=https://.../mcp ./smoke-test.sh"
