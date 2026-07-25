@@ -117,6 +117,45 @@ server.registerTool('get_bestsellers', {
       ranked.map((p, i) => `${i + 1}. ${p.sku} · ${p.name} · ${p.price_thb} บาท · เหลือ ${p.stock} ชิ้น`).join('\n') }] };
 });
 
+// Pattern 5 · โปรโมชันปัจจุบัน (mirror จาก local — ใช้ render เป็นการ์ดโปรใน LINE)
+server.registerTool('get_promotions', {
+  description: 'ดูรายการโปรโมชันที่ใช้ได้ในขณะนี้ พร้อมเงื่อนไข ใช้เมื่อถูกถามเรื่องส่วนลดหรือข้อเสนอ',
+  inputSchema: {},
+}, async () => {
+  audit('get_promotions', {});
+  return { content: [{ type: 'text',
+    text: products.promotions.map((p) => `${p.name}: ${p.detail}`).join('\n') + `\nการจัดส่ง: ${products.shipping}` }] };
+});
+
+// Pattern 6 · Governed action (ขั้นอนุมัติ) — execute ออเดอร์ที่ "มนุษย์กดยืนยันแล้ว"
+// คู่กับ create_draft_order: draft = รออนุมัติ · confirm = หลังลูกค้ากดยืนยันใน LINE (postback)
+server.registerTool('confirm_order', {
+  description:
+    'ยืนยันคำสั่งซื้อที่ลูกค้าอนุมัติแล้ว (หลังกดปุ่มยืนยัน) — สร้างเลขออเดอร์และเริ่มจัดเตรียม ' +
+    'ใช้เฉพาะเมื่อได้รับการยืนยันจากลูกค้าชัดเจนแล้วเท่านั้น ไม่ใช้ตอนลูกค้ายังแค่สอบถาม',
+  inputSchema: {
+    items: z.array(z.object({
+      sku: z.string().describe('รหัสสินค้า'),
+      qty: z.number().int().positive().describe('จำนวน'),
+    })).min(1).describe('รายการที่ยืนยันแล้ว'),
+  },
+}, async ({ items }) => {
+  audit('confirm_order', { items });
+  let subtotal = 0;
+  const lines = [];
+  for (const it of items) {
+    const p = products.products.find((x) => x.sku === it.sku.toUpperCase());
+    if (!p) return { content: [{ type: 'text', text: `❌ ไม่พบสินค้า ${it.sku} — ยกเลิกการยืนยัน` }] };
+    if (p.stock < it.qty) return { content: [{ type: 'text', text: `❌ ${p.name} สต็อกไม่พอแล้ว — เดี๋ยวให้เจ้าหน้าที่ติดต่อกลับ` }] };
+    subtotal += p.price_thb * it.qty;
+    lines.push(`${p.name} × ${it.qty}`);
+  }
+  // เลขออเดอร์จำลอง (demo) — production เชื่อมระบบออเดอร์จริง + ตัดสต็อกใน transaction
+  const orderNo = 'ORD-' + (9000 + Math.floor((subtotal + items.length) % 1000));
+  return { content: [{ type: 'text',
+    text: `✅ ยืนยันคำสั่งซื้อแล้ว!\nเลขออเดอร์: ${orderNo}\nรายการ: ${lines.join(', ')}\nยอดรวม: ${subtotal} บาท\nสถานะ: กำลังจัดเตรียมสินค้า — จะแจ้งเลขพัสดุเมื่อจัดส่งค่ะ` }] };
+});
+
 // ══════════════════════════════════════════════════════════════════
 //  RESOURCE — เอกสารนโยบายร้าน (AI ดึงอ่านเองเมื่อต้องอ้างอิงเงื่อนไข)
 // ══════════════════════════════════════════════════════════════════
@@ -161,4 +200,4 @@ server.registerPrompt(
 // ══════════════════════════════════════════════════════════════════
 const transport = new StdioServerTransport();
 await server.connect(transport);
-console.error('✅ MCP showcase "glow-beauty-showcase" พร้อมใช้งาน (4 tools + 1 resource + 1 prompt · stdio)');
+console.error('✅ MCP showcase "glow-beauty-showcase" พร้อมใช้งาน (6 tools + 1 resource + 1 prompt · stdio)');
