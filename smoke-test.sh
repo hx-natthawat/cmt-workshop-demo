@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
 # smoke-test.sh — ตรวจทุก demo ก่อนวันงานในคำสั่งเดียว (งาน D-7 ตาม playbook)
 #
-# ตรวจ 5 ด่าน:
+# ตรวจ 6 ด่าน:
 #   1. line-bot     : GET / + POST /webhook จำลอง (คำนวณ x-line-signature จริงจาก .env)
 #   2. MCP local    : initialize + tools/list ผ่าน stdio ต้องเจอครบ 3 tools
 #   3. MCP showcase : tools/list ครบ 6 + resource store://policy + prompt after_sales_reply
 #   4. MCP security : สแกนเนอร์จับ tool poisoning ได้ + ไม่ false positive
-#   5. MCP remote   : key ผิดต้องโดน 401 · key ถูกต้องได้ serverInfo
+#   5. MCP multi    : analytics server (ตัวที่ 2) ตอบ tools/list ครบ
+#   6. MCP remote   : key ผิดต้องโดน 401 · key ถูกต้องได้ serverInfo
 #
 # วิธีรัน:
 #   ./smoke-test.sh
@@ -117,9 +118,27 @@ else
   [ $? -eq 0 ] && ok "showcase ผ่านการสแกน (ไม่ false positive)" || bad "showcase ไม่ผ่านการสแกน" "ตรวจคำอธิบาย tool ใน showcase/server.mjs"
 fi
 
-# ── 5) MCP remote (Cloudflare Workers) ───────────────────────
+# ── 5) MCP multi (analytics server ตัวที่ 2) ─────────────────
 echo ""
-echo "▌5. MCP remote"
+echo "▌5. MCP multi (s2-mcp/multi · analytics server)"
+if [ ! -d s2-mcp/multi/node_modules ]; then
+  skip "ยังไม่ได้ npm install" "รันก่อน: cd s2-mcp/multi && npm install"
+else
+  OUT=$( (printf '%s\n' \
+    '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"smoke","version":"1.0"}}}' \
+    '{"jsonrpc":"2.0","method":"notifications/initialized"}' \
+    '{"jsonrpc":"2.0","id":2,"method":"tools/list"}'; sleep 2) \
+    | (cd s2-mcp/multi && node analytics-server.mjs 2>/dev/null) )
+  MISSING=""
+  for t in sales_by_channel sales_by_category find_at_risk_channel; do
+    echo "$OUT" | grep -q "\"$t\"" || MISSING="$MISSING $t"
+  done
+  [ -z "$MISSING" ] && ok "analytics tools/list ครบ 3 tools" || bad "analytics ขาด:$MISSING" "เช็ค multi/analytics-server.mjs"
+fi
+
+# ── 6) MCP remote (Cloudflare Workers) ───────────────────────
+echo ""
+echo "▌6. MCP remote"
 KEY="${DEMO_API_KEY:-$(read_env s2-mcp/remote/.dev.vars DEMO_API_KEY)}"
 if [ -z "$REMOTE_MCP_URL" ]; then
   skip "ข้าม — ยังไม่ได้ตั้ง REMOTE_MCP_URL" "หลัง deploy: REMOTE_MCP_URL=https://.../mcp ./smoke-test.sh"
