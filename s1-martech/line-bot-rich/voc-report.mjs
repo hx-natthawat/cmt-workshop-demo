@@ -32,6 +32,11 @@ const recent = logs.slice(-20).reverse();
 const maxTool = Math.max(1, ...Object.values(toolCount));
 const maxFunnel = Math.max(1, ...funnel.map((f) => f.n));
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const P = { chart: '<path d="M3 3v18h18"/><path d="M8 17v-4"/><path d="M13 17V9"/><path d="M18 17V6"/>',
+  wrench: '<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.1 2.1 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>',
+  cart: '<circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2 2h2l2.6 12.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H5"/>',
+  message: '<path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z"/>' };
+const ic = (n, sz = 18) => `<svg width="${sz}" height="${sz}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-.15em">${P[n]}</svg>`;
 const genAt = new Date().toLocaleString('th-TH', { dateStyle: 'medium', timeStyle: 'short' });
 
 const toolBars = topTools.length ? topTools.map(([t, n]) => `
@@ -102,7 +107,7 @@ header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:s
 .kpi .accent{color:var(--brand)}
 .card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:clamp(14px,3vw,20px);
   margin-bottom:14px;box-shadow:var(--shadow)}
-.card h2{font-size:.95rem;font-weight:650;margin-bottom:2px}
+.card h2{font-size:.95rem;font-weight:650;margin-bottom:2px;display:flex;align-items:center;gap:8px}.card h2 svg,.title h1 svg{color:var(--brand)}
 .card .csub{font-size:.78rem;color:var(--muted);margin-bottom:14px}
 .bar-row{display:grid;grid-template-columns:minmax(120px,1.4fr) 3fr 34px;align-items:center;gap:10px;margin:9px 0}
 .bar-label{font-size:.82rem;color:var(--text-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:right}
@@ -129,7 +134,7 @@ footer{color:var(--muted);font-size:.76rem;margin-top:18px;padding-top:14px;bord
 </style></head>
 <body class="viz-root"><div class="wrap">
 <header>
-  <div class="title"><h1>📊 VoC Dashboard</h1><p>Glow Beauty · first-party data (data loop) · อัปเดต ${genAt}</p></div>
+  <div class="title"><h1 style="display:flex;align-items:center;gap:9px">${ic('chart', 22)} VoC Dashboard</h1><p>Glow Beauty · first-party data (data loop) · อัปเดต ${genAt}</p></div>
   <button class="toggle" onclick="var r=document.documentElement;r.dataset.theme=r.dataset.theme==='dark'?'light':'dark'">🌗 สลับธีม</button>
 </header>
 <div class="kpis">
@@ -139,15 +144,15 @@ footer{color:var(--muted);font-size:.76rem;margin-top:18px;padding-top:14px;bord
   <div class="kpi"><div class="v" style="font-size:1.1rem;padding-top:6px">${esc(channelStr)}</div><div class="n">ตามช่องทาง</div></div>
 </div>
 <div class="card">
-  <h2>🔧 Tool ที่ AI เรียกบ่อย</h2><div class="csub">จำนวนครั้งที่แต่ละ tool ถูกเรียก (มากไปน้อย)</div>
+  <h2>${ic("wrench")} Tool ที่ AI เรียกบ่อย</h2><div class="csub">จำนวนครั้งที่แต่ละ tool ถูกเรียก (มากไปน้อย)</div>
   ${toolBars}
 </div>
 <div class="card">
-  <h2>🛒 Funnel การซื้อ</h2><div class="csub">เส้นทางจากสนใจ → ร่างออเดอร์ → ยืนยัน · อัตราแปลงรวม ${convRate}%</div>
+  <h2>${ic("cart")} Funnel การซื้อ</h2><div class="csub">เส้นทางจากสนใจ → ร่างออเดอร์ → ยืนยัน · อัตราแปลงรวม ${convRate}%</div>
   ${funnelBars}
 </div>
 <div class="card">
-  <h2>💬 คำถามล่าสุด</h2><div class="csub">${recent.length} รายการล่าสุด</div>
+  <h2>${ic("message")} คำถามล่าสุด</h2><div class="csub">${recent.length} รายการล่าสุด</div>
   <div class="table-scroll"><table>
     <thead><tr><th>ข้อความ</th><th>ช่องทาง</th><th>tools</th></tr></thead>
     <tbody>${recentRows}</tbody>
