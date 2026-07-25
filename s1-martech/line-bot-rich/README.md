@@ -60,11 +60,19 @@ npm run setup-richmenu
 
 ต่างจาก bot ปกติ (reactive/รอทัก) — broadcast คือ**แบรนด์ push โปรหาผู้ติดตามทั้งหมดเอง** ใช้ Flex การ์ดโปรชุดเดียวกับที่ bot ตอบ
 
+**2 ทางเลือก:**
+
 ```bash
-node broadcast.mjs           # พรีวิว (dry-run · ไม่ส่งจริง) + ดูโควตา
-node broadcast.mjs --send    # ส่งจริงถึงผู้ติดตามทุกคน
+npm run broadcast            # CLI: พรีวิว (dry-run) · เพิ่ม -- --send เพื่อส่งจริง
+npm run admin                # UI: เปิด http://localhost:3100 (operator console)
 ```
-> ⚠️ **Governance:** broadcast กลับไม่ได้ + กินโควตา OA → default เป็น dry-run · ต้องใส่ `--send` เองอย่างตั้งใจ (human-in-the-loop) · เชื่อมแนวคิด "agent เป็นฝ่ายเริ่ม" ใน Agent Economy (Session 3)
+
+**Operator Console (`npm run admin`)** — หน้าเว็บ localhost:3100 สำหรับทีมการตลาด:
+- เห็นโควตา + พรีวิวการ์ดโปรที่จะส่ง
+- **ประตู governance:** ต้องติ๊ก "เข้าใจว่าจะส่งถึงทุกคน" + พิมพ์ `SEND` ก่อนปุ่มจะทำงาน
+- รัน localhost เท่านั้น (ไม่เปิดผ่าน tunnel)
+
+> ⚠️ **Governance:** broadcast กลับไม่ได้ + กินโควตา OA → CLI default เป็น dry-run · UI มีขั้นยืนยัน 2 ชั้น (human-in-the-loop) · **ไม่ทำเป็น AI tool** กัน AI สั่งเอง · เชื่อมแนวคิด "agent เป็นฝ่ายเริ่ม" ใน Agent Economy (Session 3)
 
 ## ไฟล์
 
@@ -72,7 +80,8 @@ node broadcast.mjs --send    # ส่งจริงถึงผู้ติด�
 |---|---|
 | `app.js` | webhook + Claude/MCP loop + postback + renderer routing |
 | `flex.js` | presentation layer — Flex builders + Quick Reply + orderSummary |
-| `broadcast.mjs` | ส่งโปรเชิงรุกถึงผู้ติดตามทั้งหมด (dry-run default) |
+| `broadcast.mjs` | CLI ส่งโปรเชิงรุกถึงผู้ติดตามทั้งหมด (dry-run default) |
+| `admin.mjs` | Operator Console (หน้าเว็บ localhost:3100) broadcast + ประตูยืนยัน |
 | `setup-richmenu.mjs` | สร้าง rich menu ผ่าน LINE API |
 | `richmenu-template.html` | เทมเพลตรูปพื้นหลัง 2500×843 |
 

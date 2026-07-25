@@ -6,7 +6,9 @@
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
-    "setup-richmenu": "node setup-richmenu.mjs"
+    "setup-richmenu": "node setup-richmenu.mjs",
+    "admin": "node admin.mjs",
+    "broadcast": "node broadcast.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.113.0",
