@@ -74,11 +74,29 @@ npm run admin                # UI: เปิด http://localhost:3100 (operator 
 
 > ⚠️ **Governance:** broadcast กลับไม่ได้ + กินโควตา OA → CLI default เป็น dry-run · UI มีขั้นยืนยัน 2 ชั้น (human-in-the-loop) · **ไม่ทำเป็น AI tool** กัน AI สั่งเอง · เชื่อมแนวคิด "agent เป็นฝ่ายเริ่ม" ใน Agent Economy (Session 3)
 
+## Engagement layer (โลกจริง)
+
+โครงกลาง `agent.js` (Claude+MCP loop) ใช้ร่วมทุกช่องทาง · `store.js` เก็บ VoC log + restock interest
+
+| คำสั่ง | ทำอะไร |
+|---|---|
+| `npm run console` | 🏢 **Marketing Console** (localhost:3100) — enterprise SaaS UI รวมทุกงาน operator (Overview/Broadcast/Segments/Restock/Analytics) · real backend + governance · [Lab](../LAB-MARKETING-CONSOLE.md) |
+| `npm run webchat` | 🌐 **Web Chat** (localhost:3200) — ใช้ MCP tools ชุดเดียวกับ LINE (พิสูจน์ omnichannel) |
+| `npm run voc-report` | 📊 **VoC Dashboard** — สรุปบทสนทนา/tool/funnel จาก log (data loop, วัด ROI) |
+| `npm run restock-notify GB-004` | 🔔 **Restock** — แจ้งลูกค้าที่สนใจตอนของหมด (dry-run · `--send` ส่งจริง) |
+| `npm run broadcast-segment "แชมป์ตัวจริง"` | 🎯 **Segment targeting** — RFM จาก customer_data.csv (วางแผน · ตัวเลขจาก CSV ตัวอย่าง) |
+
+> ℹ️ **broadcast-segment ไม่ได้เช็ค LINE จริง** — อ่าน flag จาก CSV ตัวอย่าง · ส่งจริงต้อง map customer_id↔LINE userId ผ่าน CDP (เก็บ userId ตอน follow/ผูกบัญชี) · VoC log hash userId (PDPA) · restock เก็บ userId จริงเพื่อ push (ต้องมี consent) · โฟลเดอร์ `data/` gitignore
+
 ## ไฟล์
 
 | ไฟล์ | หน้าที่ |
 |---|---|
-| `app.js` | webhook + Claude/MCP loop + postback + renderer routing |
+| `app.js` | webhook LINE + renderer + postback + logging/restock capture |
+| `agent.js` | **โครงกลาง** — connectMcp + Claude/MCP loop (ใช้ร่วม LINE/Web) |
+| `store.js` | data layer — VoC log (hash) + restock interest |
+| `webchat.mjs` | Web Chat widget (localhost:3200) |
+| `voc-report.mjs` · `restock-notify.mjs` · `broadcast-segment.mjs` | engagement tools |
 | `flex.js` | presentation layer — Flex builders + Quick Reply + orderSummary |
 | `broadcast.mjs` | CLI ส่งโปรเชิงรุกถึงผู้ติดตามทั้งหมด (dry-run default) |
 | `admin.mjs` | Operator Console (หน้าเว็บ localhost:3100) broadcast + ประตูยืนยัน |
