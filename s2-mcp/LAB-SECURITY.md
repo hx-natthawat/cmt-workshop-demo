@@ -34,6 +34,14 @@ npm run scan:guarded           # ✅ ผ่าน → exit 0
 node scan-tools.mjs ../showcase/server.mjs   # ✅ server ของเราเองก็ผ่าน
 ```
 
+### 📊 ดูรายงานแบบเห็นภาพ (แนะนำสำหรับหน้าห้อง)
+
+```bash
+npm run report        # → scan-report.html แล้วเปิดในเบราว์เซอร์
+```
+เทียบ **poisoned vs guarded ข้างกัน** + **ไฮไลต์คำสั่งฝังในคำอธิบายด้วยสีแดง** —
+เห็นกับตาว่าอะไรถูกซ่อนไว้ในส่วนที่ผู้ใช้ไม่เห็นแต่โมเดลอ่าน
+
 `scan-tools.mjs` ตรวจ 7 กฎ: markup ซ่อน · ถ้อยคำสั่งการ (prompt injection) · อ้างถึงความลับ · สั่งส่งข้อมูลออก · สั่งเรียก tool อื่นต่อ · อักขระล่องหน · คำอธิบายยาวผิดปกติ
 > **exit code ใช้ใน CI ได้** — บล็อก deploy ถ้า server ที่พึ่งพามี red flag
 
@@ -91,6 +99,11 @@ MCP_ACTOR=line-bot node guarded-server.mjs
 | 4 | **Kill switch** | `DISABLED_TOOLS` / `READONLY` ผ่าน env — ปิดได้ทันที |
 | 5 | **Clean description** | คำอธิบายบอกหน้าที่อย่างเดียว → ผ่าน `scan-tools.mjs` |
 
+ตรวจอัตโนมัติได้ด้วย (ไม่ใช้ API key · อยู่ใน CI):
+```bash
+npm run test:governance   # 21 เคส: draft ไม่ execute · zod กัน input พิลึก · kill switch · readonly · audit
+```
+
 ผลจริงเมื่อทดสอบ:
 ```
 READONLY=1        → ⛔ ระบบอยู่ในโหมดอ่านอย่างเดียว — "place_order" ใช้ไม่ได้ตอนนี้
@@ -115,6 +128,8 @@ DISABLED_TOOLS=…  → ⛔ tool "place_order" ถูกปิดใช้งา
 
 - **เพิ่มกฎในสแกนเนอร์** — เช่น จับ base64 ยาวๆ, URL แปลกปลอม, หรือคำสั่งภาษาอื่น
 - **ใส่ scan เข้า CI** — `npm run scan:guarded && npm start` (บล็อกถ้า exit 1)
+  > repo นี้ทำจริงแล้วใน [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) — สแกนทุก server ก่อน merge
+  > และมี job ที่เช็คว่า **สแกนเนอร์ยังจับ poisoned ได้อยู่** (กันกฎถูกแก้จนหลุดเงียบๆ)
 - **ทดลอง payload อื่น** ใน `poisoned-server.mjs` (คงความไม่มีพิษ: ใช้ marker เท่านั้น) แล้วดูว่าโมเดลตอบต่างไปไหม
 - **เพิ่ม kill switch เข้า showcase server** ที่ bot ใช้จริง
 

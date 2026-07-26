@@ -6,3 +6,5 @@ recordings/*.mov
 .wrangler/
 s1-martech/line-bot-rich/data/
 s1-martech/line-bot-rich/voc-dashboard.html
+s2-mcp/security/scan-report.html
+s2-mcp/multi/trace.html

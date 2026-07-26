@@ -71,4 +71,6 @@ const server = http.createServer(async (req, res) => {
   } catch (e) { json(res, { ok: false, error: e.message }, 500); }
 });
 
-server.listen(3100, '127.0.0.1', () => console.log('🏢 Marketing Console: http://localhost:3100 (localhost เท่านั้น)'));
+// PORT ปรับได้เพื่อให้เทสต์รันโดยไม่ชนกับ console ที่เปิดอยู่ (ค่าปกติ 3100)
+const PORT = Number(process.env.PORT) || 3100;
+server.listen(PORT, '127.0.0.1', () => console.log(`🏢 Marketing Console: http://localhost:${PORT} (localhost เท่านั้น)`));
