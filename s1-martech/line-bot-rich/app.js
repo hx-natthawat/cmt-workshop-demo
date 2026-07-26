@@ -5,49 +5,19 @@
  * รัน:  npm install && npm start   (ต้องมี .env)
  */
 require('dotenv').config();
-const fs = require('node:fs');
 const express = require('express');
 const { middleware, messagingApi } = require('@line/bot-sdk');
 const flex = require('./flex');
 const agent = require('./agent');
 const store = require('./store');
+// renderer แยกไฟล์ เพื่อให้ rehearse.js ซ้อมได้โดยไม่ต้องมี LINE
+const { render, captureRestock } = require('./render');
 
 const lineConfig = {
   channelAccessToken: process.env.LINE_CHANNEL_ACCESS_TOKEN,
   channelSecret: process.env.LINE_CHANNEL_SECRET,
 };
 const line = new messagingApi.MessagingApiClient({ channelAccessToken: lineConfig.channelAccessToken });
-
-// สินค้าที่หมด (stock 0) + keyword — ใช้เก็บ restock interest
-const products = JSON.parse(fs.readFileSync(require('node:path').join(__dirname, '../../s2-mcp/showcase/products.json'), 'utf-8'));
-const soldOut = products.products.filter((p) => p.stock === 0)
-  .map((p) => ({ sku: p.sku, kw: p.name.replace(/\d+\w*/g, '').trim().split(' ')[0] })); // เช่น GB-004 → "โฟม"
-
-// ── Renderer: (ข้อความ + tool ที่ถูกเรียก) → LINE messages ──
-function render({ text, toolCalls }) {
-  const last = (n) => [...toolCalls].reverse().find((c) => c.name === n);
-  const textMsg = { type: 'text', text };
-  const draft = last('create_draft_order');
-  if (draft && draft.input.items) {
-    const summary = flex.orderSummary(draft.input.items);
-    if (summary) return [textMsg, flex.orderConfirmBubble(draft.input.items, summary)];
-  }
-  const rec = last('recommend_for_skin') || last('get_bestsellers');
-  if (rec) {
-    const carousel = flex.productCarousel(flex.skusFromText(rec.resultText));
-    if (carousel) return [textMsg, carousel];
-  }
-  if (last('get_promotions')) return [textMsg, flex.promotionCarousel()];
-  return [{ ...textMsg, quickReply: flex.skinQuickReply }];
-}
-
-// เก็บ restock interest ถ้าลูกค้าถามถึงสินค้าที่หมด
-function captureRestock(text, userId) {
-  for (const s of soldOut) {
-    if (s.kw && text.includes(s.kw)) { store.addRestockInterest(s.sku, userId); return s.sku; }
-  }
-  return null;
-}
 
 // ── Webhook ──
 const app = express();

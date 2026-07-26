@@ -27,6 +27,17 @@ jobs:
           done < <(find . -name node_modules -prune -o \( -name '*.js' -o -name '*.mjs' \) -print)
           exit $fail
 
+  line-bot-rich:
+    name: line-bot-rich — Flex + ตัวจับ restock
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - run: npm ci --prefix s1-martech/line-bot-rich
+      # เทสต์ตรรกะล้วน ไม่เรียก Claude/LINE → ไม่ต้องมี secret
+      - run: npm test --prefix s1-martech/line-bot-rich
+
   mcp-security-scan:
     name: สแกน tool description ของทุก MCP server
     runs-on: ubuntu-latest
