@@ -5,7 +5,12 @@
   "type": "module",
   "scripts": {
     "start": "node orchestrate.mjs",
-    "inspect:analytics": "npx @modelcontextprotocol/inspector node analytics-server.mjs"
+    "inspect:analytics": "npx @modelcontextprotocol/inspector node analytics-server.mjs",
+    "trace": "node trace-ui.mjs"
   },
-  "dependencies": { "@anthropic-ai/sdk": "^0.113.0", "@modelcontextprotocol/sdk": "^1.29.0", "zod": "^4.4.3" }
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.113.0",
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "zod": "^4.4.3"
+  }
 }

@@ -7,7 +7,11 @@
     "scan": "node scan-tools.mjs",
     "scan:poisoned": "node scan-tools.mjs ./poisoned-server.mjs",
     "scan:guarded": "node scan-tools.mjs ./guarded-server.mjs",
-    "start:guarded": "node guarded-server.mjs"
+    "start:guarded": "node guarded-server.mjs",
+    "report": "node report.mjs"
   },
-  "dependencies": { "@modelcontextprotocol/sdk": "^1.29.0", "zod": "^4.4.3" }
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "zod": "^4.4.3"
+  }
 }

@@ -34,6 +34,14 @@ npm run scan:guarded           # ✅ ผ่าน → exit 0
 node scan-tools.mjs ../showcase/server.mjs   # ✅ server ของเราเองก็ผ่าน
 ```
 
+### 📊 ดูรายงานแบบเห็นภาพ (แนะนำสำหรับหน้าห้อง)
+
+```bash
+npm run report        # → scan-report.html แล้วเปิดในเบราว์เซอร์
+```
+เทียบ **poisoned vs guarded ข้างกัน** + **ไฮไลต์คำสั่งฝังในคำอธิบายด้วยสีแดง** —
+เห็นกับตาว่าอะไรถูกซ่อนไว้ในส่วนที่ผู้ใช้ไม่เห็นแต่โมเดลอ่าน
+
 `scan-tools.mjs` ตรวจ 7 กฎ: markup ซ่อน · ถ้อยคำสั่งการ (prompt injection) · อ้างถึงความลับ · สั่งส่งข้อมูลออก · สั่งเรียก tool อื่นต่อ · อักขระล่องหน · คำอธิบายยาวผิดปกติ
 > **exit code ใช้ใน CI ได้** — บล็อก deploy ถ้า server ที่พึ่งพามี red flag
 

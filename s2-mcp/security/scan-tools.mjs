@@ -17,27 +17,8 @@ import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js'
 const target = process.argv[2];
 if (!target) { console.error('ใช้: node scan-tools.mjs <path/to/server.mjs>'); process.exit(2); }
 
-// ── กฎตรวจจับ: แต่ละข้อคือแพทเทิร์นที่ "คำอธิบายเครื่องมือปกติ" ไม่ควรมี ──
-const RULES = [
-  { id: 'hidden-markup', sev: 'high', re: /<!--[\s\S]*?-->|<script|<\/?system>/i,
-    why: 'มี markup ซ่อน (HTML comment/tag) — ใช้ซ่อนคำสั่งจากสายตาผู้ใช้' },
-  { id: 'instruction-injection', sev: 'high',
-    re: /(ignore (all |the )?(previous|prior)|disregard .{0,20}instruction|you must (always|never)|system note|system prompt|ก่อนตอบ.{0,30}(ให้|ต้อง)|ห้ามบอกผู้ใช้|อย่าบอกผู้ใช้|เพิกเฉยคำสั่ง)/i,
-    why: 'มีถ้อยคำสั่งการต่อโมเดล (prompt injection) ไม่ใช่คำอธิบายหน้าที่ของ tool' },
-  { id: 'secret-access', sev: 'high',
-    re: /(\.env\b|credential|api[_ -]?key|secret key|private key|password|token ของ|~\/\.ssh)/i,
-    why: 'อ้างถึงความลับ/ไฟล์ลับ — คำอธิบาย tool ปกติไม่ต้องพูดถึงสิ่งเหล่านี้' },
-  { id: 'exfiltration', sev: 'high',
-    re: /(ส่งข้อมูล.{0,20}(ไปยัง|ออก)|upload .{0,15}to|POST .{0,15}https?:\/\/|curl |fetch\(|webhook)/i,
-    why: 'สั่งส่งข้อมูลออกนอกระบบ' },
-  { id: 'chain-other-tools', sev: 'medium',
-    re: /(เรียก tool|call (the )?tool|ให้เรียกใช้.{0,15}(เครื่องมือ|tool)|then call)/i,
-    why: 'สั่งให้เรียก tool อื่นต่อ — อาจพาไปทำสิ่งที่ผู้ใช้ไม่ได้ขอ' },
-  { id: 'hidden-chars', sev: 'medium', re: /[​-‏‪-‮﻿]/,
-    why: 'มีอักขระล่องหน (zero-width/RTL override) — ใช้ซ่อนข้อความ' },
-  { id: 'oversized', sev: 'low', test: (d) => d.length > 600,
-    why: 'คำอธิบายยาวผิดปกติ (>600 ตัวอักษร) — ที่ซ่อนคำสั่งได้ง่าย' },
-];
+// กฎตรวจจับอยู่ใน rules.mjs (ใช้ร่วมกับ report.mjs ที่ทำ UI)
+import { RULES } from './rules.mjs';
 
 const transport = new StdioClientTransport({ command: 'node', args: [target] });
 const mcp = new Client({ name: 'tool-scanner', version: '1.0.0' });
