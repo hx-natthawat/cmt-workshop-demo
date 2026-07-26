@@ -76,6 +76,11 @@ jobs:
           fi
           echo "✅ ยังจับได้ (exit 1 ตามคาด)"
 
+      # ประตูกำกับดูแลฝั่ง AI: draft ไม่ execute · zod กัน input พิลึก · kill switch/readonly/audit
+      - name: ประตูกำกับดูแลของ MCP ต้องยังทำงาน
+        working-directory: s2-mcp/security
+        run: npm run test:governance
+
       - name: สร้างรายงาน HTML ได้จริง
         working-directory: s2-mcp/security
         run: npm run report && test -s scan-report.html

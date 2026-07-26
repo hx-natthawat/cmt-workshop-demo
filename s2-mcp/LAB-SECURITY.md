@@ -99,6 +99,11 @@ MCP_ACTOR=line-bot node guarded-server.mjs
 | 4 | **Kill switch** | `DISABLED_TOOLS` / `READONLY` ผ่าน env — ปิดได้ทันที |
 | 5 | **Clean description** | คำอธิบายบอกหน้าที่อย่างเดียว → ผ่าน `scan-tools.mjs` |
 
+ตรวจอัตโนมัติได้ด้วย (ไม่ใช้ API key · อยู่ใน CI):
+```bash
+npm run test:governance   # 21 เคส: draft ไม่ execute · zod กัน input พิลึก · kill switch · readonly · audit
+```
+
 ผลจริงเมื่อทดสอบ:
 ```
 READONLY=1        → ⛔ ระบบอยู่ในโหมดอ่านอย่างเดียว — "place_order" ใช้ไม่ได้ตอนนี้

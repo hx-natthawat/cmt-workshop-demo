@@ -109,6 +109,7 @@ cd s2-mcp/security && npm install
 npm run scan:poisoned    # 🚨 สแกนเนอร์จับ tool poisoning (exit 1)
 npm run scan:guarded     # ✅ ผ่าน
 npm run report           # 📊 รายงาน UI — ไฮไลต์คำสั่งฝัง เทียบ poisoned vs guarded
+npm run test:governance  # 🔒 ประตูกำกับดูแล 21 เคส (showcase + guarded) ไม่ใช้ API key
 DISABLED_TOOLS=place_order node guarded-server.mjs   # kill switch
 ```
 tool poisoning demo (payload ไม่มีพิษ) · สแกนเนอร์ 7 กฎ · guarded server 5 การป้องกัน · [คู่มือ lab](s2-mcp/LAB-SECURITY.md)

@@ -8,7 +8,8 @@
     "scan:poisoned": "node scan-tools.mjs ./poisoned-server.mjs",
     "scan:guarded": "node scan-tools.mjs ./guarded-server.mjs",
     "start:guarded": "node guarded-server.mjs",
-    "report": "node report.mjs"
+    "report": "node report.mjs",
+    "test:governance": "node test-governance.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
