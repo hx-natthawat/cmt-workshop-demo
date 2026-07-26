@@ -123,6 +123,8 @@ DISABLED_TOOLS=…  → ⛔ tool "place_order" ถูกปิดใช้งา
 
 - **เพิ่มกฎในสแกนเนอร์** — เช่น จับ base64 ยาวๆ, URL แปลกปลอม, หรือคำสั่งภาษาอื่น
 - **ใส่ scan เข้า CI** — `npm run scan:guarded && npm start` (บล็อกถ้า exit 1)
+  > repo นี้ทำจริงแล้วใน [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) — สแกนทุก server ก่อน merge
+  > และมี job ที่เช็คว่า **สแกนเนอร์ยังจับ poisoned ได้อยู่** (กันกฎถูกแก้จนหลุดเงียบๆ)
 - **ทดลอง payload อื่น** ใน `poisoned-server.mjs` (คงความไม่มีพิษ: ใช้ marker เท่านั้น) แล้วดูว่าโมเดลตอบต่างไปไหม
 - **เพิ่ม kill switch เข้า showcase server** ที่ bot ใช้จริง
 
