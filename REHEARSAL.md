@@ -43,6 +43,13 @@ Checklist หน้าเดียวสำหรับซ้อมจริง 
 - [ ] `mini_dashboard.html` (C) — ข้อมูลจริง 300 ราย + RFM + กราฟช่องทาง
 
 ### ▌D1.4 — LINE Bot end-to-end  ⚠️ พังง่ายสุด — ซ้อมเต็ม flow ≥2 รอบ
+
+**ก่อนต่อ tunnel ทุกครั้ง** (ถ้าจะเดโมตัว rich — เร็วกว่ามานั่งหาสาเหตุตอนบอทเงียบ):
+```
+cd s1-martech/line-bot-rich && npm test && npm run rehearse
+```
+ทั้งคู่ต้องเขียว — `rehearse` ตรวจ Flex ตามข้อจำกัดจริงของ LINE (บอทเงียบส่วนใหญ่คือโดน 400 จาก Flex ผิด)
+
 ```
 cd s1-martech/line-bot && npm install && npm start
 npx cloudflared tunnel --url http://localhost:3000

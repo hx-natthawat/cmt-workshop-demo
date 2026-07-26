@@ -46,18 +46,39 @@ tool ตัวเดียวกันนี้ใช้กับเว็บ/�
 ## Warm-up (10 นาที)
 
 ```bash
-cd s1-martech/line-bot-rich && npm install && cp ../line-bot/.env .env && npm start
+cd s1-martech/line-bot-rich && npm install && cp ../line-bot/.env .env
+
+npm test           # ① ตรรกะล้วน 17 เคส (ไม่ใช้ API key) — ~1 วินาที
+npm run rehearse   # ② ซ้อมของจริง 9 สถานการณ์ ตรวจ Flex ก่อนส่ง LINE — ~1 นาที
+
+npm start          # ③ ค่อยเปิดบอทจริง
 npx cloudflared tunnel --url http://localhost:3000
 ```
+
+> 💡 **ทำไมต้องซ้อมก่อนต่อ LINE** — Flex ผิดโครงสร้างนิดเดียว LINE ตอบ 400 แล้ว **บอทเงียบ ไม่มี error ให้เห็นฝั่งเรา**
+> `rehearse` วิ่ง pipeline จริงแล้วตรวจตามข้อจำกัดของ LINE (≤5 message · altText · carousel ≤12 · postback data ≤300 · รูป https)
+> เจอในเครื่องดีกว่าเจอตอนลูกค้าทัก
+
 ตั้ง webhook แล้วลองพิมพ์ 4 อย่างในตาราง README เทียบผลที่ได้
 
 ---
 
 ## กลไก (อ่านโค้ด 10 นาที)
 
-- `app.js` → `runClaude()` วน loop เก็บ **toolCalls** ไว้ · `render()` ดูว่า tool ไหนถูกเรียกล่าสุด → เลือก Flex ให้ตรง
-- `flex.js` → ตัวสร้าง Flex JSON (การ์ดสินค้า/โปร/ยืนยัน) แยกจาก logic ชัดเจน
+แยกไฟล์ตามหน้าที่ — แต่ละชั้นทดสอบแยกได้:
+
+| ไฟล์ | หน้าที่ |
+|---|---|
+| `agent.js` | วน loop คุยกับ Claude + เรียก MCP เก็บ **toolCalls** ไว้ (ใช้ร่วมกับ Web Chat) |
+| `render.js` | ดูว่า tool ไหนถูกเรียก**ล่าสุด** → เลือก Flex ให้ตรง · ไม่รู้จัก LINE SDK เลย จึงเทสต์ได้ |
+| `flex.js` | ตัวสร้าง Flex JSON (การ์ดสินค้า/โปร/ยืนยัน) |
+| `validate-line.js` | ตรวจข้อจำกัดของ Messaging API ก่อนส่ง |
+| `app.js` | webhook + `handlePostback()` — เหลือแค่งานต่อ LINE |
+
 - **postback** → กดปุ่มบนการ์ด ส่ง data กลับ → `handlePostback()` → เรียก `confirm_order`
+- 🐛 **บทเรียนจากบั๊กจริงในโค้ดนี้:** ตัวจับสินค้าหมดเคยใช้ `name.split(' ')[0]` แยกคำ
+  แต่**ภาษาไทยไม่เว้นวรรค** → ได้ `"โฟมล้างหน้าใยไหม"` ทั้งพวง ลูกค้าพิมพ์ "โฟมล้างหน้า" จึงไม่เคยแมตช์
+  ฟีเจอร์ตายเงียบโดยไม่มี error — เจอตอนเขียนเทสต์ ไม่ใช่ตอนอ่านโค้ด
 
 > ทำไมไม่ให้ Claude เขียน Flex JSON เอง? — schema Flex ซับซ้อน โมเดลอาจสร้าง JSON พังตอน demo สด · ใช้เทมเพลต deterministic ปลอดภัยกว่า (โลกจริงก็ทำแบบนี้)
 
@@ -70,7 +91,9 @@ npx cloudflared tunnel --url http://localhost:3000
 - **ใส่ image_url ใน products.json** แล้วให้การ์ดสินค้ามีรูป hero (โลกจริงต้องมีรูป)
 - **Quick Reply หลังแนะนำสินค้า** ("สั่งเลย" / "ดูตัวอื่น" / "มีโปรไหม")
 
-**เกณฑ์ผ่าน:** ทำงานใน LINE จริง · แยก logic (tool) กับ render (flex) ชัด · governance ยังอยู่ (ยืนยันก่อน execute)
+- **เพิ่มสถานการณ์ใน `rehearse.js`** ให้ครอบคลุมของที่ตัวเองเพิ่ม แล้วให้ผ่านทั้งหมด
+
+**เกณฑ์ผ่าน:** ทำงานใน LINE จริง · แยก logic (tool) กับ render (flex) ชัด · governance ยังอยู่ (ยืนยันก่อน execute) · `npm test` + `npm run rehearse` ผ่าน
 
 ---
 
