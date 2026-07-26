@@ -15,7 +15,8 @@
     "broadcast-segment": "node broadcast-segment.mjs",
     "console": "node console.mjs",
     "rehearse": "node rehearse.js",
-    "test": "node test-offline.js"
+    "test": "node test-offline.js",
+    "test:console": "node test-console.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.113.0",

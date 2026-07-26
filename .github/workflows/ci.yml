@@ -37,6 +37,9 @@ jobs:
       - run: npm ci --prefix s1-martech/line-bot-rich
       # เทสต์ตรรกะล้วน ไม่เรียก Claude/LINE → ไม่ต้องมี secret
       - run: npm test --prefix s1-martech/line-bot-rich
+      # ประตูกันส่งจริงของ Marketing Console — ทดสอบเฉพาะทางที่ต้องถูกปฏิเสธ
+      # (ใช้ token ปลอม ถ้าโค้ดเผลอยิงไป LINE จริงเทสต์จะพัง = สิ่งที่ต้องการ)
+      - run: npm run test:console --prefix s1-martech/line-bot-rich
 
   mcp-security-scan:
     name: สแกน tool description ของทุก MCP server
