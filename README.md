@@ -171,7 +171,7 @@ Schema.org JSON-LD · `llms.txt` · `/.well-known/agent-card.json` (มี `x-ne
 ./smoke-test.sh                                     # local ทั้งหมด
 REMOTE_MCP_URL=https://.../mcp ./smoke-test.sh      # รวม remote หลัง deploy
 ```
-7 ด่าน: line-bot · MCP local · MCP showcase · MCP security · MCP multi · storefront (4 ประตู) · MCP remote · exit ≠ 0 ถ้ามีด่านพัง
+8 ด่าน: line-bot · MCP local · MCP showcase · MCP security · MCP multi · storefront (4 ประตู) · MCP remote · exit ≠ 0 ถ้ามีด่านพัง
 
 ---
 
