@@ -171,6 +171,8 @@ Schema.org JSON-LD · `llms.txt` · `/.well-known/agent-card.json` (มี `x-ne
 ./smoke-test.sh                                     # local ทั้งหมด
 REMOTE_MCP_URL=https://.../mcp ./smoke-test.sh      # รวม remote หลัง deploy
 ```
+ทดสอบด่าน remote ได้โดยไม่ต้อง deploy — สตาร์ต `wrangler dev` แล้วชี้ `REMOTE_MCP_URL=http://127.0.0.1:8787/mcp` (ดู [s2-mcp/remote/README](s2-mcp/remote/README.md))
+
 8 ด่าน: line-bot · MCP local · MCP showcase · MCP security (สแกนเนอร์ + ประตูกำกับดูแล) · MCP multi · storefront (4 ประตู) · line-bot-rich (Flex + ประตูกันส่งจริง) · MCP remote · exit ≠ 0 ถ้ามีด่านพัง
 
 ---
