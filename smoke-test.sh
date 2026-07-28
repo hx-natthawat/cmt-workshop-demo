@@ -1,10 +1,15 @@
 #!/usr/bin/env bash
 # smoke-test.sh — ตรวจทุก demo ก่อนวันงานในคำสั่งเดียว (งาน D-7 ตาม playbook)
 #
-# ตรวจ 3 ด่าน:
-#   1. line-bot   : GET / + POST /webhook จำลอง (คำนวณ x-line-signature จริงจาก .env)
-#   2. MCP local  : initialize + tools/list ผ่าน stdio ต้องเจอครบ 3 tools
-#   3. MCP remote : key ผิดต้องโดน 401 · key ถูกต้องได้ serverInfo
+# ตรวจ 8 ด่าน:
+#   1. line-bot     : GET / + POST /webhook จำลอง (คำนวณ x-line-signature จริงจาก .env)
+#   2. MCP local    : initialize + tools/list ผ่าน stdio ต้องเจอครบ 3 tools
+#   3. MCP showcase : tools/list ครบ 6 + resource store://policy + prompt after_sales_reply
+#   4. MCP security : สแกนเนอร์จับ tool poisoning ได้ + ไม่ false positive + ประตูกำกับดูแล MCP
+#   5. MCP multi    : analytics server (ตัวที่ 2) ตอบ tools/list ครบ
+#   6. storefront   : Agent-Ready 4 ประตู (Schema.org · llms.txt · MCP · Agent Card)
+#   7. line-bot-rich: Flex ผ่านข้อจำกัด LINE · ตัวจับ restock · ประตูกันส่งจริงของ Console
+#   8. MCP remote   : key ผิดต้องโดน 401 · key ถูกต้องได้ serverInfo
 #
 # วิธีรัน:
 #   ./smoke-test.sh
@@ -25,8 +30,10 @@ bad()  { echo "  ❌ $1"; [ -n "${2:-}" ] && echo "     → $2"; FAIL=$((FAIL+1)
 skip() { echo "  ⏭️  $1"; [ -n "${2:-}" ] && echo "     → $2"; SKIP=$((SKIP+1)); }
 
 # อ่านค่าจากไฟล์ env แบบระบุ key (ไม่ source ทั้งไฟล์)
+# ตัด whitespace นำ/ตาม + quotes ให้เหมือนที่ dotenv/wrangler โหลด (เช่น "KEY= value" → "value")
 read_env() { # $1=file $2=key
-  [ -f "$1" ] && grep -E "^$2=" "$1" | head -1 | cut -d= -f2- | tr -d '"' || true
+  [ -f "$1" ] && grep -E "^$2=" "$1" | head -1 | cut -d= -f2- \
+    | sed 's/^[[:space:]]*//; s/[[:space:]]*$//' | tr -d '"' || true
 }
 
 echo "═══ Smoke Test — CMT Workshop Demos ═══"
@@ -78,9 +85,106 @@ else
   fi
 fi
 
-# ── 3) MCP remote (Cloudflare Workers) ───────────────────────
+# ── 3) MCP showcase (stdio · tools + resource + prompt) ──────
 echo ""
-echo "▌3. MCP remote"
+echo "▌3. MCP showcase (s2-mcp/showcase · stdio)"
+if [ ! -d s2-mcp/showcase/node_modules ]; then
+  bad "ยังไม่ได้ npm install" "รันก่อน: cd s2-mcp/showcase && npm install"
+else
+  OUT=$( (printf '%s\n' \
+    '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"smoke","version":"1.0"}}}' \
+    '{"jsonrpc":"2.0","method":"notifications/initialized"}' \
+    '{"jsonrpc":"2.0","id":2,"method":"tools/list"}' \
+    '{"jsonrpc":"2.0","id":3,"method":"resources/list"}' \
+    '{"jsonrpc":"2.0","id":4,"method":"prompts/list"}'; sleep 2) \
+    | (cd s2-mcp/showcase && node server.mjs 2>/dev/null) )
+  MISSING=""
+  for t in recommend_for_skin track_order create_draft_order get_bestsellers get_promotions confirm_order; do
+    echo "$OUT" | grep -q "\"$t\"" || MISSING="$MISSING $t"
+  done
+  [ -z "$MISSING" ] && ok "tools/list ครบ 6 tools" || bad "tools/list ขาด:$MISSING" "เช็ค showcase/server.mjs"
+  echo "$OUT" | grep -q 'store://policy' && ok "resource store://policy พร้อม" || bad "ไม่พบ resource store://policy"
+  echo "$OUT" | grep -q 'after_sales_reply' && ok "prompt after_sales_reply พร้อม" || bad "ไม่พบ prompt after_sales_reply"
+fi
+
+# ── 4) MCP security (สแกน tool description) ──────────────────
+echo ""
+echo "▌4. MCP security (s2-mcp/security · tool poisoning scanner)"
+if [ ! -d s2-mcp/security/node_modules ]; then
+  skip "ยังไม่ได้ npm install" "รันก่อน: cd s2-mcp/security && npm install"
+else
+  # สแกนเนอร์ต้องจับ poisoned ได้ (exit 1) และไม่ false positive กับ showcase (exit 0)
+  (cd s2-mcp/security && node scan-tools.mjs ./poisoned-server.mjs >/dev/null 2>&1)
+  [ $? -eq 1 ] && ok "สแกนเนอร์จับ poisoned-server ได้ (exit 1)" || bad "สแกนเนอร์ไม่จับ poisoned-server" "เช็คกฎใน scan-tools.mjs"
+  (cd s2-mcp/security && node scan-tools.mjs ../showcase/server.mjs >/dev/null 2>&1)
+  [ $? -eq 0 ] && ok "showcase ผ่านการสแกน (ไม่ false positive)" || bad "showcase ไม่ผ่านการสแกน" "ตรวจคำอธิบาย tool ใน showcase/server.mjs"
+  # ประตูกำกับดูแลฝั่ง AI: draft ไม่ execute · zod · kill switch · readonly · audit (21 เคส)
+  if [ -d s2-mcp/showcase/node_modules ]; then
+    if (cd s2-mcp/security && node test-governance.mjs >/tmp/gov.$$.log 2>&1); then
+      ok "ประตูกำกับดูแล MCP ผ่านครบ ($(grep -oE '✅ [0-9]+ ผ่าน' /tmp/gov.$$.log | tail -1))"
+    else
+      bad "ประตูกำกับดูแล MCP ไม่ผ่าน" "ดูรายละเอียด: cd s2-mcp/security && npm run test:governance"
+    fi
+    rm -f /tmp/gov.$$.log
+  else
+    skip "ข้ามเทสต์ governance" "รันก่อน: cd s2-mcp/showcase && npm install"
+  fi
+fi
+
+# ── 5) MCP multi (analytics server ตัวที่ 2) ─────────────────
+echo ""
+echo "▌5. MCP multi (s2-mcp/multi · analytics server)"
+if [ ! -d s2-mcp/multi/node_modules ]; then
+  skip "ยังไม่ได้ npm install" "รันก่อน: cd s2-mcp/multi && npm install"
+else
+  OUT=$( (printf '%s\n' \
+    '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"smoke","version":"1.0"}}}' \
+    '{"jsonrpc":"2.0","method":"notifications/initialized"}' \
+    '{"jsonrpc":"2.0","id":2,"method":"tools/list"}'; sleep 2) \
+    | (cd s2-mcp/multi && node analytics-server.mjs 2>/dev/null) )
+  MISSING=""
+  for t in sales_by_channel sales_by_category find_at_risk_channel; do
+    echo "$OUT" | grep -q "\"$t\"" || MISSING="$MISSING $t"
+  done
+  [ -z "$MISSING" ] && ok "analytics tools/list ครบ 3 tools" || bad "analytics ขาด:$MISSING" "เช็ค multi/analytics-server.mjs"
+fi
+
+# ── 6) Agent-Ready storefront (4 ประตู) ──────────────────────
+echo ""
+echo "▌6. Agent-Ready storefront (s3-economy/storefront)"
+SCORE=$(cd s3-economy/storefront && node audit-gates.mjs 2>/dev/null | grep -oE 'คะแนนรวม: [0-9]+' | grep -oE '[0-9]+')
+if [ -z "$SCORE" ]; then
+  bad "รัน audit-gates.mjs ไม่ได้" "เช็ค s3-economy/storefront/audit-gates.mjs"
+elif [ "$SCORE" -ge 15 ]; then
+  ok "storefront ผ่าน 4 ประตู ($SCORE/20)"
+else
+  bad "storefront คะแนนต่ำ ($SCORE/20)" "ตรวจ index.html · llms.txt · agent-card.json"
+fi
+
+# ── 7) line-bot-rich (เทสต์ออฟไลน์ ไม่ต้องสตาร์ต bot) ────────
+echo ""
+echo "▌7. line-bot-rich (Flex · ตัวจับ restock · ประตูกันส่งจริง)"
+if [ ! -d s1-martech/line-bot-rich/node_modules ]; then
+  skip "ยังไม่ได้ npm install" "รันก่อน: cd s1-martech/line-bot-rich && npm install"
+else
+  if (cd s1-martech/line-bot-rich && node test-offline.js >/tmp/rich.$$.log 2>&1); then
+    ok "Flex + ตัวจับ restock ผ่าน ($(grep -oE '✅ [0-9]+ ผ่าน' /tmp/rich.$$.log | tail -1))"
+  else
+    bad "เทสต์ line-bot-rich ไม่ผ่าน" "ดูรายละเอียด: cd s1-martech/line-bot-rich && npm test"
+  fi
+  rm -f /tmp/rich.$$.log
+  # ประตูกันส่งจริงของ Marketing Console — ทดสอบเฉพาะทางที่ต้องถูกปฏิเสธ ไม่มีเคสไหนส่งจริง
+  if (cd s1-martech/line-bot-rich && node test-console.mjs >/tmp/con.$$.log 2>&1); then
+    ok "ประตูกันส่งจริงของ Console ยังปฏิเสธถูกต้อง ($(grep -oE '✅ [0-9]+ ผ่าน' /tmp/con.$$.log | tail -1))"
+  else
+    bad "ประตูกันส่งจริงของ Console ไม่ผ่าน" "ดูรายละเอียด: cd s1-martech/line-bot-rich && npm run test:console"
+  fi
+  rm -f /tmp/con.$$.log
+fi
+
+# ── 8) MCP remote (Cloudflare Workers) ───────────────────────
+echo ""
+echo "▌8. MCP remote"
 KEY="${DEMO_API_KEY:-$(read_env s2-mcp/remote/.dev.vars DEMO_API_KEY)}"
 if [ -z "$REMOTE_MCP_URL" ]; then
   skip "ข้าม — ยังไม่ได้ตั้ง REMOTE_MCP_URL" "หลัง deploy: REMOTE_MCP_URL=https://.../mcp ./smoke-test.sh"

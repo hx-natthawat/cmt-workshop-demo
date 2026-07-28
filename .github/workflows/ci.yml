@@ -1,0 +1,102 @@
+# CI — ตรวจก่อน merge ทุกครั้ง
+#
+# หลักคิด: repo นี้ "สอน" เรื่อง MCP security → ตัวมันเองต้องทำตามที่สอน
+# Lab Security บอกว่า "ใส่ scan เข้า CI แล้วบล็อกถ้า exit 1" — ไฟล์นี้คือของจริง
+#
+# ไม่ต้องใช้ secret ใดๆ (ไม่เรียก Anthropic/LINE) → รันได้บน fork ด้วย
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  syntax:
+    name: ตรวจ syntax ทุกไฟล์ JS
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - name: node --check ทุก .js/.mjs (ข้าม node_modules)
+        run: |
+          fail=0
+          while IFS= read -r f; do
+            node --check "$f" || { echo "❌ $f"; fail=1; }
+          done < <(find . -name node_modules -prune -o \( -name '*.js' -o -name '*.mjs' \) -print)
+          exit $fail
+
+  line-bot-rich:
+    name: line-bot-rich — Flex + ตัวจับ restock
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - run: npm ci --prefix s1-martech/line-bot-rich
+      # เทสต์ตรรกะล้วน ไม่เรียก Claude/LINE → ไม่ต้องมี secret
+      - run: npm test --prefix s1-martech/line-bot-rich
+      # ประตูกันส่งจริงของ Marketing Console — ทดสอบเฉพาะทางที่ต้องถูกปฏิเสธ
+      # (ใช้ token ปลอม ถ้าโค้ดเผลอยิงไป LINE จริงเทสต์จะพัง = สิ่งที่ต้องการ)
+      - run: npm run test:console --prefix s1-martech/line-bot-rich
+
+  mcp-security-scan:
+    name: สแกน tool description ของทุก MCP server
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+
+      # ต้องติดตั้ง dep ของ server ที่จะสแกน เพราะสแกนเนอร์รัน server จริงแล้วขอ tools/list
+      - name: ติดตั้ง dependencies
+        run: |
+          for d in s2-mcp/security s2-mcp/local s2-mcp/showcase s2-mcp/multi; do
+            npm ci --prefix "$d"
+          done
+
+      # server ที่เราใช้จริงต้องสะอาดทุกตัว — exit 1 = บล็อก merge
+      - name: server ของเราต้องผ่านสแกน
+        working-directory: s2-mcp/security
+        run: |
+          for t in ../local/server.mjs ../showcase/server.mjs \
+                   ../multi/analytics-server.mjs ./guarded-server.mjs; do
+            echo "── สแกน $t"
+            node scan-tools.mjs "$t"
+          done
+
+      # กันสแกนเนอร์เสียเงียบๆ: ถ้าจับ poisoned ไม่ได้แล้ว = CI ต้องแดง
+      - name: สแกนเนอร์ต้องยังจับ poisoned server ได้
+        working-directory: s2-mcp/security
+        run: |
+          if node scan-tools.mjs ./poisoned-server.mjs; then
+            echo "❌ สแกนเนอร์ไม่จับ poisoned-server แล้ว — กฎใน rules.mjs อาจถูกแก้จนหลุด"
+            exit 1
+          fi
+          echo "✅ ยังจับได้ (exit 1 ตามคาด)"
+
+      # ประตูกำกับดูแลฝั่ง AI: draft ไม่ execute · zod กัน input พิลึก · kill switch/readonly/audit
+      - name: ประตูกำกับดูแลของ MCP ต้องยังทำงาน
+        working-directory: s2-mcp/security
+        run: npm run test:governance
+
+      - name: สร้างรายงาน HTML ได้จริง
+        working-directory: s2-mcp/security
+        run: npm run report && test -s scan-report.html
+
+  storefront-gates:
+    name: Agent-Readiness 4 ประตู
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - name: คะแนนต้องไม่ต่ำกว่า 16/20
+        working-directory: s3-economy/storefront
+        run: |
+          out=$(node audit-gates.mjs)
+          echo "$out"
+          score=$(echo "$out" | grep -o 'คะแนนรวม: [0-9]*' | grep -o '[0-9]*')
+          echo "คะแนนที่ได้: $score/20"
+          [ "${score:-0}" -ge 16 ] || { echo "❌ ต่ำกว่าเกณฑ์ 16"; exit 1; }

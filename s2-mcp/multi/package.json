@@ -1,0 +1,16 @@
+{
+  "name": "mcp-multi-orchestration",
+  "version": "1.0.0",
+  "description": "Multi-server MCP orchestration — Claude เรียกหลาย server ต่อกัน (HarmonyX)",
+  "type": "module",
+  "scripts": {
+    "start": "node orchestrate.mjs",
+    "inspect:analytics": "npx @modelcontextprotocol/inspector node analytics-server.mjs",
+    "trace": "node trace-ui.mjs"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.113.0",
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "zod": "^4.4.3"
+  }
+}

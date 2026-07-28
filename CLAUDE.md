@@ -8,7 +8,7 @@ Repo เตรียม live demo สำหรับ 3 workshops ดูแผน
 - `s1-martech/vibe` — ผลลัพธ์ Mini-Lab ตัวอย่าง (utm_builder.html ฯลฯ)
 - `s2-mcp/local` — MCP server stdio (@modelcontextprotocol/sdk) · รัน: `npm start` · ทดสอบ: `npm run inspect`
 - `s2-mcp/remote` — Cloudflare Workers (Streamable HTTP ที่ `/mcp`) · dev: `npm start` · deploy: `npm run deploy` — ต้องตั้ง secret `DEMO_API_KEY` ก่อน (ดู README)
-- `s3-economy` — prompt สำหรับ Agent-Readiness Audit ไม่มีโค้ด
+- `s3-economy` — วัสดุ Session 3 (ไม่มีโค้ด): `audit-prompts.md` (Lab 1 + worksheet 4 ประตู), `lab2-journey-canvas.md` (Lab 2 canvas)
 - `deck` — สไลด์เด็คงาน (index.html) บน Cloudflare Pages · deploy: `cd deck && ./deploy.sh` · live: https://cmt2026.harmonyx.co (ดู README)
 - `recordings` — วิดีโอสำรองทุก demo (ไม่ commit)
 - `smoke-test.sh` — ตรวจทุก demo ก่อนวันงานในคำสั่งเดียว (line-bot / MCP local / MCP remote)

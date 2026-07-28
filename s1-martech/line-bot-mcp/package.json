@@ -1,0 +1,17 @@
+{
+  "name": "line-bot-mcp",
+  "version": "1.0.0",
+  "description": "LINE bot × MCP — ตอบลูกค้าผ่าน MCP tools จริง (HarmonyX)",
+  "type": "commonjs",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.113.0",
+    "@line/bot-sdk": "^11.2.0",
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1"
+  }
+}

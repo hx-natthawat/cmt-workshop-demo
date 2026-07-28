@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Customer Dashboard — Glow Beauty</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   /* โทนเดียวกับ utm_builder / roi_calculator — ตัวเลขทั้งหมดคำนวณจาก customer_data.csv (300 ราย) */
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -28,7 +30,8 @@
     }
   }
   body.viz-root {
-    font-family: -apple-system, "Segoe UI", "Noto Sans Thai", sans-serif;
+    font-family: "IBM Plex Sans Thai", "Noto Sans Thai", -apple-system, "Segoe UI", sans-serif;
+    -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; line-height: 1.6;
     background: var(--surface-1); color: var(--text-primary);
     display: flex; justify-content: center; padding: 32px 16px;
   }

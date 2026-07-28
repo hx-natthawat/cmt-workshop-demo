@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>Rich Menu Template — 2500×843</title>
+<style>
+  /* เปิดไฟล์นี้ในเบราว์เซอร์ → แคปเฉพาะกล่อง .menu (2500×843) → บันทึกเป็น richmenu.png
+     (Chrome: คลิกขวา .menu > Inspect > เลือก node > Capture node screenshot) */
+  body { margin: 0; background: #333; display: flex; justify-content: center; padding: 20px; font-family: "Noto Sans Thai", -apple-system, sans-serif; }
+  .menu { width: 2500px; height: 843px; display: grid; grid-template-columns: repeat(4, 1fr); }
+  .cell { display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; gap: 24px; border-right: 3px solid rgba(255,255,255,.25); }
+  .cell:last-child { border-right: none; }
+  .cell .icon { font-size: 150px; line-height: 1; }
+  .cell .label { font-size: 56px; font-weight: 700; }
+  .c1 { background: #345589; }
+  .c2 { background: #3d6098; }
+  .c3 { background: #2b4a78; }
+  .c4 { background: #223c63; }
+</style>
+</head>
+<body>
+  <div class="menu">
+    <div class="cell c1"><div class="icon">🧴</div><div class="label">แนะนำสินค้า</div></div>
+    <div class="cell c2"><div class="icon">🎁</div><div class="label">โปรโมชัน</div></div>
+    <div class="cell c3"><div class="icon">📦</div><div class="label">เช็คออเดอร์</div></div>
+    <div class="cell c4"><div class="icon">💬</div><div class="label">เจ้าหน้าที่</div></div>
+  </div>
+</body>
+</html>

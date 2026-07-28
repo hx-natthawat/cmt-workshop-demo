@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Glow Beauty Thailand — สกินแคร์สำหรับทุกสภาพผิว</title>
+<meta name="description" content="ร้านสกินแคร์ Glow Beauty Thailand — เซรั่มวิตามินซี ครีมกันแดด SPF50+ โฟมล้างหน้า ราคา สต็อก และเงื่อนไขจัดส่งแสดงเป็นข้อความชัดเจน">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- ═══ ประตูที่ 1 · Structured Data (Schema.org JSON-LD) ═══
+     agent อ่านตรงนี้ได้ทันทีโดยไม่ต้องเดาจากหน้าเว็บ -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Store",
+      "@id": "https://glowbeauty.example/#store",
+      "name": "Glow Beauty Thailand",
+      "description": "ร้านสกินแคร์ออนไลน์ จำหน่ายเซรั่ม ครีมกันแดด และผลิตภัณฑ์ทำความสะอาดผิวหน้า",
+      "telephone": "+66-2-xxx-xxxx",
+      "openingHours": "Mo-Fr 09:00-18:00",
+      "areaServed": "TH",
+      "currenciesAccepted": "THB",
+      "paymentAccepted": "Credit Card, Bank Transfer, PromptPay"
+    },
+    {
+      "@type": "Product",
+      "sku": "GB-001",
+      "name": "เซรั่มวิตามินซี 30ml",
+      "description": "วิตามินซีเข้มข้น 15% พร้อมไฮยาลูรอน เหมาะกับผิวหมองคล้ำ ต้องการความกระจ่างใส ใช้ได้ทุกสภาพผิว",
+      "brand": { "@type": "Brand", "name": "Glow Beauty" },
+      "offers": {
+        "@type": "Offer", "price": "790", "priceCurrency": "THB",
+        "availability": "https://schema.org/InStock", "inventoryLevel": { "@type": "QuantitativeValue", "value": 42 },
+        "shippingDetails": { "@type": "OfferShippingDetails", "shippingRate": { "@type": "MonetaryAmount", "value": "0", "currency": "THB" },
+          "deliveryTime": { "@type": "ShippingDeliveryTime", "handlingTime": { "@type": "QuantitativeValue", "minValue": 1, "maxValue": 2, "unitCode": "DAY" } } },
+        "hasMerchantReturnPolicy": { "@type": "MerchantReturnPolicy", "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow", "merchantReturnDays": 7 }
+      }
+    },
+    {
+      "@type": "Product",
+      "sku": "GB-002",
+      "name": "ครีมกันแดด SPF50+ PA++++ สูตรเนื้อเจล 50g",
+      "description": "เนื้อเจลบางเบา ไม่วอก คุมมันได้ 8 ชั่วโมง เหมาะกับผิวมัน ผิวผสม เป็นสิวง่าย ไม่อุดตัน",
+      "brand": { "@type": "Brand", "name": "Glow Beauty" },
+      "offers": { "@type": "Offer", "price": "590", "priceCurrency": "THB",
+        "availability": "https://schema.org/InStock", "inventoryLevel": { "@type": "QuantitativeValue", "value": 8 } }
+    },
+    {
+      "@type": "Product",
+      "sku": "GB-003",
+      "name": "ครีมกันแดด SPF50+ สูตรผิวแห้ง/ผิวบอบบาง 50g",
+      "description": "อ่อนโยน ไม่มีน้ำหอม ผ่านการทดสอบการแพ้ มีส่วนผสมเซราไมด์ เหมาะกับผิวแห้ง ผิวแพ้ง่าย",
+      "brand": { "@type": "Brand", "name": "Glow Beauty" },
+      "offers": { "@type": "Offer", "price": "650", "priceCurrency": "THB",
+        "availability": "https://schema.org/InStock", "inventoryLevel": { "@type": "QuantitativeValue", "value": 25 } }
+    },
+    {
+      "@type": "Product",
+      "sku": "GB-004",
+      "name": "โฟมล้างหน้าใยไหม 100g",
+      "description": "โฟมล้างหน้าเนื้อนุ่ม เหมาะกับทุกสภาพผิว — สินค้าหมดชั่วคราว จะเข้าสต็อกกลางเดือนหน้า",
+      "brand": { "@type": "Brand", "name": "Glow Beauty" },
+      "offers": { "@type": "Offer", "price": "320", "priceCurrency": "THB",
+        "availability": "https://schema.org/OutOfStock", "inventoryLevel": { "@type": "QuantitativeValue", "value": 0 } }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        { "@type": "Question", "name": "ค่าจัดส่งเท่าไร",
+          "acceptedAnswer": { "@type": "Answer", "text": "ส่งฟรีเมื่อสั่งซื้อครบ 600 บาท จัดส่ง 1-2 วันทำการในกรุงเทพฯ และ 2-4 วันทำการต่างจังหวัด" } },
+        { "@type": "Question", "name": "คืนสินค้าได้ไหม",
+          "acceptedAnswer": { "@type": "Answer", "text": "คืนได้ภายใน 7 วันหากสินค้าไม่ถูกเปิดใช้ เฉพาะกรณีสินค้าชำรุดหรือส่งผิด" } },
+        { "@type": "Question", "name": "ครีมกันแดดตัวไหนเหมาะกับผิวมัน",
+          "acceptedAnswer": { "@type": "Answer", "text": "แนะนำ GB-002 ครีมกันแดด SPF50+ PA++++ สูตรเนื้อเจล ราคา 590 บาท เนื้อบางเบา คุมมัน 8 ชั่วโมง ไม่อุดตันรูขุมขน" } },
+        { "@type": "Question", "name": "มีโปรโมชันอะไรบ้าง",
+          "acceptedAnswer": { "@type": "Answer", "text": "โปรหน้าฝน ซื้อครีมกันแดด 2 ชิ้น ลด 15% ถึง 31 สิงหาคม 2026 และสมาชิกใหม่ LINE OA รับส่วนลด 50 บาท เมื่อสั่งซื้อครั้งแรกขั้นต่ำ 500 บาท ใช้โค้ด NEW50" } }
+      ]
+    }
+  ]
+}
+</script>
+
+<style>
+  :root{--bg:#f6f7f9;--surface:#fff;--border:#e7e8ec;--text:#101828;--text-2:#475467;--muted:#98a2b3;
+    --brand:#345589;--brand-soft:#eef2f8;--good:#12805c;--good-soft:#e6f4ee;--warn:#b42318;--warn-soft:#fef3f2;--shadow:0 1px 3px rgba(16,24,40,.06)}
+  @media(prefers-color-scheme:dark){:root{--bg:#0f1115;--surface:#171a1f;--border:#282d35;--text:#f2f4f7;--text-2:#c3c8d0;--muted:#7d8590;
+    --brand:#6b9bd8;--brand-soft:#1c2636;--good:#3ddc97;--good-soft:#132318;--warn:#f97066;--warn-soft:#2a1614;--shadow:none}}
+  *{box-sizing:border-box;margin:0}
+  body{font-family:"IBM Plex Sans Thai","Noto Sans Thai",-apple-system,sans-serif;background:var(--bg);color:var(--text);
+    line-height:1.6;font-size:15px;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+  .wrap{max-width:900px;margin:0 auto;padding:clamp(16px,4vw,32px)}
+  header{margin-bottom:24px}
+  h1{font-size:clamp(1.3rem,4vw,1.7rem);font-weight:700;letter-spacing:-.02em}
+  .tag{display:inline-block;background:var(--good-soft);color:var(--good);font-size:.72rem;font-weight:600;padding:3px 10px;border-radius:20px;margin-bottom:8px}
+  .lead{color:var(--text-2);font-size:.92rem;margin-top:4px}
+  h2{font-size:1.05rem;font-weight:650;margin:26px 0 12px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px;box-shadow:var(--shadow)}
+  .sku{font-size:.7rem;color:var(--muted);font-weight:600;letter-spacing:.04em}
+  .name{font-weight:600;margin:3px 0 6px;font-size:.95rem}
+  .desc{font-size:.83rem;color:var(--text-2);margin-bottom:10px}
+  .price{font-size:1.2rem;font-weight:700;color:var(--brand)}
+  .stock{font-size:.78rem;font-weight:600;padding:2px 9px;border-radius:20px;display:inline-block;margin-top:6px}
+  .in{background:var(--good-soft);color:var(--good)}.out{background:var(--warn-soft);color:var(--warn)}
+  .faq{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:6px 18px;box-shadow:var(--shadow)}
+  details{border-bottom:1px solid var(--border);padding:12px 0}details:last-child{border-bottom:none}
+  summary{font-weight:600;font-size:.9rem;cursor:pointer}
+  details p{color:var(--text-2);font-size:.86rem;margin-top:8px}
+  .policy{background:var(--brand-soft);border-radius:12px;padding:16px 18px;font-size:.88rem;color:var(--text-2)}
+  .policy b{color:var(--text)}
+  footer{margin-top:28px;padding-top:16px;border-top:1px solid var(--border);color:var(--muted);font-size:.78rem}
+  footer a{color:var(--brand)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <span class="tag">✓ Agent-Ready Storefront (ตัวอย่างสำหรับ Lab 1)</span>
+  <h1>Glow Beauty Thailand</h1>
+  <p class="lead">สกินแคร์สำหรับทุกสภาพผิว — ราคา สต็อก และเงื่อนไขทั้งหมดแสดงเป็น<strong>ข้อความจริง</strong> ไม่ฝังในรูปภาพ</p>
+</header>
+
+<!-- ═══ ประตูที่ 1 (ต่อ) · ราคา/สต็อกเป็นข้อความจริง — agent คัดลอกได้ ไม่ต้อง OCR ═══ -->
+<h2>สินค้าทั้งหมด</h2>
+<div class="grid">
+  <div class="card">
+    <div class="sku">GB-001</div><div class="name">เซรั่มวิตามินซี 30ml</div>
+    <p class="desc">วิตามินซีเข้มข้น 15% พร้อมไฮยาลูรอน — ผิวหมองคล้ำ ต้องการความกระจ่างใส ใช้ได้ทุกสภาพผิว</p>
+    <div class="price">790 บาท</div><span class="stock in">มีสินค้า · คงเหลือ 42 ชิ้น</span>
+  </div>
+  <div class="card">
+    <div class="sku">GB-002</div><div class="name">ครีมกันแดด SPF50+ PA++++ เนื้อเจล 50g</div>
+    <p class="desc">เนื้อเจลบางเบา ไม่วอก คุมมัน 8 ชั่วโมง — ผิวมัน ผิวผสม เป็นสิวง่าย ไม่อุดตัน</p>
+    <div class="price">590 บาท</div><span class="stock in">มีสินค้า · คงเหลือ 8 ชิ้น</span>
+  </div>
+  <div class="card">
+    <div class="sku">GB-003</div><div class="name">ครีมกันแดด SPF50+ ผิวแห้ง/บอบบาง 50g</div>
+    <p class="desc">อ่อนโยน ไม่มีน้ำหอม ผ่านการทดสอบการแพ้ มีเซราไมด์ — ผิวแห้ง ผิวแพ้ง่าย</p>
+    <div class="price">650 บาท</div><span class="stock in">มีสินค้า · คงเหลือ 25 ชิ้น</span>
+  </div>
+  <div class="card">
+    <div class="sku">GB-004</div><div class="name">โฟมล้างหน้าใยไหม 100g</div>
+    <p class="desc">โฟมเนื้อนุ่ม เหมาะกับทุกสภาพผิว — จะเข้าสต็อกกลางเดือนหน้า</p>
+    <div class="price">320 บาท</div><span class="stock out">สินค้าหมดชั่วคราว</span>
+  </div>
+</div>
+
+<!-- ═══ ประตูที่ 2 · AEO — คำตอบชัด อ้างอิงได้ ให้ answer engine หยิบไปตอบ ═══ -->
+<h2>คำถามที่พบบ่อย</h2>
+<div class="faq">
+  <details open><summary>ค่าจัดส่งเท่าไร</summary>
+    <p>ส่งฟรีเมื่อสั่งซื้อครบ 600 บาท · จัดส่ง 1-2 วันทำการในกรุงเทพฯ และ 2-4 วันทำการต่างจังหวัด</p></details>
+  <details><summary>คืนสินค้าได้ไหม</summary>
+    <p>คืนได้ภายใน 7 วันหากสินค้าไม่ถูกเปิดใช้ เฉพาะกรณีสินค้าชำรุดหรือส่งผิด</p></details>
+  <details><summary>ครีมกันแดดตัวไหนเหมาะกับผิวมัน</summary>
+    <p>แนะนำ GB-002 ครีมกันแดด SPF50+ PA++++ สูตรเนื้อเจล ราคา 590 บาท — เนื้อบางเบา คุมมัน 8 ชั่วโมง ไม่อุดตันรูขุมขน</p></details>
+  <details><summary>มีโปรโมชันอะไรบ้าง</summary>
+    <p><b>โปรหน้าฝน</b> ซื้อครีมกันแดด 2 ชิ้น ลด 15% (ถึง 31 ส.ค. 2026)<br>
+       <b>สมาชิกใหม่ LINE OA</b> รับส่วนลด 50 บาท เมื่อสั่งซื้อครั้งแรกขั้นต่ำ 500 บาท ใช้โค้ด NEW50</p></details>
+</div>
+
+<h2>นโยบายร้าน</h2>
+<div class="policy">
+  <b>การจัดส่ง:</b> ส่งฟรีเมื่อครบ 600 บาท · กทม. 1-2 วันทำการ · ต่างจังหวัด 2-4 วันทำการ<br>
+  <b>การคืนสินค้า:</b> ภายใน 7 วัน หากไม่ถูกเปิดใช้ (สินค้าชำรุด/ส่งผิด)<br>
+  <b>การรับประกัน:</b> สินค้าหมดอายุหรือชำรุดจากการผลิต เปลี่ยนใหม่ฟรี<br>
+  <b>ติดต่อ:</b> โทร 02-xxx-xxxx (จ-ศ 9:00-18:00)
+</div>
+
+<footer>
+  หน้านี้เป็น <b>ตัวอย่างวัสดุสอน</b> สำหรับ Lab 1 (Agent-Readiness Audit) ของ Session 3 · ไม่ใช่ร้านค้าจริง<br>
+  ไฟล์ที่ทำให้ agent อ่านออก: <a href="/llms.txt">/llms.txt</a> ·
+  <a href="/.well-known/agent-card.json">/.well-known/agent-card.json</a> · JSON-LD ฝังในหน้านี้ (ดู view-source)
+</footer>
+
+</div>
+</body>
+</html>

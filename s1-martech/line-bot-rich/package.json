@@ -1,0 +1,28 @@
+{
+  "name": "line-bot-rich",
+  "version": "1.0.0",
+  "description": "LINE bot × MCP × Rich UI (Flex/QuickReply/Postback/RichMenu) — HarmonyX",
+  "type": "commonjs",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "setup-richmenu": "node setup-richmenu.mjs",
+    "admin": "node admin.mjs",
+    "broadcast": "node broadcast.mjs",
+    "webchat": "node webchat.mjs",
+    "voc-report": "node voc-report.mjs",
+    "restock-notify": "node restock-notify.mjs",
+    "broadcast-segment": "node broadcast-segment.mjs",
+    "console": "node console.mjs",
+    "rehearse": "node rehearse.js",
+    "test": "node test-offline.js",
+    "test:console": "node test-console.mjs"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.113.0",
+    "@line/bot-sdk": "^11.2.0",
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1"
+  }
+}
