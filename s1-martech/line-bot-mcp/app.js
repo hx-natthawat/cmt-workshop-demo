@@ -45,6 +45,7 @@ async function connectMcp() {
 // ---------- 3) agentic loop: Claude + MCP tools ----------
 async function askClaudeWithTools(userText) {
   const messages = [{ role: 'user', content: userText }];
+  let retries = 0;
   for (let hop = 0; hop < 6; hop++) {
     const res = await anthropic.messages.create({
       model: 'claude-sonnet-5',
@@ -54,16 +55,25 @@ async function askClaudeWithTools(userText) {
       tools: anthTools,
       messages,
     });
-    messages.push({ role: 'assistant', content: res.content });
+    const toolUses = res.content.filter((b) => b.type === 'tool_use');
     if (res.stop_reason !== 'tool_use') {
+      messages.push({ role: 'assistant', content: res.content });
       return res.content.find((b) => b.type === 'text')?.text ?? 'ขออภัยค่ะ เดี๋ยวให้เจ้าหน้าที่ติดต่อกลับนะคะ';
     }
+    // บางครั้ง stop_reason = tool_use แต่ไม่มี tool_use block จริง (โมเดลพ่น <invoke> เป็นข้อความ)
+    // ถ้าเดินต่อจะส่ง user message ว่าง → API ตอบ 400 แล้วบอทเงียบ · ลองใหม่ไม่เกิน 2 ครั้ง
+    if (!toolUses.length) {
+      if (++retries <= 2) continue;
+      return 'ขออภัยค่ะ เดี๋ยวให้เจ้าหน้าที่ติดต่อกลับนะคะ';
+    }
+    messages.push({ role: 'assistant', content: res.content });
     // เรียก MCP tool ที่ Claude เลือก แล้วส่งผลกลับ
     const results = [];
-    for (const tu of res.content.filter((b) => b.type === 'tool_use')) {
+    for (const tu of toolUses) {
       const r = await mcp.callTool({ name: tu.name, arguments: tu.input });
+      const text = r.content.map((c) => c.text).join('\n');
       results.push({ type: 'tool_result', tool_use_id: tu.id,
-        content: r.content.map((c) => ({ type: 'text', text: c.text })) });
+        content: [{ type: 'text', text: text || '(ไม่มีข้อมูล)' }] });
     }
     messages.push({ role: 'user', content: results });
   }

@@ -64,6 +64,33 @@ server.registerTool('track_order', {
 });
 
 // Pattern 3 · Governed action — สร้าง "ร่างออเดอร์" ไม่ execute จริง (human-in-the-loop สไลด์ governance)
+// เช็คสต็อก — ลูกค้าถามบ่อยสุดว่า "ยังมีไหม" · รับได้ทั้งรหัสสินค้าและชื่อบางส่วน
+// (ไทยไม่เว้นวรรค ลูกค้าพิมพ์ "โฟมล้างหน้า" ต้องเจอ "โฟมล้างหน้าใยไหม 100g")
+server.registerTool('check_stock', {
+  description:
+    'ตรวจสอบว่าสินค้ามีของหรือไม่ และเหลือกี่ชิ้น ค้นได้ทั้งจากรหัสสินค้า (เช่น GB-002) ' +
+    'และจากชื่อสินค้าบางส่วน (เช่น "โฟมล้างหน้า" "ครีมกันแดด") ' +
+    'เหมาะกับคำถามลักษณะ "มีของไหม" "ยังมีอยู่ไหม" "เหลือกี่ชิ้น" "หมดหรือยัง" ' +
+    'ตัวเลขที่คืนมาอ่านจากระบบคลังโดยตรง ไม่ใช่ค่าประมาณ',
+  inputSchema: {
+    query: z.string().describe('รหัสสินค้าหรือชื่อสินค้า (บางส่วนก็ได้) เช่น GB-002 หรือ โฟมล้างหน้า'),
+  },
+}, async ({ query }) => {
+  audit('check_stock', { query });
+  const q = query.trim().toLowerCase();
+  const hits = products.products.filter(
+    (p) => p.sku.toLowerCase() === q || p.name.toLowerCase().includes(q) || p.sku.toLowerCase().includes(q),
+  );
+  if (!hits.length) {
+    return { content: [{ type: 'text', text: `ไม่พบสินค้าที่ตรงกับ "${query}" — ลองบอกชื่อหรือรหัสสินค้าอีกครั้งค่ะ` }] };
+  }
+  const lines = hits.map((p) => (p.stock === 0
+    // ของหมด: บอกตรงๆ + เปิดทางให้เก็บ restock interest (bot จะบันทึกให้เอง)
+    ? `❌ ${p.name} (${p.sku}) — สินค้าหมดชั่วคราว แจ้งเตือนเมื่อของเข้าได้ค่ะ`
+    : `✅ ${p.name} (${p.sku}) — คงเหลือ ${p.stock} ชิ้น · ${p.price_thb} บาท${p.stock <= 10 ? ' (ใกล้หมด)' : ''}`));
+  return { content: [{ type: 'text', text: lines.join('\n') }] };
+});
+
 // action tool ต้องคืนสถานะ "รออนุมัติ" ให้มนุษย์ยืนยันก่อน ไม่ตัดสต็อก/ตัดเงินเอง
 server.registerTool('create_draft_order', {
   description:
@@ -200,4 +227,4 @@ server.registerPrompt(
 // ══════════════════════════════════════════════════════════════════
 const transport = new StdioServerTransport();
 await server.connect(transport);
-console.error('✅ MCP showcase "glow-beauty-showcase" พร้อมใช้งาน (6 tools + 1 resource + 1 prompt · stdio)');
+console.error('✅ MCP showcase "glow-beauty-showcase" พร้อมใช้งาน (7 tools + 1 resource + 1 prompt · stdio)');

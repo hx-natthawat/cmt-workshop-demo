@@ -55,6 +55,20 @@ npx @modelcontextprotocol/inspector
 
 เลือก transport เป็น Streamable HTTP, URL `http://localhost:8787/mcp` แล้วเพิ่ม header `Authorization: Bearer <key>`
 
+### ✅ ตรวจให้ครบด้วยคำสั่งเดียวก่อน deploy
+
+`smoke-test.sh` ใช้กับ worker ในเครื่องได้เลย ไม่ต้อง deploy ก่อน:
+
+```bash
+REMOTE_MCP_URL=http://127.0.0.1:8787/mcp DEMO_API_KEY=<key-ที่ใช้ตอน dev> ./smoke-test.sh
+```
+ด่าน 8 ต้องขึ้น ✅ ทั้งคู่ (key ผิด → 401 · key ถูก → `serverInfo`)
+**ผ่านตรงนี้แล้ว deploy เหลือแค่เรื่องบัญชี Cloudflare — โค้ดพิสูจน์แล้ว**
+
+> ตรวจจริงเมื่อ 2026-07-27 หลังอัป dependency ข้าม major (agents 0.19 · wrangler ใหม่ · TypeScript 7):
+> `tsc --noEmit` ผ่าน · auth ผ่านทั้ง `Authorization: Bearer` และ `x-api-key` · ไม่ส่ง key → 401
+> · `tools/list` ครบ 3 tools · เรียก `search_products` / `check_stock` / `get_promotions` ได้ข้อมูลจริง
+
 ## ขั้นตอน Deploy
 
 ```bash

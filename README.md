@@ -39,7 +39,7 @@ cmt-workshop-demo/
 ├── s2-mcp/                     # Session 2 · Advanced MCP
 │   ├── local/                  #   Lab MCP-1 — stdio server (3 tools)
 │   ├── remote/                 #   Lab MCP-2 — Cloudflare Workers + API key
-│   └── showcase/               #   ⭐ MCP โลกจริง (6 tools + resource + prompt)
+│   └── showcase/               #   ⭐ MCP โลกจริง (7 tools + resource + prompt)
 ├── s3-economy/                 # Session 3 · Agent Economy
 │   └── storefront/             #   Agent-Ready storefront + เครื่องตรวจ 4 ประตู
 ├── dev-all.sh · smoke-test.sh  # เครื่องมือซ้อม
@@ -171,6 +171,8 @@ Schema.org JSON-LD · `llms.txt` · `/.well-known/agent-card.json` (มี `x-ne
 ./smoke-test.sh                                     # local ทั้งหมด
 REMOTE_MCP_URL=https://.../mcp ./smoke-test.sh      # รวม remote หลัง deploy
 ```
+ทดสอบด่าน remote ได้โดยไม่ต้อง deploy — สตาร์ต `wrangler dev` แล้วชี้ `REMOTE_MCP_URL=http://127.0.0.1:8787/mcp` (ดู [s2-mcp/remote/README](s2-mcp/remote/README.md))
+
 8 ด่าน: line-bot · MCP local · MCP showcase · MCP security (สแกนเนอร์ + ประตูกำกับดูแล) · MCP multi · storefront (4 ประตู) · line-bot-rich (Flex + ประตูกันส่งจริง) · MCP remote · exit ≠ 0 ถ้ามีด่านพัง
 
 ---

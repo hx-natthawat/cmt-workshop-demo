@@ -45,8 +45,8 @@ npm run trace        # → trace.html แล้วเปิดในเบรา
 
 ```
 🔌 ต่อ 📊 analytics — 3 tools
-🔌 ต่อ 🧴 shop — 6 tools
-รวม 9 tools จาก 2 servers
+🔌 ต่อ 🧴 shop — 7 tools
+รวม 10 tools จาก 2 servers
 
   [hop 1] 📊 analytics → sales_by_channel({})
   [hop 1] 📊 analytics → find_at_risk_channel({})
