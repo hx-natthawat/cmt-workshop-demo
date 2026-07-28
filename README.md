@@ -39,7 +39,7 @@ cmt-workshop-demo/
 ├── s2-mcp/                     # Session 2 · Advanced MCP
 │   ├── local/                  #   Lab MCP-1 — stdio server (3 tools)
 │   ├── remote/                 #   Lab MCP-2 — Cloudflare Workers + API key
-│   └── showcase/               #   ⭐ MCP โลกจริง (6 tools + resource + prompt)
+│   └── showcase/               #   ⭐ MCP โลกจริง (7 tools + resource + prompt)
 ├── s3-economy/                 # Session 3 · Agent Economy
 │   └── storefront/             #   Agent-Ready storefront + เครื่องตรวจ 4 ประตู
 ├── dev-all.sh · smoke-test.sh  # เครื่องมือซ้อม

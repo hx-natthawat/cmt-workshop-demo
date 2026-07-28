@@ -64,6 +64,12 @@ for (let hop = 1; hop <= 8; hop++) {
     model: 'claude-sonnet-5', max_tokens: 2000, thinking: { type: 'disabled' },
     system: SYSTEM, tools: allTools, messages,
   });
+  const toolUses = res.content.filter((b) => b.type === 'tool_use');
+  // กัน stop_reason=tool_use แต่ไม่มี tool_use block จริง (ดู agent.js — เคยทำให้ API ตอบ 400)
+  if (res.stop_reason === 'tool_use' && !toolUses.length) {
+    console.error('⚠️  โมเดลไม่ได้ส่ง tool_use block ที่ถูกต้อง — ลองใหม่');
+    continue;
+  }
   messages.push({ role: 'assistant', content: res.content });
 
   if (res.stop_reason !== 'tool_use') {
@@ -72,7 +78,7 @@ for (let hop = 1; hop <= 8; hop++) {
   }
   const calls = [];
   const results = [];
-  for (const tu of res.content.filter((b) => b.type === 'tool_use')) {
+  for (const tu of toolUses) {
     const entry = registry.get(tu.name);
     const started = Date.now();
     const r = await entry.client.callTool({ name: tu.name, arguments: tu.input });
