@@ -9,6 +9,7 @@
  * รัน:  npm test
  */
 const { matchSoldOut } = require('./render');
+const { planFromResponse, stripToolXml, MAX_RETRIES } = require('./agent');
 const { validateReply } = require('./validate-line');
 const flex = require('./flex');
 
@@ -25,6 +26,31 @@ t('พิมพ์รหัสสินค้ามาตรงๆ ต้อง�
 t('คำถามทั่วไปต้องไม่จับผิด', matchSoldOut('ผิวแห้งมาก แนะนำอะไรดีคะ') === null);
 t('ข้อความว่างต้องไม่พัง', matchSoldOut('') === null);
 t('undefined ต้องไม่พัง', matchSoldOut(undefined) === null);
+
+console.log('\n▌1b. agentic loop ต้องทนคำตอบเพี้ยนจากโมเดล');
+// เคสจริงที่เคยทำให้บอทเงียบ: stop_reason=tool_use แต่ไม่มี tool_use block
+const noToolUse = { stop_reason: 'tool_use', content: [{ type: 'text', text: '<invoke name="check_stock"><parameter name="query">โฟม</parameter></invoke>' }] };
+let p = planFromResponse(noToolUse, 0);
+t('ไม่มี tool_use block → ต้อง retry (ไม่ส่ง message ว่างไป API)', p.kind === 'retry', p.kind);
+t('retry แล้วต้องไม่มี XML ดิบติดไปกับข้อความ', !/<invoke|<parameter/.test(p.text), p.text.slice(0, 60));
+
+p = planFromResponse(noToolUse, MAX_RETRIES);
+t('retry ครบโควตาแล้ว → giveup (ไม่วนไม่รู้จบ)', p.kind === 'giveup', p.kind);
+
+p = planFromResponse({ stop_reason: 'tool_use', content: [
+  { type: 'text', text: 'กำลังเช็คให้นะคะ' },
+  { type: 'tool_use', id: 'tu1', name: 'check_stock', input: { query: 'GB-001' } },
+] }, 0);
+t('มี tool_use จริง → เรียก tool ต่อ', p.kind === 'tools' && p.toolUses.length === 1, p.kind);
+
+p = planFromResponse({ stop_reason: 'end_turn', content: [{ type: 'text', text: 'ส่ง 1-2 วันค่ะ' }] }, 0);
+t('end_turn → จบ ใช้ข้อความตอบ', p.kind === 'final' && p.text === 'ส่ง 1-2 วันค่ะ', `${p.kind}/${p.text}`);
+
+p = planFromResponse({ stop_reason: 'end_turn', content: [] }, 0);
+t('คำตอบว่างเปล่า → ต้องมีข้อความสำรอง ไม่ส่งค่าว่างให้ลูกค้า', p.kind === 'final' && p.text.length > 0, p.text);
+
+t('stripToolXml ตัด <invoke> ทั้งก้อนทิ้ง', stripToolXml('สวัสดีค่ะ<invoke name="x"><parameter name="y">z</parameter></invoke>') === 'สวัสดีค่ะ');
+t('stripToolXml ไม่แตะข้อความปกติ', stripToolXml('ครีมกันแดด 590 บาท') === 'ครีมกันแดด 590 บาท');
 
 console.log('\n▌2. Flex ที่เราสร้างเองต้องผ่านข้อจำกัด LINE');
 const carousel = flex.productCarousel(['GB-001', 'GB-002', 'GB-003']);
