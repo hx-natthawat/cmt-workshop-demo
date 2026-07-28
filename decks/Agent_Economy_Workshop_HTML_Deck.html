@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Agent Economy Workshop — HarmonyX</title>
+<meta name="description" content="The Agent Economy Workshop 3 ชั่วโมง — Discover · Transact · Trust · Prepare: เตรียมแบรนด์ให้ถูกค้นพบ เจรจา และรับชำระเงินจาก AI agents (A2A + AP2) | HarmonyX Solution">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23345589'/%3E%3Ctext x='32' y='44' font-family='Arial' font-size='34' font-weight='800' fill='%23F2A33C' text-anchor='middle'%3EX%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --hx:#345589; --hx-dark:#22375C; --hx-deep:#182948; --hx-mid:#4A6BA5;
+  --hx-tint:#E9EFF7; --hx-bg:#F7F9FC; --accent:#F2A33C; --coral:#E9635B;
+  --ink:#1D2433; --mut:#66738A; --line:#D9E2EF; --white:#FFFFFF;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;background:#0E1830;font-family:'Noto Sans Thai',sans-serif;overflow:hidden;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+::selection{background:var(--accent);color:var(--hx-deep)}
+button:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+#toc::-webkit-scrollbar{width:8px}
+#toc::-webkit-scrollbar-thumb{background:#33456E;border-radius:99px}
+#toc::-webkit-scrollbar-track{background:transparent}
+#stage{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+#frame{position:relative;width:1280px;height:720px;transform-origin:center center;background:var(--white);box-shadow:0 20px 80px rgba(0,0,0,.5);border-radius:6px;overflow:hidden}
+.slide{position:absolute;inset:0;padding:52px 60px 58px;display:none;flex-direction:column;overflow:hidden}
+.slide.active{display:flex}
+.slide.dark{background:linear-gradient(135deg,var(--hx-dark) 0%,var(--hx-deep) 100%);color:var(--white)}
+.slide.light{background:var(--white)}
+
+.kicker{font-size:14px;font-weight:700;letter-spacing:.18em;color:var(--coral);text-transform:uppercase;margin-bottom:8px}
+.dark .kicker{color:var(--accent)}
+h1{font-size:42px;font-weight:800;color:var(--hx-dark);line-height:1.15}
+.dark h1{color:var(--white)}
+.card h3{font-size:20px;font-weight:700;color:var(--hx-dark);margin-bottom:8px}
+.card.navy h3{color:var(--accent)}
+
+.foot{position:absolute;left:0;right:0;bottom:0;padding:14px 60px 14px;display:flex;justify-content:space-between;font-size:11px;color:var(--mut);z-index:30;pointer-events:none;background:linear-gradient(0deg,var(--white) 55%,rgba(255,255,255,0))}
+.dark .foot{color:#8FA6CE;background:linear-gradient(0deg,#182948 55%,rgba(24,41,72,0))}
+.foot .brand b{color:var(--hx)} .dark .foot .brand b{color:var(--accent)}
+.cite{position:absolute;right:60px;bottom:38px;font-size:10.5px;font-style:italic;color:#93A1B8;max-width:70%;text-align:right;z-index:31;background:rgba(255,255,255,.88);padding:2px 8px;border-radius:6px}
+.dark .cite{color:#8FA6CE;background:rgba(24,41,72,.88)}
+
+.row{display:flex;gap:20px;flex:1;min-height:0}
+.col{flex:1;min-width:0}
+.card{background:var(--hx-bg);border:1px solid var(--line);border-radius:14px;padding:22px 24px}
+.card.navy{background:linear-gradient(150deg,var(--hx) 0%,var(--hx-dark) 100%);border:none;color:var(--white)}
+ul.b{list-style:none;margin-top:8px}
+ul.b li{position:relative;padding-left:18px;margin-bottom:9px;font-size:15.5px;line-height:1.45;color:var(--ink)}
+.card.navy ul.b li{color:var(--hx-tint)}
+ul.b li::before{content:"";position:absolute;left:0;top:9px;width:7px;height:7px;border-radius:50%;background:var(--coral)}
+.card.navy ul.b li::before{background:var(--accent)}
+.stat-big{font-size:56px;font-weight:800;color:var(--accent);line-height:1}
+.tagline{margin-top:auto;font-size:15px;font-style:italic;color:var(--mut);padding-top:10px}
+.tagline.strong{color:var(--coral);font-weight:600}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px;flex:1;min-height:0}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;flex:1;min-height:0}
+.chipnum{width:40px;height:40px;border-radius:50%;background:var(--hx);color:#fff;font-weight:700;font-size:18px;display:flex;align-items:center;justify-content:center;margin-bottom:12px}
+.chipnum.coral{background:var(--coral)}
+
+#bar{position:fixed;left:0;top:0;height:4px;background:linear-gradient(90deg,var(--accent),var(--coral));width:0;transition:width .35s cubic-bezier(.4,0,.2,1);z-index:90}
+::selection{background:rgba(242,163,60,.3)}
+body{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+.slide h1{text-wrap:balance}
+.slide p{text-wrap:pretty}
+button:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+#notes{position:fixed;left:0;right:0;bottom:0;background:rgba(24,41,72,.96);color:#EAF1FB;font-size:14px;line-height:1.5;padding:14px 60px;display:none;z-index:85;border-top:3px solid var(--accent)}
+#help{position:fixed;left:14px;top:12px;font-size:11px;color:#CFE0F5;background:rgba(24,41,72,.8);padding:4px 12px;border-radius:99px;z-index:90;cursor:default;transition:opacity .6s}
+#help.hide{opacity:0;pointer-events:none}
+/* ── Control bar ── */
+#ctrl{position:fixed;right:14px;top:10px;display:flex;gap:6px;align-items:center;z-index:95;background:rgba(24,41,72,.85);border:1px solid #33456E;border-radius:99px;padding:4px 8px;backdrop-filter:blur(12px) saturate(1.3);box-shadow:0 4px 18px rgba(10,20,40,.35)}
+#ctrl button{appearance:none;border:none;background:transparent;color:#CFE0F5;font-family:inherit;font-size:13px;font-weight:700;min-width:30px;height:28px;border-radius:99px;cursor:pointer;padding:0 8px;line-height:1}
+#ctrl button:hover{background:rgba(242,163,60,.25);color:#fff}
+#ctrl button.on{background:var(--accent);color:var(--hx-deep)}
+#ctrl .sep{width:1px;height:16px;background:#33456E}
+#ctrl #cnt{font-size:11.5px;color:#CFE0F5;padding:0 6px;font-variant-numeric:tabular-nums;white-space:nowrap}
+#ctrl #fsv{font-size:10.5px;color:#8FA6CE;min-width:34px;text-align:center}
+/* ── Edge nav arrows ── */
+.edge{position:fixed;top:0;bottom:0;width:9%;z-index:80;display:flex;align-items:center;cursor:pointer;opacity:0;transition:opacity .25s;border:none;background:linear-gradient(90deg,rgba(14,24,48,.35),transparent)}
+.edge:hover{opacity:1}
+.edge span{font-size:34px;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,.6);padding:0 12px}
+#navL{left:0}
+#navR{right:0;justify-content:flex-end;background:linear-gradient(270deg,rgba(14,24,48,.35),transparent)}
+@keyframes slideFade{from{opacity:0}to{opacity:1}}
+.slide.active{animation:slideFade .3s ease-out}
+@media (max-width:700px){#help{display:none}#ctrl #fsv{display:none}}
+@media print{#ctrl,.edge{display:none!important}}
+/* ── โหมดอ่านมือถือ (จอแคบ + portrait): reflow เป็นคอลัมน์เดียว ฟอนต์ขนาดอ่านจริง ── */
+html.mm,body.mm{overflow-y:auto!important;overflow-x:hidden;height:auto}
+body.mm #stage{position:static;display:block;height:auto!important}
+body.mm #frame{position:static;transform:none!important;width:100%;height:auto;box-shadow:none;border-radius:0;overflow:visible}
+body.mm .slide{position:relative;display:flex!important;flex-direction:column;width:100%;height:auto;min-height:0;inset:auto;padding:26px 18px 22px;margin-bottom:6px;animation:none!important;overflow:visible}
+body.mm .slide.hidden-slide{display:none!important}
+/* ยกเลิก animation + inline layout ที่ออกแบบมาเพื่อจอ 16:9 */
+body.mm .slide *{animation:none!important;opacity:1;transform:none}
+body.mm h1{font-size:24px!important;line-height:1.25}
+body.mm .kicker{font-size:11px}
+/* กริด/แถวทุกแบบ → คอลัมน์เดียว */
+body.mm .grid2,body.mm .grid3,body.mm .slide div[style*="grid-template-columns"]{display:flex!important;flex-direction:column!important;gap:12px!important}
+body.mm .row{flex-direction:column}
+body.mm .flowrow{flex-direction:column;gap:6px}
+body.mm .flowrow .tag{width:100%;padding:8px 14px}
+body.mm .pills{flex-wrap:wrap}
+/* การ์ดที่จัด layout แนวนอนด้วย inline flex (เช่น สไลด์ LLM, C-R-T-F, Takeaways) → พับเป็นแนวตั้ง */
+body.mm .slide .card[style*="display:flex"]{flex-direction:column!important;align-items:flex-start!important;gap:10px!important}
+body.mm .slide .card[style*="display:flex"]>.chipnum{margin-bottom:2px}
+/* กล่องแนวนอนที่ห่อการ์ดหลายใบ (journey, before/after) → เรียงลงล่าง */
+body.mm .slide div[style*="display:flex"]:has(>.card){flex-direction:column!important;align-items:stretch!important;gap:10px!important}
+/* ลูกศรคั่นระหว่างการ์ดแนวนอน ไม่มีความหมายในแนวตั้ง — ซ่อน (คงเฉพาะ ↓ ของ architecture/ladder) */
+body.mm .arrow{display:none!important}
+body.mm .aro{display:none!important}
+body.mm .archrow .aro{display:inline-block!important}
+/* ล้างความกว้าง/สูงตายตัวที่ฝังใน inline style */
+body.mm .slide div,body.mm .slide p,body.mm .slide b,body.mm .slide span,body.mm .slide i{width:auto!important;max-width:100%;height:auto!important;min-height:0!important}
+body.mm .slide div.chipnum,body.mm .slide span.chipnum{width:40px!important;height:40px!important;min-width:40px!important;min-height:40px!important;flex:0 0 40px!important;border-radius:50%!important}
+body.mm .slide div.icn,body.mm .slide span.icn{width:44px!important;height:44px!important;min-width:44px!important;min-height:44px!important;flex:0 0 44px!important}
+body.mm .slide svg{height:auto!important;max-height:180px}
+body.mm table.tbl{display:block;overflow-x:auto}
+/* footer/cite กลับเข้า flow ปกติ */
+/* จังหวะระยะห่างแนวตั้งสม่ำเสมอทุกสไลด์ (มือถือ) */
+body.mm .slide [style*="margin-top"]{margin-top:8px!important}
+body.mm .slide>[style*="margin-top"]{margin-top:16px!important}
+body.mm .slide .kicker{margin-bottom:6px}
+body.mm .slide h1{margin:0 0 4px}
+body.mm .foot{position:static;padding:14px 0 0;background:none!important;margin-top:14px;border-top:1px solid var(--line)}
+body.mm .dark .foot{border-top:1px solid #33456E}
+body.mm .cite{position:static;text-align:left;max-width:100%;margin-top:8px;display:inline-block}
+body.mm .tagline{margin-top:14px}
+body.mm .roadmap{margin-top:16px}
+/* ตัด margin ใหญ่ของสไลด์ divider/title ที่ออกแบบเพื่อจอ 16:9 */
+body.mm .slide>div[style*="display:flex"]{flex-direction:column!important;align-items:stretch!important;gap:14px!important}
+/* วงกลมต้องกลม — กันกฎ width:auto ทับ (avatar, เลขข้อ, จุดไอคอน) */
+body.mm .slide div[style*="border-radius:50%"],body.mm .slide span[style*="border-radius:50%"]{width:46px!important;height:46px!important;min-width:46px!important;max-width:46px!important;min-height:46px!important;flex:0 0 46px!important;align-self:flex-start!important;border-radius:50%!important}
+/* ระยะห่างแนวนอนที่ออกแบบไว้สำหรับจอกว้าง — ปลดในโหมดคอลัมน์ */
+body.mm .slide div[style*="margin-left:2"],body.mm .slide div[style*="margin-left:3"],body.mm .slide div[style*="margin-left:4"]{margin-left:0!important}
+body.mm .slide .card{width:100%!important}
+body.mm .slide div[style*="margin-top:150px"],body.mm .slide div[style*="margin-top:140px"],body.mm .slide div[style*="margin-top:130px"],body.mm .slide div[style*="margin-top:70px"]{margin-top:0!important}
+body.mm .slide div[style*="margin:auto"]{margin:0!important}
+body.mm h1[style*="font-size:84px"],body.mm h1[style*="font-size:68px"],body.mm h1[style*="font-size:64px"],body.mm h1[style*="font-size:60px"],body.mm h1[style*="font-size:56px"],body.mm h1[style*="font-size:52px"],body.mm h1[style*="font-size:46px"]{font-size:28px!important}
+body.mm .edge,body.mm #notes{display:none!important}
+body.mm #ctrl #bPrev,body.mm #ctrl #bNext,body.mm #ctrl #bTimer,body.mm #ctrl #bNotes,body.mm #ctrl #bFull{display:none}
+/* มือถือ: พื้นหลังเทา สไลด์เป็นการ์ด อ่านแยกใบชัดเจน */
+body.mm{background:#DEE7F3}
+body.mm .slide{margin:10px 10px 0;width:auto;border-radius:14px;box-shadow:0 2px 12px rgba(20,35,70,.10)}
+body.mm .slide:last-of-type{margin-bottom:80px}
+body.mm #ctrl{top:8px;right:8px;padding:5px 9px}
+body.mm #ctrl button{min-width:38px;height:36px;font-size:15px}
+/* ปุ่มกลับขึ้นบนสุด (เฉพาะโหมดอ่าน) */
+#topBtn{display:none;position:fixed;right:14px;bottom:18px;width:44px;height:44px;border-radius:50%;border:none;background:rgba(24,41,72,.88);color:#F2A33C;font-size:20px;z-index:95;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.25)}
+body.mm #topBtn{display:flex;align-items:center;justify-content:center}
+@media (max-width:700px){#toclist{grid-template-columns:1fr}#toc{padding:64px 16px 30px}}
+@media print{#topBtn{display:none!important}}
+#toc{position:fixed;inset:0;background:rgba(14,24,48,.97);z-index:88;display:none;overflow-y:auto;padding:56px 60px 40px}
+#toc.on{display:block}
+#toclist{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+#toclist a{display:block;background:rgba(255,255,255,.06);border:1px solid #33456E;border-radius:10px;padding:10px 14px;color:#EAF1FB;text-decoration:none;font-size:13px;line-height:1.4;cursor:pointer}
+#toclist a:hover{background:rgba(242,163,60,.15);border-color:var(--accent)}
+#toclist a b{color:var(--accent);margin-right:8px}
+#toclist a.grp{grid-column:1/-1;background:rgba(242,163,60,.14);border-color:var(--accent);font-weight:800;letter-spacing:.02em;margin-top:6px}
+#toclist a.hid{opacity:.45;border-style:dashed}
+#toclist a.hid::after{content:" · ซ่อนอยู่";color:var(--coral);font-size:11px}
+@media print{#toc{display:none!important}.hidden-slide{display:none!important}}
+
+.agrow{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:9px;padding:5px 12px}
+.agrow .t{background:var(--hx-dark);color:#fff;font-weight:700;font-size:11.5px;border-radius:6px;padding:3px 8px;min-width:50px;text-align:center}
+.agrow.hl .t{background:var(--coral)}
+.agrow.break{background:var(--hx-tint)} .agrow.break .t{background:var(--mut)}
+.agrow .n{flex:1;font-size:12.5px;color:var(--ink)} .agrow.hl .n{color:var(--coral);font-weight:700}
+.agrow .d{font-size:11px;color:var(--mut)}
+
+.pills{display:flex;gap:14px;margin-top:26px}
+.pill{border:1px solid #56719F;background:rgba(255,255,255,.08);color:#fff;border-radius:99px;padding:9px 26px;font-weight:700;font-size:16px}
+.pill.hot{background:var(--accent);border-color:var(--accent);color:var(--hx-deep)}
+.arrow{color:#9FB4D8;font-size:18px;align-self:center}
+
+.flowrow{display:flex;gap:14px;margin-bottom:10px;align-items:stretch}
+.flowrow .tag{width:210px;border-radius:10px;color:#fff;font-weight:700;font-size:14.5px;display:flex;align-items:center;padding:0 14px}
+.flowrow .desc{flex:1;background:var(--hx-bg);border:1px solid var(--line);border-radius:10px;display:flex;align-items:center;padding:10px 18px;font-size:14.5px;color:var(--ink)}
+.flowfill{display:flex;flex-direction:column;gap:10px;flex:1;min-height:0}
+.flowfill .flowrow{flex:1;margin-bottom:0;min-height:0}
+.roadmap{margin-top:auto;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.roadmap .lbl{font-size:13px;color:#8FA6CE;font-weight:700;margin-right:4px}
+.roadmap span.rchip{border:1px solid #3D577F;background:rgba(255,255,255,.06);color:#CADCFC;border-radius:99px;padding:6px 16px;font-size:13px}
+.slide.active .roadmap span.rchip{animation:fadeUp .4s both}
+.slide.active .roadmap span.rchip:nth-child(2){animation-delay:.08s}.slide.active .roadmap span.rchip:nth-child(3){animation-delay:.16s}
+.slide.active .roadmap span.rchip:nth-child(4){animation-delay:.24s}.slide.active .roadmap span.rchip:nth-child(5){animation-delay:.32s}
+.slide.active .roadmap span.rchip:nth-child(6){animation-delay:.4s}.slide.active .roadmap span.rchip:nth-child(7){animation-delay:.48s}
+.slide.active .roadmap span.rchip:nth-child(8){animation-delay:.56s}.slide.active .roadmap span.rchip:nth-child(9){animation-delay:.64s}
+
+table.tbl{width:100%;border-collapse:separate;border-spacing:0 7px}
+table.tbl th{background:var(--hx-dark);color:#fff;font-size:13.5px;text-align:left;padding:9px 14px}
+table.tbl th:first-child{border-radius:8px 0 0 8px} table.tbl th:last-child{border-radius:0 8px 8px 0}
+table.tbl td{background:var(--hx-bg);font-size:13px;padding:9px 14px;color:var(--ink);border-top:1px solid var(--line);border-bottom:1px solid var(--line);vertical-align:top}
+table.tbl td:first-child{border-left:1px solid var(--line);border-radius:8px 0 0 8px;font-weight:700;color:var(--hx-dark)}
+table.tbl td:last-child{border-right:1px solid var(--line);border-radius:0 8px 8px 0}
+table.tbl td.gate{color:var(--coral);font-weight:700}
+
+.ref{display:flex;gap:16px;background:var(--hx-bg);border:1px solid var(--line);border-radius:10px;padding:8px 16px;margin-bottom:7px;font-size:12px}
+.ref b{width:340px;flex-shrink:0;color:var(--hx-dark);font-size:12.5px}
+.ref span{color:var(--ink)} .ref i{color:var(--hx-mid)}
+
+.icn{width:44px;height:44px;border-radius:12px;background:var(--hx-tint);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.icn svg{width:26px;height:26px;stroke:var(--hx);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.icn.hot{background:#FDECEC}.icn.hot svg{stroke:var(--coral)}
+.doclink{display:inline-flex;align-items:center;gap:5px;margin-top:10px;font-size:11.5px;font-weight:600;color:var(--hx-mid);text-decoration:none;border:1px solid var(--line);border-radius:99px;padding:3px 12px;background:#fff}
+.doclink:hover{border-color:var(--hx);color:var(--hx)}
+.sample{background:#fff;border:1px solid var(--line);border-left:5px solid var(--hx);border-radius:10px;padding:12px 18px;margin-bottom:10px}
+.sample .lbl{font-size:12px;font-weight:700;color:var(--hx);margin-bottom:4px}
+.sample p{font-size:13.5px;color:var(--ink);line-height:1.5;font-style:italic}
+
+/* ===== Animations (เล่นซ้ำอัตโนมัติเมื่อเปิดสไลด์) ===== */
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@keyframes drawIn{from{stroke-dashoffset:500}to{stroke-dashoffset:0}}
+@keyframes pulseA{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.55;transform:scale(1.18)}}
+.slide.active .grid2>.card,.slide.active .grid3>.card{animation:fadeUp .45s both}
+.slide.active .grid2>.card:nth-child(2),.slide.active .grid3>.card:nth-child(2){animation-delay:.12s}
+.slide.active .grid2>.card:nth-child(3),.slide.active .grid3>.card:nth-child(3){animation-delay:.24s}
+.slide.active .grid2>.card:nth-child(4),.slide.active .grid3>.card:nth-child(4){animation-delay:.36s}
+.slide.active .grid3>.card:nth-child(5){animation-delay:.48s}
+.slide.active .grid3>.card:nth-child(6){animation-delay:.6s}
+.slide.active .flowrow{animation:fadeUp .5s both}
+.slide.active .flowrow:nth-child(2){animation-delay:.18s}
+.slide.active .flowrow:nth-child(3){animation-delay:.36s}
+.slide.active .flowrow:nth-child(4){animation-delay:.54s}
+.slide.active .flowrow:nth-child(5){animation-delay:.72s}
+.slide.active .agrow{animation:fadeUp .35s both}
+.slide.active .agrow:nth-child(2){animation-delay:.07s}.slide.active .agrow:nth-child(3){animation-delay:.14s}
+.slide.active .agrow:nth-child(4){animation-delay:.21s}.slide.active .agrow:nth-child(5){animation-delay:.28s}
+.slide.active .agrow:nth-child(6){animation-delay:.35s}.slide.active .agrow:nth-child(7){animation-delay:.42s}
+.slide.active .agrow:nth-child(8){animation-delay:.49s}
+.slide.active .archrow{animation:fadeUp .5s both}
+.slide.active .archrow:nth-child(2){animation-delay:.2s}.slide.active .archrow:nth-child(3){animation-delay:.4s}
+.slide.active .archrow:nth-child(4){animation-delay:.6s}.slide.active .archrow:nth-child(5){animation-delay:.8s}
+.slide.active .archrow:nth-child(6){animation-delay:1s}.slide.active .archrow:nth-child(7){animation-delay:1.2s}
+.slide.active .tlnode{animation:fadeUp .5s both}
+.slide.active .tlnode:nth-child(2){animation-delay:.25s}.slide.active .tlnode:nth-child(3){animation-delay:.5s}
+.slide.active .tlnode:nth-child(4){animation-delay:.75s}.slide.active .tlnode:nth-child(5){animation-delay:1s}
+.aro{display:inline-block;animation:pulseA 1.6s infinite}
+.slide.active .chaos line,.slide.active .hubline{stroke-dasharray:500;animation:drawIn 1.2s ease-out both}
+/* โหมดแสดงสไลด์ที่ซ่อน (ค่าเริ่มต้น: ปิด) */
+body.showhid .slide.hidden-slide.active{outline:3px dashed var(--coral);outline-offset:-3px}
+body.showhid.mm .slide.hidden-slide{display:flex!important;opacity:.92}
+@media print{body.showhid .hidden-slide{display:flex!important}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+@media print{
+  .slide .card,.slide .flowrow,.slide .agrow,.slide .archrow,.slide .tlnode{animation:none!important;opacity:1!important;transform:none!important}
+  html,body{overflow:visible;background:#fff}
+  #stage{position:static}
+  #frame{width:1280px;height:720px;box-shadow:none;border-radius:0;position:relative;transform:none!important}
+  .slide{display:flex!important;position:relative;width:1280px;height:720px;page-break-after:always}
+  #bar,#counter,#help,#notes{display:none!important}
+}
+
+/* ── Session 3 identity: teal accent ── */
+:root{--coral:#0E8C7F}
+#bar{background:#18B2A2}
+#toclist a.grp{background:rgba(24,178,162,.15);border-color:#18B2A2}
+.icn.hot{background:#E4F5F2}
+</style>
+</head>
+<body>
+<div id="bar"></div>
+<div id="help">← → เปลี่ยนสไลด์ · N บันทึกผู้สอน · O สารบัญ · H ซ่อนสไลด์นี้ · Shift+H แสดงที่ซ่อนทั้งหมด · F เต็มจอ · P พิมพ์ · ? ดูซ้ำ</div>
+<div id="ctrl">
+  <button id="bPrev" title="สไลด์ก่อนหน้า (←)">‹</button>
+  <span id="cnt">1 / 41</span>
+  <button id="bNext" title="สไลด์ถัดไป (→)">›</button>
+  <span class="sep"></span>
+  <button id="bTimer" title="จับเวลา (T เริ่ม/หยุด · Shift+T รีเซ็ต)">0:00</button>
+  <span class="sep"></span>
+  <button id="bFsDn" title="ลดขนาดตัวอักษร" style="font-size:11px">A−</button>
+  <span id="fsv">100%</span>
+  <button id="bFsUp" title="เพิ่มขนาดตัวอักษร" style="font-size:15px">A+</button>
+  <span class="sep"></span>
+  <button id="bNotes" title="บันทึกผู้สอน (N)" style="font-size:12px">🗒</button>
+  <button id="bShowHid" title="แสดง/ซ่อนสไลด์ที่ถูกซ่อนทั้งหมด (Shift+H) — ค่าเริ่มต้น: ปิด" style="font-size:12px">👁</button>
+  <button id="bToc" title="สารบัญ (O)">☰</button>
+  <button id="bFull" title="เต็มจอ (F)">⛶</button>
+</div>
+<button class="edge" id="navL" aria-label="ก่อนหน้า"><span>‹</span></button>
+<button class="edge" id="navR" aria-label="ถัดไป"><span>›</span></button>
+<button id="topBtn" aria-label="กลับขึ้นบนสุด">↑</button>
+<div id="toc"><div id="toclist"></div></div>
+<div id="stage"><div id="frame">
+
+<!-- 1 TITLE -->
+<section class="slide dark" data-notes="เด็คที่ 3 ของซีรีส์ — ผู้เรียนผ่าน workshop หลัก (MCP ระดับผู้ใช้) และควรผ่าน Advanced (สร้าง server) มาแล้ว วันนี้มองไปข้างหน้า: เมื่อ agent กลายเป็นลูกค้า คู่ค้า และผู้เจรจา">
+  <div style="margin-top:70px">
+    <div class="kicker">Session 3 · 3 Hours · Strategy + Hands-on</div>
+    <h1 style="font-size:68px">The Agent Economy</h1>
+    <p style="font-size:21px;color:var(--hx-tint);margin-top:14px">เมื่อลูกค้าคนต่อไปของแบรนด์ ไม่ใช่คน — เตรียมธุรกิจให้ถูกค้นพบ เจรจา และรับชำระเงินจาก AI agents</p>
+    <div class="pills">
+      <div class="pill">Discover</div><div class="arrow">→</div>
+      <div class="pill">Transact</div><div class="arrow">→</div>
+      <div class="pill">Trust</div><div class="arrow">→</div>
+      <div class="pill hot">Prepare</div>
+    </div>
+  </div>
+  <div style="margin-top:auto;color:#8FA6CE;font-size:14px">วิทยากร: ______________________ &nbsp;&nbsp; วันที่: ______________ &nbsp;&nbsp; เงื่อนไข: ผ่าน AI for MarTech Workshop</div>
+  <div class="foot"><div class="brand">Harmony<b>X</b> · Agent Economy Workshop</div><div>1</div></div>
+</section>
+
+<!-- 2 HOOK -->
+<section class="slide dark" data-notes="เล่าช้าๆ ให้เห็นภาพ — จุดพีคคือประโยคปิด: ร้าน B ไม่เคยรู้ว่าเคยถูกพิจารณา ถามห้อง: วันนี้ถ้า agent มาเยี่ยมเว็บของท่าน มันจะอ่านอะไรออกบ้าง — เก็บคำตอบไว้ใช้ใน Lab 1">
+  <div class="kicker">เรื่องจากอนาคตอันใกล้</div>
+  <h1 style="font-size:44px">40 วินาทีของการซื้อ ที่แบรนด์ไม่เคยเห็นลูกค้า</h1>
+  <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:30px">
+    <div class="tlnode" style="background:rgba(255,255,255,.07);border:1px solid #3D577F;border-radius:12px;padding:16px 14px">
+      <div style="font-size:12px;font-weight:700;color:var(--accent)">00:00</div>
+      <div style="font-size:14px;color:#fff;font-weight:700;margin-top:6px">ลูกค้าพูดสั้นๆ</div>
+      <div style="font-size:12px;color:var(--hx-tint);margin-top:6px">"เซรั่มตัวเดิมใกล้หมด สั่งให้หน่อย งบไม่เกิน 900"</div></div>
+    <div class="tlnode" style="background:rgba(255,255,255,.07);border:1px solid #3D577F;border-radius:12px;padding:16px 14px">
+      <div style="font-size:12px;font-weight:700;color:var(--accent)">00:05</div>
+      <div style="font-size:14px;color:#fff;font-weight:700;margin-top:6px">Agent ค้นหา 3 ร้าน</div>
+      <div style="font-size:12px;color:var(--hx-tint);margin-top:6px">อ่านแคตตาล็อก เทียบราคา เช็คสต็อก — เฉพาะร้านที่ "อ่านออก"</div></div>
+    <div class="tlnode" style="background:rgba(255,255,255,.07);border:1px solid #3D577F;border-radius:12px;padding:16px 14px">
+      <div style="font-size:12px;font-weight:700;color:var(--accent)">00:15</div>
+      <div style="font-size:14px;color:#fff;font-weight:700;margin-top:6px">เจรจากับ agent ร้าน</div>
+      <div style="font-size:12px;color:var(--hx-tint);margin-top:6px">ขอโค้ดสมาชิก + ส่งด่วน — agent สองฝั่งตกลงกันเอง</div></div>
+    <div class="tlnode" style="background:rgba(255,255,255,.07);border:1px solid #3D577F;border-radius:12px;padding:16px 14px">
+      <div style="font-size:12px;font-weight:700;color:var(--accent)">00:30</div>
+      <div style="font-size:14px;color:#fff;font-weight:700;margin-top:6px">ยืนยัน + จ่ายเงิน</div>
+      <div style="font-size:12px;color:var(--hx-tint);margin-top:6px">ลูกค้ากดอนุมัติครั้งเดียว — ธุรกรรมเซ็นกำกับครบสาย</div></div>
+    <div class="tlnode" style="background:rgba(233,99,91,.18);border:1px solid var(--coral);border-radius:12px;padding:16px 14px">
+      <div style="font-size:12px;font-weight:700;color:var(--coral)">00:40</div>
+      <div style="font-size:14px;color:#fff;font-weight:700;margin-top:6px">จบการซื้อ</div>
+      <div style="font-size:12px;color:var(--hx-tint);margin-top:6px">ร้าน A ได้ยอด — ร้าน B ไม่เคยรู้ด้วยซ้ำว่าเคยถูกพิจารณา</div></div>
+  </div>
+  <p style="margin-top:auto;font-size:18px;font-weight:700;color:var(--accent)">คำถามของวันนี้: แบรนด์ของท่านจะเป็นร้าน A หรือร้าน B — และตัดสินกันที่โครงสร้างพื้นฐาน ไม่ใช่งบโฆษณา</p>
+  <div class="foot"><div class="brand">Harmony<b>X</b> · Agent Economy Workshop</div><div>2</div></div>
+</section>
+
+<!-- 3 AGENDA -->
+<section class="slide light" data-notes="เดินกำหนดการ 1 นาที — เน้นว่านี่คือ session เชิงกลยุทธ์ที่สุดในซีรีส์ แต่ยังมี lab ลงมือ 2 ช่วง (audit จริง + ออกแบบ journey)">
+  <div class="kicker">Agenda</div><h1>กำหนดการ 3 ชั่วโมง — Discover · Transact · Trust · Prepare</h1>
+  <div style="margin-top:22px">
+    <div class="agrow"><div class="t">0:00</div><div class="n">เปิด + เรื่อง 40 วินาที + The Protocol Stack (MCP → A2A → AP2)</div><div class="d">20 น.</div></div>
+    <div class="agrow"><div class="t">0:20</div><div class="n">DISCOVER: agent หาแบรนด์เจอได้อย่างไร — AEO ยุค agent + Agent Card</div><div class="d">25 น.</div></div>
+    <div class="agrow hl"><div class="t">0:45</div><div class="n">★ Lab 1 — Agent-Readiness Audit: ตรวจแบรนด์จริงด้วย Claude</div><div class="d">30 น.</div></div>
+    <div class="agrow break"><div class="t">1:15</div><div class="n">พัก</div><div class="d">10 น.</div></div>
+    <div class="agrow"><div class="t">1:25</div><div class="n">TRANSACT: A2A (agent ร่วมงานกัน) + AP2 (3 Mandates ของการจ่ายเงิน)</div><div class="d">35 น.</div></div>
+    <div class="agrow hl"><div class="t">2:00</div><div class="n">★ Lab 2 — ออกแบบ Agent Commerce Journey ของธุรกิจทีม</div><div class="d">30 น.</div></div>
+    <div class="agrow"><div class="t">2:30</div><div class="n">TRUST: ความเสี่ยงใหม่ + โครงสร้างความเชื่อถือ</div><div class="d">15 น.</div></div>
+    <div class="agrow"><div class="t">2:45</div><div class="n">PREPARE: บันได Brand Readiness 4 ขั้น + แผน 90 วัน + สรุป</div><div class="d">15 น.</div></div>
+  </div>
+  <p class="tagline">เงื่อนไข: ผ่าน AI for MarTech Workshop (แนะนำผ่าน Advanced MCP ด้วย) · ใช้ Claude ระหว่างเรียน</p>
+  <div class="foot"><div class="brand">Harmony<b>X</b> · Agent Economy Workshop</div><div>3</div></div>
+</section>
+
+<!-- 4 PROTOCOL STACK -->
+<section class="slide light" data-notes="สไลด์แกนของ session — วางตำแหน่งทุกอย่างที่เรียนมา: workshop 1-2 คือชั้นล่าง วันนี้คือชั้น 2-3 เดินจากล่างขึ้นบน ย้ำว่าทุกชั้นเป็นมาตรฐานเปิดที่ ecosystem ใหญ่หนุนแล้ว ไม่ใช่ของทดลอง">
+  <div class="kicker">ภาพรวม · The Protocol Stack</div><h1>บันไดโปรโตคอลของ Agent Economy</h1>
+  <div style="margin-top:20px;display:flex;flex-direction:column;gap:6px;flex:1;max-width:1020px;align-self:center;width:100%">
+    <div class="card navy archrow" style="padding:14px 22px"><b style="color:var(--accent);font-size:15.5px">3 · AP2 — Agent Payments Protocol (ชั้นธุรกรรม)</b><p style="font-size:13px;color:var(--hx-tint)">agent จ่ายเงินอย่างตรวจสอบได้ด้วย 3 Mandates ที่เซ็นกำกับ — Google + องค์กร payment 60+ ราย</p></div>
+    <div class="archrow" style="text-align:center;color:var(--coral);font-weight:800"><span class="aro">↑</span></div>
+    <div class="card navy archrow" style="padding:14px 22px"><b style="color:var(--accent);font-size:15.5px">2 · A2A — Agent2Agent (ชั้นความร่วมมือ)</b><p style="font-size:13px;color:var(--hx-tint)">agent ค้นพบและทำงานร่วมกันข้ามค่าย — Linux Foundation, 150+ องค์กร, production แล้วใน supply chain/การเงิน/ประกัน</p></div>
+    <div class="archrow" style="text-align:center;color:var(--coral);font-weight:800"><span class="aro">↑</span></div>
+    <div class="card archrow" style="padding:14px 22px"><b style="color:var(--hx);font-size:15.5px">1 · MCP — Model Context Protocol (ชั้นเครื่องมือ/ข้อมูล)</b><p style="font-size:13px;color:var(--ink)">agent เข้าถึงเครื่องมือและข้อมูล — สิ่งที่ท่านใช้เป็นและสร้างเองได้แล้วจาก 2 workshop ที่ผ่านมา ✓</p></div>
+    <div class="archrow" style="text-align:center;color:var(--coral);font-weight:800"><span class="aro">↑</span></div>
+    <div class="card archrow" style="padding:14px 22px"><b style="color:var(--hx-dark);font-size:15.5px">0 · ข้อมูลและตัวตนของแบรนด์ (รากฐาน)</b><p style="font-size:13px;color:var(--ink)">แคตตาล็อก ราคา นโยบาย ที่ machine-readable — ไม่มีชั้นนี้ ชั้นบนทั้งหมดมองไม่เห็นแบรนด์ของท่าน</p></div>
+  </div>
+  <p class="tagline strong">สูตรของ ecosystem: สร้าง agent → ต่อเครื่องมือด้วย MCP → ร่วมงานด้วย A2A → จ่ายเงินด้วย AP2</p>
+  <div class="cite">ที่มา: Linux Foundation (A2A) · Google Cloud (AP2) · Anthropic (MCP) — ดูสไลด์ References</div>
+  <div class="foot"><div class="brand">Harmony<b>X</b> · Agent Economy Workshop</div><div>4</div></div>
+</section>
+
+<!-- 5 DIVIDER DISCOVER -->
+<section class="slide dark" data-notes="ช่วง Discover 25 นาที + Lab 30 นาที — โจทย์: ก่อน agent จะซื้อ ต้องหาเราเจอและอ่านเราออกก่อน">
+  <div style="margin-top:150px">
+    <div class="kicker">Part 1 · Discover</div>
+    <h1 style="font-size:60px">ถูกค้นพบโดยสิ่งที่ไม่ใช่คน</h1>
+    <p style="font-size:22px;color:var(--hx-tint);margin-top:12px">agent เลือกแบรนด์จากโครงสร้างข้อมูล ไม่ใช่ความสวยของเว็บ</p>
+  </div>
+  <div class="roadmap"><span class="lbl">ในช่วงนี้:</span><span class="rchip">AEO ยุค Agent</span><span class="rchip">หน้าร้านใหม่ = MCP Server</span><span class="rchip">Agent Card (A2A)</span><span class="rchip">Lab 1: Audit จริง</span></div>
+  <div class="foot"><div class="brand">Harmony<b>X</b> · Agent Economy Workshop</div><div>5</div></div>
+</section>
+
+<!-- 6 AGENTIC DISCOVERY -->
+<section class="slide light" data-notes="ต่อยอด AEO จาก workshop หลักสู่ระดับโครงสร้าง — เปรียบเทียบ: เว็บสวยแต่ข้อมูลฝังในรูปภาพ = ร้านปิดไฟสำหรับ agent จุดพลิกความคิด: MCP server ของแบรนด์ (ที่สร้างใน Advanced) คือหน้าร้านสาขาใหม่">
+  <div class="kicker">Discover · โครงสร้างที่ agent อ่านออก</div><h1>4 ประตูที่ทำให้ Agent มองเห็นแบรนด์</h1>
+  <div class="grid2" style="margin-top:20px">
+    <div class="card"><h3 style="font-size:16px;color:var(--coral)">1 · Structured Data บนเว็บ</h3><p style="font-size:13px;color:var(--ink)">Schema.org (Product, Offer, FAQ), ราคา/สต็อกในรูปแบบข้อความจริง ไม่ฝังในภาพ — พื้นฐานที่ทำได้ทันทีสัปดาห์นี้</p></div>
+    <div class="card"><h3 style="font-size:16px;color:var(--coral)">2 · เนื้อหาสำหรับ Answer Engines</h3><p style="font-size:13px;color:var(--ink)">AEO ที่เรียนใน workshop หลัก — คำตอบชัด อ้างอิงได้ เป็นกลางพอที่ AI จะหยิบไปตอบ + ไฟล์แนะนำ AI เช่น llms.txt</p></div>
+    <div class="card navy"><h3 style="font-size:16px">3 · MCP Server ของแบรนด์</h3><p style="font-size:13px;color:var(--hx-tint)">สิ่งที่สร้างใน Advanced MCP คือ "หน้าร้านสาขา agent" — เปิดแคตตาล็อก/สต็อก/โปรโมชันให้ AI เรียกตรงอย่างมีสิทธิ์ควบคุม</p></div>
+    <div class="card navy"><h3 style="font-size:16px">4 · Agent Card (A2A)</h3><p style="font-size:13px;color:var(--hx-tint)">"นามบัตรมาตรฐาน" ที่ประกาศว่า agent ของแบรนด์ทำอะไรได้ เจรจาอะไรได้ ติดต่อทางไหน — ให้ agent ฝั่งลูกค้าค้นพบเราเป็นระบบ</p></div>
+  </div>
+  <p class="tagline strong">ลำดับใหม่ของ funnel: ก่อนชนะใจลูกค้า ต้องผ่านการคัดกรองของ agent ที่ลูกค้าไว้ใจก่อน</p>
+  <div class="foot"><div class="brand">Harmony<b>X</b> · Agent Economy Workshop</div><div>6</div></div>
+</section>
+
+<!-- 7 LAB 1 -->
+<section class="slide light" data-notes="Lab เชิงกลยุทธ์ที่สนุกที่สุด — ทีมเลือกแบรนด์ตัวเองหรือแบรนด์ดัง ใช้ Claude (web search) จำลองสายตา agent จริง เดินดูผล: ส่วนใหญ่จะพบว่าข้อมูลสำคัญอ่านไม่ออก — นั่นแหละคือประเด็น แชร์ผลทีมละ 1 นาที">
+  <div class="kicker">Lab 1 · Discover · 30 นาที</div><h1>Lab 1: Agent-Readiness Audit — มอง แบรนด์ด้วยตา Agent</h1>
+  <div class="row" style="margin-top:18px">
+    <div class="col card" style="flex:1.5">
+      <h3>ภารกิจทีม (3-4 ท่าน)</h3>
+      <ul class="b" style="font-size:13.5px">
+        <li><b>Step 1 (5 นาที):</b> เลือกแบรนด์ — ของทีมเอง หรือแบรนด์ไทยที่รู้จักดี</li>
+        <li><b>Step 2 (15 นาที):</b> ใช้ Claude เป็น "agent จำลอง": ให้ค้นเว็บจริงแล้วตอบ — สินค้าหลักราคาเท่าไร มีของไหม ส่งกี่วัน คืนสินค้าอย่างไร มีโปรโมชันอะไร</li>
+        <li><b>Step 3 (5 นาที):</b> ให้คะแนน 4 ประตู (Structured Data / AEO / MCP / Agent Card) ประตูละ 0-5 ลง worksheet</li>
+        <li><b>Step 4 (5 นาที):</b> สรุป 1 ประโยค: "สิ่งแรกที่ต้องแก้คือ ______" + แชร์หน้าห้อง</li>
+      </ul>
+    </div>
+    <div class="col card navy">
+      <h3>Prompt Starter</h3>
+      <p style="font-size:12.5px;color:var(--hx-tint);font-style:italic;line-height:1.55;background:rgba(255,255,255,.08);border:1px solid #3D577F;border-radius:10px;padding:12px 14px">"คุณคือ shopping agent ที่ลูกค้าสั่งให้ซื้อ [สินค้า] จากแบรนด์ [ชื่อ] ค้นเว็บจริงแล้วรายงาน: ข้อมูลใดหาเจอ/หาไม่เจอ ราคา สต็อก เงื่อนไขส่ง-คืน และสรุปว่าถ้าท่านเป็น agent จะกล้าสั่งซื้อจากแบรนด์นี้หรือไม่ เพราะอะไร"</p>
+      <h3 style="margin-top:12px">สิ่งที่มักค้นพบ</h3>
+      <ul class="b" style="font-size:12.5px">
+        <li>ราคาซ่อนใน LINE/DM — agent อ่านไม่ได้</li>
+        <li>โปรโมชันอยู่ในรูปภาพ — มองไม่เห็น</li>
+        <li>นโยบายคืนสินค้าไม่มีเป็นลายลักษณ์</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot"><div class="brand">Harmony<b>X</b> · Agent Economy Workshop</div><div>7</div></div>
+</section>
+
+<!-- 8 DIVIDER TRANSACT -->
+<section class="slide dark" data-notes="หลังพัก — ช่วงเนื้อหาหนักสุด 35 นาที: A2A แล้วต่อ AP2 ใช้ตัวอย่างเดินเรื่องตลอด อย่าลงลึกเชิงเทคนิคเกิน เพราะเป้าคือผู้บริหาร/นักการตลาดเข้าใจกลไกความรับผิดชอบ">
+  <div style="margin-top:150px">
+    <div class="kicker">Part 2 · Transact</div>
+    <h1 style="font-size:60px">เมื่อ Agent สองตัวตกลงกันเอง</h1>
+    <p style="font-size:22px;color:var(--hx-tint);margin-top:12px">A2A: ภาษากลางของความร่วมมือ — AP2: ลายเซ็นของความรับผิดชอบ</p>
+  </div>
+  <div class="roadmap"><span class="lbl">ในช่วงนี้:</span><span class="rchip">A2A: Agent Card · Tasks</span><span class="rchip">AP2: 3 Mandates</span><span class="rchip">เดินเรื่องธุรกรรมจริง</span><span class="rchip">Lab 2: ออกแบบ Journey</span></div>
+  <div class="foot"><div class="brand">Harmony<b>X</b> · Agent Economy Workshop</div><div>8</div></div>
+</section>
+
+<!-- 9 A2A -->
+<section class="slide light" data-notes="A2A ตอบคำถาม: agent ต่างค่าย ต่างเจ้าของ คุยกันอย่างไร — 3 แนวคิดพอสำหรับผู้ฟังกลุ่มนี้ เน้นตัวอย่าง MarTech: agency agent เจรจา brief/งบกับ brand agent อัตโนมัติ สถานะ: Linux Foundation, 150+ orgs, production จริงแล้ว">
+  <div class="kicker">Transact · A2A Protocol</div><h1>A2A: ภาษากลางให้ Agent ต่างค่ายร่วมงานกัน</h1>
+  <div class="grid3" style="margin-top:20px">
+    <div class="card"><div class="chipnum">1</div><h3>Agent Card</h3><p style="font-size:13px;color:var(--ink)">ประกาศตัวตน+ความสามารถของ agent ในรูปแบบมาตรฐาน — อีกฝ่ายรู้ทันทีว่าคุยเรื่องอะไรได้ ผ่านช่องทางใด</p></div>
+    <div class="card"><div class="chipnum">2</div><h3>Tasks &amp; Artifacts</h3><p style="font-size:13px;color:var(--ink)">มอบงานข้าม agent เป็น task ที่ติดตามสถานะได้ ผลลัพธ์ส่งกลับเป็น artifact — เหมือน brief งานระหว่างบริษัท แต่เกิดในวินาที</p></div>
+    <div class="card navy"><div class="chipnum coral">3</div><h3>ข้ามค่าย ข้ามเจ้าของ</h3><p style="font-size:13px;color:var(--hx-tint)">agent บน Google, Microsoft, AWS หรือของแบรนด์เอง คุยกันได้ด้วยมาตรฐานเดียว — production แล้วใน supply chain, การเงิน, ประกัน</p></div>
+  </div>
+  <div class="card" style="margin-top:14px;background:var(--hx-tint);border:none">
+    <p style="font-size:14px;color:var(--hx-dark)"><b>ตัวอย่าง MarTech:</b> agent ของ agency รับ brief "หา influencer สายผิวแพ้ง่าย งบ 200,000" → ค้น Agent Card ของ platform ต่างๆ → เจรจาเรตกับ agent ของ influencer แต่ละราย → สรุป shortlist พร้อมราคากลับมาให้มนุษย์เลือก — ทั้งหมดผ่าน A2A</p>
+  </div>
+  <p class="tagline strong">สถานะ 2026: องค์กรหนุน 150+ ราย ใต้ Linux Foundation — ไม่ใช่ standard war แต่เป็น standard ที่ชนะแล้ว</p>
+  <div class="cite">ที่มา: Linux Foundation press (2026) · a2a-protocol adoption reports</div>
+  <div class="foot"><div class="brand">Harmony<b>X</b> · Agent Economy Workshop</div><div>9</div></div>
+</section>
+
+<!-- 10 AP2 MANDATES -->
+<section class="slide light" data-notes="หัวใจของ AP2 = ตอบคำถาม 'ใครรับผิดชอบเมื่อ AI กดซื้อ' — เดิน 3 mandates ทีละใบ เน้นว่าเซ็นด้วย crypto ตรวจย้อนได้ทุกขั้น เปรียบ: ใบสั่งซื้อ-ใบส่งของ-ใบเสร็จ ยุคดิจิทัลที่ปลอมไม่ได้">
+  <div class="kicker">Transact · AP2 Protocol</div><h1>AP2: สามลายเซ็นที่ทำให้ Agent จ่ายเงินได้อย่างรับผิดชอบ</h1>
+  <div class="flowfill" style="margin-top:20px">
+    <div class="flowrow"><div class="tag" style="background:var(--hx-dark)">Intent Mandate</div><div class="desc"><b>ลูกค้าเซ็น:</b> "อนุญาตให้ซื้อเซรั่มตัวเดิม งบไม่เกิน 900 บาท ภายในสัปดาห์นี้" — ขอบเขตอำนาจที่มอบให้ agent ชัดเจน ตรวจย้อนได้</div></div>
+    <div class="flowrow"><div class="tag" style="background:var(--coral)">Cart Mandate</div><div class="desc"><b>Agent เซ็น:</b> ตะกร้าที่จัดจริง — สินค้า ร้าน ราคา 890 บาท ส่งพรุ่งนี้ — พิสูจน์ว่าทำตามขอบเขตที่ได้รับ ไม่เกิน ไม่แถม</div></div>
+    <div class="flowrow"><div class="tag" style="background:var(--hx)">Payment Mandate</div><div class="desc"><b>ฝั่งชำระเงินเซ็น:</b> รายการเรียกเก็บจริงที่เครือข่าย payment ประมวล — สามใบต่อกันเป็นสายหลักฐานครบวงจร</div></div>
+    <div class="flowrow"><div class="tag" style="background:var(--hx-dark)">ผลลัพธ์</div><div class="desc">เมื่อมีข้อพิพาท: เทียบ 3 ใบ รู้ทันทีว่าผิดชั้นไหน — ลูกค้าสั่งเกิน? agent จัดเกิน? ร้านเก็บเกิน? — ความรับผิดชอบมีเจ้าของเสมอ</div></div>
+  </div>
+  <p class="tagline strong">สำหรับแบรนด์: รับออเดอร์จาก agent = ตรวจ mandate ให้เป็น — เหมือนที่เคยเรียนรู้การรับบัตรเครดิตเมื่อ 30 ปีก่อน</p>
+  <div class="cite">ที่มา: Google Cloud — Announcing AP2 · ap2-protocol.org (องค์กร payment 60+ ราย)</div>
+  <div class="foot"><div class="brand">Harmony<b>X</b> · Agent Economy Workshop</div><div>10</div></div>
+</section>
+
+<!-- 11 FULL TRANSACTION FLOW -->
+<section class="slide light" data-notes="ประกอบทุกโปรโตคอลในธุรกรรมเดียว — ชี้ว่าแต่ละขั้นใช้โปรโตคอลใด (สีของ tag) นี่คือภาพที่เชื่อม 3 workshop เข้าด้วยกันสมบูรณ์">
+  <div class="kicker">Transact · เดินเรื่องเต็มสาย</div><h1>หนึ่งธุรกรรม สามโปรโตคอล — ใครทำอะไรตรงไหน</h1>
+  <div class="flowfill" style="margin-top:20px">
+    <div class="flowrow"><div class="tag" style="background:var(--hx-dark)">1 · ลูกค้า → agent</div><div class="desc">มอบหมาย + เซ็น Intent Mandate (AP2) — "ซื้อเซรั่มเดิม งบ 900"</div></div>
+    <div class="flowrow"><div class="tag" style="background:var(--hx)">2 · ค้นพบร้าน</div><div class="desc">agent อ่าน structured data + Agent Card ของแบรนด์ (Discover) — คัดเหลือร้านที่ "อ่านออกและเชื่อถือได้"</div></div>
+    <div class="flowrow"><div class="tag" style="background:var(--coral)">3 · คุยกับร้าน (A2A)</div><div class="desc">agent ลูกค้า ↔ agent แบรนด์: เช็คสต็อกจริง ขอโปรสมาชิก ตกลงเงื่อนไขส่ง — ฝั่งแบรนด์ดึงข้อมูลผ่าน MCP server ของตัวเอง</div></div>
+    <div class="flowrow"><div class="tag" style="background:var(--coral)">4 · ปิดดีล (AP2)</div><div class="desc">Cart Mandate → ลูกค้าอนุมัติครั้งเดียว → Payment Mandate → ชำระผ่านเครือข่ายจริง</div></div>
+    <div class="flowrow"><div class="tag" style="background:var(--hx-dark)">5 · หลังการขาย</div><div class="desc">ใบเสร็จ/สถานะส่งของไหลกลับอัตโนมัติ — ข้อมูลเข้าสู่ CDP เป็น first-party data รอบใหม่ (data loop จาก workshop หลัก)</div></div>
+  </div>
+  <p class="tagline strong">สังเกต: MCP ที่ท่านสร้างเป็นใน Advanced คือ "อวัยวะภายใน" ของ agent แบรนด์ในขั้นที่ 3 — ทุกอย่างต่อกันเป็นระบบเดียว</p>
+  <div class="foot"><div class="brand">Harmony<b>X</b> · Agent Economy Workshop</div><div>11</div></div>
+</section>
+
+<!-- 12 LAB 2 -->
+<section class="slide light" data-notes="Lab ออกแบบ — ทีมเดิมจาก Lab 1 ใช้ผล audit เป็นตั้งต้น canvas 4 ช่องล้อ journey ที่เพิ่งเรียน เดินช่วยตั้งคำถามยั่ว: จะยอมให้ agent ต่อรองส่วนลดถึงกี่ % โดยไม่ถามมนุษย์ — คำถามแบบนี้คือแก่นของแลป">
+  <div class="kicker">Lab 2 · Transact · 30 นาที</div><h1>Lab 2: ออกแบบ Agent Commerce Journey ของธุรกิจท่าน</h1>
+  <div class="row" style="margin-top:18px">
+    <div class="col card" style="flex:1.5">
+      <h3>โจทย์ทีม (ต่อจาก Lab 1)</h3>
+      <ul class="b" style="font-size:13.5px">
+        <li><b>Design (20 นาที):</b> วาด journey 5 ขั้น (สไลด์ที่แล้ว) ของธุรกิจทีม ลง canvas — ระบุ: จุด discover ที่ต้องแก้ก่อน / ข้อมูลที่เปิดผ่าน MCP / สิ่งที่ยอมให้ agent เจรจา (ส่วนลด? bundle? เวลาส่ง?) / ขอบเขต mandate สูงสุด</li>
+        <li><b>กำหนดเส้นแดง (5 นาที):</b> จุดใดต้องมีมนุษย์อนุมัติเสมอ (มูลค่าเกินเท่าไร ลูกค้าใหม่ สินค้าหมวดใด)</li>
+        <li><b>สรุป (5 นาที):</b> "Quick win 30 วันแรกของเราคือ ______" — ทีมละ 1 ประโยคหน้าห้อง</li>
+      </ul>
+    </div>
+    <div class="col card navy">
+      <h3>Canvas 4 ช่อง</h3>
+      <ul class="b" style="font-size:13px">
+        <li>1 · Discover: ประตูไหนพัง ต้องซ่อมก่อน (จากผล audit)</li>
+        <li>2 · Data ผ่าน MCP: เปิดอะไร ไม่เปิดอะไร</li>
+        <li>3 · Negotiable: ให้ agent ตกลงอะไรแทนเราได้</li>
+        <li>4 · เส้นแดง + Mandate: เพดานอำนาจ + จุดรอมนุษย์</li>
+      </ul>
+      <p style="font-size:12.5px;color:var(--accent);font-weight:700;margin-top:12px">ใช้ Claude ช่วยได้เต็มที่ — โดยเฉพาะช่อง 3: ให้ช่วยคิดว่าธุรกิจประเภทนี้ควรเปิดเจรจาอะไร</p>
+    </div>
+  </div>
+  <div class="foot"><div class="brand">Harmony<b>X</b> · Agent Economy Workshop</div><div>12</div></div>
+</section>
+
+<!-- 13 DIVIDER TRUST -->
+<section class="slide dark" data-notes="15 นาที — โอกาสมาพร้อมความเสี่ยงรูปแบบใหม่ ช่วงนี้สำหรับผู้บริหารเป็นพิเศษ">
+  <div style="margin-top:150px">
+    <div class="kicker">Part 3 · Trust</div>
+    <h1 style="font-size:60px">เศรษฐกิจใหม่ ต้องการความเชื่อถือแบบใหม่</h1>
+    <p style="font-size:22px;color:var(--hx-tint);margin-top:12px">ความเสี่ยงที่มากับ agent — และโครงสร้างที่กำลังสร้างขึ้นมารับ</p>
+  </div>
+  <div class="roadmap"><span class="lbl">ในช่วงนี้:</span><span class="rchip">4 ความเสี่ยงใหม่</span><span class="rchip">Trust Infrastructure</span><span class="rchip">มุมกฎหมายไทย/EU</span></div>
+  <div class="foot"><div class="brand">Harmony<b>X</b> · Agent Economy Workshop</div><div>13</div></div>
+</section>
+
+<!-- 14 NEW RISKS -->
+<section class="slide light" data-notes="4 ความเสี่ยงระดับธุรกิจ (ไม่ใช่เทคนิคล้วนแบบ Advanced) — ข้อ 4 สำคัญสุดสำหรับนักการตลาด: เมื่อ agent เป็นผู้เล่าเรื่องแบรนด์ เราคุม narrative ได้แค่ผ่านคุณภาพข้อมูลที่ให้มัน">
+  <div class="kicker">Trust · ความเสี่ยงใหม่</div><h1>4 ความเสี่ยงที่ผู้บริหารต้องมองเห็นก่อนเปิดรับ Agent</h1>
+  <div class="grid2" style="margin-top:20px">
+    <div class="card"><h3 style="font-size:16px;color:var(--coral)">1 · Agent ปลอมตัว</h3><p style="font-size:13px;color:var(--ink)">agent อ้างตัวเป็นลูกค้า/คู่ค้าเพื่อดูดข้อมูลราคา สต็อก เงื่อนไข — ต้องแยกชั้นข้อมูล public/authenticated ให้ชัดตั้งแต่ออกแบบ</p></div>
+    <div class="card"><h3 style="font-size:16px;color:var(--coral)">2 · Mandate Fraud</h3><p style="font-size:13px;color:var(--ink)">ธุรกรรมอ้าง mandate ที่ไม่มีจริงหรือเกินขอบเขต — ฝั่งแบรนด์ต้อง "ตรวจลายเซ็นเป็น" ก่อนรับออเดอร์ agent เสมอ</p></div>
+    <div class="card"><h3 style="font-size:16px;color:var(--coral)">3 · การแข่งขันที่มองไม่เห็น</h3><p style="font-size:13px;color:var(--ink)">แพ้-ชนะเกิดในเสี้ยววินาทีที่ไม่มีมนุษย์เห็น — ต้องมี analytics ใหม่: ถูก agent พิจารณากี่ครั้ง แพ้เพราะอะไร (ราคา? ข้อมูลไม่ครบ? ส่งช้า?)</p></div>
+    <div class="card navy"><h3 style="font-size:16px">4 · Narrative อยู่ในมือ Agent</h3><p style="font-size:13px;color:var(--hx-tint)">agent เป็นผู้สรุปแบรนด์ให้ลูกค้าฟัง — แบรนด์คุมเรื่องเล่าได้ทางเดียว: คุณภาพและความชัดของข้อมูลที่เปิดให้ agent อ่าน</p></div>
+  </div>
+  <p class="tagline strong">โครงสร้างรองรับกำลังมา: agent identity, MCP curated registry (Q4 2026), กรอบ PDPA/EU AI Act ที่เรียนไปแล้ว — ผู้เริ่มก่อนอย่างมีวินัยได้เปรียบ</p>
+  <div class="foot"><div class="brand">Harmony<b>X</b> · Agent Economy Workshop</div><div>14</div></div>
+</section>
+
+<!-- 15 DIVIDER PREPARE -->
+<section class="slide dark" data-notes="ช่วงปิด 15 นาที — เปลี่ยนทุกอย่างเป็นแผนปฏิบัติ">
+  <div style="margin-top:150px">
+    <div class="kicker">Part 4 · Prepare</div>
+    <h1 style="font-size:60px">เริ่มวันนี้ ด้วยของที่มีอยู่แล้ว</h1>
+    <p style="font-size:22px;color:var(--hx-tint);margin-top:12px">บันได Readiness 4 ขั้น และแผน 90 วันที่ทำได้จริง</p>
+  </div>
+  <div class="roadmap"><span class="lbl">ในช่วงนี้:</span><span class="rchip">บันได 4 ขั้น</span><span class="rchip">แผน 90 วัน</span><span class="rchip">Commitment</span></div>
+  <div class="foot"><div class="brand">Harmony<b>X</b> · Agent Economy Workshop</div><div>15</div></div>
+</section>
+
+<!-- 16 READINESS LADDER -->
+<section class="slide light" data-notes="ให้โหวตเหมือนทุกครั้ง: องค์กรอยู่ขั้นไหน — ส่วนใหญ่ยังขั้น 0-1 นั่นคือข่าวดี: ขั้น 1-2 ทำได้ด้วยความรู้จาก 3 workshop นี้ครบแล้ว ไม่ต้องรอใคร">
+  <div class="kicker">Prepare · Readiness Ladder</div><h1>บันได 4 ขั้นสู่แบรนด์ที่ Agent เลือก</h1>
+  <div style="margin-top:20px;display:flex;flex-direction:column;gap:8px;flex:1;max-width:1020px;align-self:center;width:100%">
+    <div class="card archrow" style="padding:13px 22px;display:flex;gap:14px;align-items:center"><div class="chipnum" style="margin:0;width:34px;height:34px;font-size:15px">1</div><div><b style="color:var(--hx-dark);font-size:15px">Readable — agent อ่านเราออก</b><p style="font-size:12.5px;color:var(--ink)">structured data, ราคา/นโยบายเป็นข้อความ, AEO — เริ่มได้สัปดาห์นี้ งบแทบเป็นศูนย์</p></div></div>
+    <div class="archrow" style="text-align:center;color:var(--coral);font-weight:800;line-height:.7"><span class="aro">↓</span></div>
+    <div class="card archrow" style="padding:13px 22px;display:flex;gap:14px;align-items:center"><div class="chipnum" style="margin:0;width:34px;height:34px;font-size:15px">2</div><div><b style="color:var(--hx-dark);font-size:15px">Connectable — agent ต่อเราได้</b><p style="font-size:12.5px;color:var(--ink)">MCP server เปิดแคตตาล็อก/สต็อก + LINE Bot ตอบลูกค้า — คือ Advanced MCP + Lab 3 ที่เรียนแล้ว</p></div></div>
+    <div class="archrow" style="text-align:center;color:var(--coral);font-weight:800;line-height:.7"><span class="aro">↓</span></div>
+    <div class="card navy archrow" style="padding:13px 22px;display:flex;gap:14px;align-items:center"><div class="chipnum coral" style="margin:0;width:34px;height:34px;font-size:15px">3</div><div><b style="color:#fff;font-size:15px">Negotiable — agent เจรจากับเราได้</b><p style="font-size:12.5px;color:var(--hx-tint)">Agent Card + นโยบายเจรจาชัดเจน (จาก Lab 2 วันนี้) — เริ่ม pilot เมื่อ ecosystem ฝั่งไทยขยับ</p></div></div>
+    <div class="archrow" style="text-align:center;color:var(--coral);font-weight:800;line-height:.7"><span class="aro">↓</span></div>
+    <div class="card archrow" style="padding:13px 22px;display:flex;gap:14px;align-items:center"><div class="chipnum" style="margin:0;width:34px;height:34px;font-size:15px">4</div><div><b style="color:var(--hx-dark);font-size:15px">Transactable — agent จ่ายเงินเราได้</b><p style="font-size:12.5px;color:var(--ink)">รองรับ AP2 mandate ผ่าน payment partner — ติดตามผู้ให้บริการไทย/ภูมิภาคที่จะเปิดตัวตาม 60+ องค์กรแรก</p></div></div>
+  </div>
+  <p class="tagline strong">โหวต: วันนี้องค์กรของท่านอยู่ขั้นใด — และขั้น 1-2 ไม่ต้องรอใครอนุญาต</p>
+  <div class="foot"><div class="brand">Harmony<b>X</b> · Agent Economy Workshop</div><div>16</div></div>
+</section>
+
+<!-- 17 90-DAY PLAN -->
+<section class="slide light" data-notes="แผนที่ตั้งใจให้ 'เริ่มได้โดยไม่ต้องขอ งบใหม่' เดือน 1 คือของฟรีทั้งหมด ปิดด้วย commitment เขียนลง worksheet เช่นเคย">
+  <div class="kicker">Prepare · แผนปฏิบัติ</div><h1>แผน 90 วันสู่ Agent Economy — เริ่มจากศูนย์บาท</h1>
+  <div style="margin-top:20px;display:flex;flex-direction:column;gap:14px;flex:1">
+    <div class="card" style="display:flex;gap:20px;align-items:center"><div style="background:var(--hx-dark);color:#fff;font-weight:700;font-size:14px;border-radius:9px;padding:9px 16px;width:130px;text-align:center;flex-shrink:0">เดือน 1</div><b style="width:230px;font-size:16px;color:var(--hx-dark);flex-shrink:0">Readable (ขั้น 1)</b><p style="font-size:13.5px;color:var(--ink)">แก้สิ่งที่ Lab 1 พบ: structured data, ราคา/นโยบายเป็นข้อความ, เนื้อหา AEO — ทีมเดิม งบเดิม</p></div>
+    <div class="card" style="display:flex;gap:20px;align-items:center"><div style="background:var(--hx);color:#fff;font-weight:700;font-size:14px;border-radius:9px;padding:9px 16px;width:130px;text-align:center;flex-shrink:0">เดือน 2</div><b style="width:230px;font-size:16px;color:var(--hx-dark);flex-shrink:0">Connectable (ขั้น 2)</b><p style="font-size:13.5px;color:var(--ink)">MCP server ข้อมูลจริง (read-only) + วัดผลผ่าน Cowork ทีมใน — ตามแผน 30 วันของ Advanced MCP</p></div>
+    <div class="card navy" style="display:flex;gap:20px;align-items:center"><div style="background:var(--coral);color:#fff;font-weight:700;font-size:14px;border-radius:9px;padding:9px 16px;width:130px;text-align:center;flex-shrink:0">เดือน 3</div><b style="width:230px;font-size:16px;color:#fff;flex-shrink:0">จับตา + ทดลองขั้น 3</b><p style="font-size:13.5px;color:var(--hx-tint)">ร่าง Agent Card + นโยบายเจรจา (จาก Lab 2) · ตั้ง radar ติดตาม A2A/AP2 ฝั่งไทย · แชร์บทเรียนให้ผู้บริหารทุกเดือน</p></div>
+  </div>
+  <p class="tagline strong">Commitment: "ภายใน 90 วัน แบรนด์ของฉันจะขึ้นถึงขั้น ______ และสิ่งแรกที่ทำสัปดาห์หน้าคือ ______"</p>
+  <div class="foot"><div class="brand">Harmony<b>X</b> · Agent Economy Workshop</div><div>17</div></div>
+</section>
+
+<!-- 18 SERIES CLOSE -->
+<section class="slide light" data-notes="สไลด์ปิดซีรีส์ 3 workshop — ภาพรวมการเดินทางทั้งหมด ให้ผู้เรียนเห็นว่าตนเองมาไกลแค่ไหน และแต่ละชิ้นต่อกันเป็นระบบเดียว">
+  <div class="kicker">ปิดซีรีส์ · 3 Workshops, 1 ระบบ</div><h1>เส้นทางที่เดินมาด้วยกัน — และสิ่งที่ท่านทำได้แล้ววันนี้</h1>
+  <div class="grid3" style="margin-top:20px">
+    <div class="card"><h3 style="font-size:16px;color:var(--hx)">1 · AI for MarTech</h3><ul class="b" style="font-size:12.5px"><li>เข้าใจ AI/LLM + C-R-T-F</li><li>MCP + Integration ระดับผู้ใช้</li><li>วิเคราะห์ลูกค้า + ออกแบบ architecture</li><li>LINE Bot ตัวแรก</li></ul></div>
+    <div class="card"><h3 style="font-size:16px;color:var(--hx)">2 · Advanced MCP</h3><ul class="b" style="font-size:12.5px"><li>เขียน MCP server เอง</li><li>Security + governance ในโค้ด</li><li>Deploy ขึ้น cloud ให้ทั้งทีม</li><li>เห็นภาพ multi-server workflow</li></ul></div>
+    <div class="card navy"><h3 style="font-size:16px">3 · Agent Economy (วันนี้)</h3><ul class="b" style="font-size:12.5px"><li>มองแบรนด์ด้วยตา agent</li><li>เข้าใจ A2A + AP2 ระดับตัดสินใจ</li><li>Journey + เส้นแดงของธุรกิจตนเอง</li><li>แผน 90 วันเริ่มได้ทันที</li></ul></div>
+  </div>
+  <p class="tagline strong">จากคำถาม "เช้าวันจันทร์" ใน workshop แรก — วันนี้ท่านมีทั้งเครื่องมือ ท่อข้อมูล และแผนที่ของเศรษฐกิจใบใหม่ครบมือแล้ว</p>
+  <div class="foot"><div class="brand">Harmony<b>X</b> · Agent Economy Workshop</div><div>18</div></div>
+</section>
+
+<!-- 19 REFERENCES -->
+<section class="slide light" data-notes="แหล่งอ้างอิง — A2A/AP2 ยังพัฒนาเร็ว ตรวจสถานะล่าสุดก่อนสอนทุกรอบ">
+  <div class="kicker">References</div><h1>แหล่งอ้างอิง</h1>
+  <div style="margin-top:16px">
+    <div class="ref"><b>A2A: 150+ องค์กร, Linux Foundation, production ใน supply chain/การเงิน/ประกัน</b><span>Linux Foundation — "A2A Protocol Surpasses 150 Organizations…" (2026) <i>linuxfoundation.org/press · a2a-protocol adoption reports</i></span></div>
+    <div class="ref"><b>AP2: 3 Mandates (Intent/Cart/Payment), องค์กร payment 60+ ราย</b><span>Google Cloud — "Announcing Agent Payments Protocol (AP2)"; เอกสารทางการ <i>cloud.google.com/blog · ap2-protocol.org</i></span></div>
+    <div class="ref"><b>Protocol stack: MCP → A2A → AP2</b><span>Google Cloud (AP2 announcement) — "equip with MCP, collaborate via A2A, secure payments with AP2"; Anthropic — Model Context Protocol <i>modelcontextprotocol.io</i></span></div>
+    <div class="ref"><b>Agent-to-Agent Commerce (บริบทผู้บริโภค)</b><span>MarTech.org — "How AI agents will reshape every part of marketing in 2026"; eMarketer — AI & CX FAQ 2026 <i>martech.org · emarketer.com</i></span></div>
+    <div class="ref"><b>กรอบกำกับดูแล</b><span>EU AI Act (บังคับใช้เต็ม ส.ค. 2026) · พ.ร.บ.คุ้มครองข้อมูลส่วนบุคคล (PDPA) · MCP curated registry (Q4 2026)</span></div>
+  </div>
+  <p class="tagline" style="font-size:12.5px">เข้าถึงข้อมูล: กรกฎาคม 2026 — A2A/AP2 พัฒนาเร็วมาก ตรวจสอบสถานะ adoption ล่าสุดก่อนการสอนแต่ละรอบ</p>
+  <div class="foot"><div class="brand">Harmony<b>X</b> · Agent Economy Workshop</div><div>19</div></div>
+</section>
+
+<!-- 20 THANK YOU -->
+<section class="slide dark" data-notes="ปิดซีรีส์ — เก็บ feedback + ชวนติดตามผล 90 วัน อาจนัด alumni session เมื่อ A2A/AP2 มี pilot ฝั่งไทย">
+  <div style="margin:auto;text-align:center">
+    <h1 style="font-size:64px">ขอบคุณ</h1>
+    <p style="font-size:20px;color:var(--hx-tint);margin-top:16px">The Agent Economy — Discover · Transact · Trust · Prepare</p>
+    <p style="font-size:16px;color:var(--accent);margin-top:28px">แบรนด์ที่ชนะในเศรษฐกิจ agent ไม่ใช่แบรนด์ที่เสียงดังที่สุด — แต่คือแบรนด์ที่เครื่องอ่านออกและเชื่อถือได้ที่สุด</p>
+    <p style="font-size:15px;color:var(--hx-tint);margin-top:10px">เอกสาร + worksheet: [ QR / ลิงก์ ]</p>
+    <p style="font-size:14px;color:#8FA6CE;margin-top:14px">Harmony<b style="color:var(--accent)">X</b> Solution · harmonyx.co · hello@harmonyx.co</p>
+  </div>
+  <div class="foot"><div class="brand">Harmony<b>X</b> · Agent Economy Workshop</div><div>20</div></div>
+</section>
+
+</div></div>
+<div id="notes"></div>
+<script>
+const slides=[...document.querySelectorAll('.slide')];
+let cur=0;
+const bar=document.getElementById('bar'),counter=document.getElementById('cnt'),notes=document.getElementById('notes');
+let notesOn=false;
+let showHidden=false; // ค่าเริ่มต้น: ปิด (ไม่จำค่า — รีเซ็ตทุกครั้งที่เปิด)
+const isHidden=i=>slides[i].classList.contains('hidden-slide')&&!showHidden;
+const visCount=()=>showHidden?slides.length:slides.filter(s=>!s.classList.contains('hidden-slide')).length;
+const visPos=i=>showHidden?(i+1):slides.slice(0,i+1).filter(s=>!s.classList.contains('hidden-slide')).length;
+function show(i){
+  cur=Math.max(0,Math.min(slides.length-1,i));
+  slides.forEach((s,j)=>s.classList.toggle('active',j===cur));
+  bar.style.width=(visPos(cur)/visCount()*100)+'%';
+  counter.textContent=isHidden(cur)?('ซ่อน · '+(cur+1)):(visPos(cur)+' / '+visCount());
+  notes.textContent=slides[cur].dataset.notes||'';
+  notes.style.display=notesOn&&notes.textContent?'block':'none';
+  document.getElementById('bNotes').classList.toggle('on',notesOn);
+  if(document.body.classList.contains('mm'))counter.textContent='เลื่อนดู · '+visCount()+' สไลด์';
+  location.hash=cur+1;
+}
+// เดินหน้า/ถอยหลังโดยข้ามสไลด์ที่ซ่อน (ยังเปิดดูได้ผ่านสารบัญ)
+function step(dir){
+  let i=cur+dir;
+  while(i>=0&&i<slides.length&&isHidden(i))i+=dir;
+  if(i>=0&&i<slides.length)show(i);
+}
+/* ── ซ่อน/แสดงสไลด์ด้วยปุ่ม H — จำค่าไว้ในเบราว์เซอร์ ── */
+const hideOv=JSON.parse(localStorage.getItem('ecoDeckHiddenOv')||'{}');
+Object.entries(hideOv).forEach(([i,v])=>slides[+i]&&slides[+i].classList.toggle('hidden-slide',v));
+function toggleHide(){
+  const v=!isHidden(cur);
+  slides[cur].classList.toggle('hidden-slide',v);
+  hideOv[cur]=v;
+  localStorage.setItem('ecoDeckHiddenOv',JSON.stringify(hideOv));
+  const a=toclist.children[cur];
+  if(a)a.classList.toggle('hid',v);
+  show(cur);fit();
+}
+/* ── ปรับขนาดตัวอักษร (A− / A+) ── */
+const FS_STEPS=[0.85,0.92,1,1.06,1.12,1.18];
+let fsIdx=parseInt(localStorage.getItem('ecoDeckFs')||'2');
+const fsOrig=new WeakMap();
+function applyFS(){
+  fsIdx=Math.max(0,Math.min(FS_STEPS.length-1,fsIdx));
+  const f=FS_STEPS[fsIdx];
+  document.querySelectorAll('#frame .slide, #frame .slide *').forEach(el=>{
+    if(el.tagName==='svg'||el.closest('svg'))return; // ไม่ปรับข้อความใน SVG diagram
+    if(!fsOrig.has(el)){
+      const fs=parseFloat(getComputedStyle(el).fontSize);
+      fsOrig.set(el,fs/FS_STEPS[2]);
+    }
+    el.style.fontSize=(fsOrig.get(el)*f)+'px';
+  });
+  document.getElementById('fsv').textContent=Math.round(f*100)+'%';
+  localStorage.setItem('ecoDeckFs',fsIdx);
+}
+function fit(){
+  const f=document.getElementById('frame');
+  const st=document.getElementById('stage');
+  const vv=window.visualViewport;
+  const vw=vv?vv.width:document.documentElement.clientWidth;
+  const vh=vv?vv.height:document.documentElement.clientHeight;
+  const mobilePortrait=vw<700&&vh>vw;
+  document.body.classList.toggle('mm',mobilePortrait);
+  document.documentElement.classList.toggle('mm',mobilePortrait);
+  if(mobilePortrait){
+    // โหมดอ่าน: reflow คอลัมน์เดียว ไม่ย่อส่วน — ตัวอักษรขนาดจริง
+    f.style.transform='none';
+    const visible=visCount();
+    counter.textContent='เลื่อนดู · '+visible+' สไลด์';
+    return;
+  }
+  st.style.height='';
+  const pad=vw<700?1.0:1.015;
+  const sc=Math.min(vw/(1280*pad),vh/(720*pad));
+  f.style.transform='scale('+sc+')';
+  show(cur); // คืนค่าตัวนับ/สถานะเมื่อกลับสู่โหมดนำเสนอ
+}
+addEventListener('resize',fit);
+addEventListener('orientationchange',()=>setTimeout(fit,150));
+document.addEventListener('fullscreenchange',()=>setTimeout(fit,50));
+if(window.visualViewport)visualViewport.addEventListener('resize',fit);
+const toc=document.getElementById('toc'),toclist=document.getElementById('toclist');
+slides.forEach((s,i)=>{
+  const t=s.querySelector('h1'),k=s.querySelector('.kicker');
+  const a=document.createElement('a');
+  if(s.classList.contains('hidden-slide'))a.className='hid';
+  // สไลด์ divider (Part/Bonus) แสดงเป็นหัวข้อกลุ่มในสารบัญ
+  if(s.classList.contains('dark')&&k&&/^(Part|Bonus)/.test(k.textContent.trim()))a.classList.add('grp');
+  a.innerHTML='<b>'+(i+1)+'</b>'+(k?k.textContent+' — ':'')+(t?t.textContent:'');
+  a.onclick=()=>{
+    toc.classList.remove('on');
+    if(document.body.classList.contains('mm'))slides[i].scrollIntoView({behavior:'smooth',block:'start'});
+    else show(i);
+  };
+  toclist.appendChild(a);
+});
+addEventListener('keydown',e=>{
+  if(e.key==='Escape'){toc.classList.remove('on');return;}
+  if(toc.classList.contains('on'))return;
+  if(e.key==='ArrowRight'||e.key===' '||e.key==='PageDown')step(1);
+  else if(e.key==='ArrowLeft'||e.key==='PageUp')step(-1);
+  else if(e.key==='Home')show(0);
+  else if(e.key==='End')show(slides.length-1);
+  else if(e.key.toLowerCase()==='n'){notesOn=!notesOn;show(cur);}
+  else if(e.key==='T'&&e.shiftKey){tReset();}
+  else if(e.key==='H'&&e.shiftKey){toggleShowHidden();}
+  else if(e.key.toLowerCase()==='t'){tToggle();}
+  else if(e.key.toLowerCase()==='h'&&!e.shiftKey){toggleHide();}
+  else if(e.key==='?'){const hp=document.getElementById('help');hp.classList.remove('hide');setTimeout(()=>hp.classList.add('hide'),7000);}
+  else if(e.key.toLowerCase()==='o'){toc.classList.toggle('on');}
+  else if(e.key.toLowerCase()==='f'){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();}
+  else if(e.key.toLowerCase()==='p'){print();}
+});
+document.getElementById('frame').addEventListener('click',e=>{
+  if(document.body.classList.contains('mm'))return; // โหมดอ่าน: เลื่อนตามปกติ
+  if(e.target.closest('a'))return;
+  if(getSelection().toString())return;
+  if(e.clientX>innerWidth/2)step(1);else step(-1);
+});
+let tx=null;
+addEventListener('touchstart',e=>tx=e.touches[0].clientX);
+addEventListener('touchend',e=>{
+  if(document.body.classList.contains('mm'))return; // โหมดอ่าน: ใช้ scroll แทน swipe
+  if(tx===null)return;
+  const dx=e.changedTouches[0].clientX-tx;
+  if(Math.abs(dx)>50)step(dx<0?1:-1);
+  tx=null;
+});
+/* ── ปุ่มควบคุม ── */
+document.getElementById('bPrev').onclick=()=>step(-1);
+document.getElementById('bNext').onclick=()=>step(1);
+document.getElementById('navL').onclick=()=>step(-1);
+document.getElementById('navR').onclick=()=>step(1);
+document.getElementById('bFsDn').onclick=()=>{fsIdx--;applyFS();};
+document.getElementById('bFsUp').onclick=()=>{fsIdx++;applyFS();};
+document.getElementById('bNotes').onclick=()=>{notesOn=!notesOn;show(cur);};
+document.getElementById('bToc').onclick=()=>toc.classList.toggle('on');
+document.getElementById('bFull').onclick=()=>{document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();};
+setTimeout(()=>document.getElementById('help').classList.add('hide'),7000);
+/* ── นาฬิกาจับเวลาวิทยากร (T เริ่ม/หยุด · Shift+T รีเซ็ต) ── */
+let tSec=0,tRun=false,tInt=null;
+const bT=document.getElementById('bTimer');
+function tShow(){
+  const h=Math.floor(tSec/3600),m=Math.floor(tSec%3600/60),s=tSec%60;
+  bT.textContent=(h?h+':'+String(m).padStart(2,'0'):m)+':'+String(s).padStart(2,'0');
+  bT.classList.toggle('on',tRun);
+  bT.style.color=tSec>=12600?'#E9635B':''; // เกิน 3.5 ชม. เตือนสีแดง
+}
+function tToggle(){
+  tRun=!tRun;
+  if(tRun)tInt=setInterval(()=>{tSec++;tShow();},1000);
+  else clearInterval(tInt);
+  tShow();
+}
+function tReset(){tRun=false;clearInterval(tInt);tSec=0;tShow();}
+bT.onclick=tToggle;
+/* ── แสดง/ซ่อน สไลด์ที่ถูกซ่อนทั้งหมด (ค่าเริ่มต้น: ปิด) ── */
+function toggleShowHidden(){
+  showHidden=!showHidden;
+  document.body.classList.toggle('showhid',showHidden);
+  document.getElementById('bShowHid').classList.toggle('on',showHidden);
+  if(!showHidden&&slides[cur].classList.contains('hidden-slide'))step(1); // ปิดโหมดขณะอยู่บนสไลด์ซ่อน → เลื่อนไปสไลด์ถัดไป
+  else show(cur);
+  fit();
+}
+document.getElementById('bShowHid').onclick=toggleShowHidden;
+/* ── ซ่อนแถบควบคุมอัตโนมัติเมื่อ fullscreen และเมาส์นิ่ง 3 วินาที ── */
+let idleT=null;
+function idleArm(){
+  const c1=document.getElementById('ctrl');
+  c1.style.opacity='1';c1.style.transition='opacity .4s';
+  clearTimeout(idleT);
+  if(document.fullscreenElement)idleT=setTimeout(()=>{c1.style.opacity='0';},3000);
+}
+addEventListener('mousemove',idleArm);
+document.addEventListener('fullscreenchange',idleArm);
+/* ── โหมดอ่านมือถือ: progress ตามการเลื่อน + ตัวนับรู้ตำแหน่ง + ปุ่มขึ้นบน ── */
+document.getElementById('topBtn').onclick=()=>scrollTo({top:0,behavior:'smooth'});
+addEventListener('scroll',()=>{
+  if(!document.body.classList.contains('mm'))return;
+  const d=document.documentElement;
+  const p=d.scrollHeight>d.clientHeight?(scrollY/(d.scrollHeight-d.clientHeight)):0;
+  bar.style.width=(p*100)+'%';
+},{passive:true});
+const io=new IntersectionObserver(es=>{
+  if(!document.body.classList.contains('mm'))return;
+  es.forEach(en=>{
+    if(en.isIntersecting){
+      const i=slides.indexOf(en.target);
+      counter.textContent=visPos(i)+' / '+visCount();
+    }
+  });
+},{threshold:0.35});
+slides.forEach(s=>io.observe(s));
+fit();
+show(parseInt(location.hash.slice(1))-1||0);
+if(fsIdx!==2)applyFS();else document.getElementById('fsv').textContent='100%';
+</script>
+</body>
+</html>

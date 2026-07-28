@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Advanced MCP Workshop — HarmonyX</title>
+<meta name="description" content="Advanced MCP Workshop 3 ชั่วโมง — Build · Secure · Deploy · Orchestrate: เขียน MCP Server ของธุรกิจเองและใช้งานจริงทั้งองค์กร | HarmonyX Solution">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23345589'/%3E%3Ctext x='32' y='44' font-family='Arial' font-size='34' font-weight='800' fill='%23F2A33C' text-anchor='middle'%3EX%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --hx:#345589; --hx-dark:#22375C; --hx-deep:#182948; --hx-mid:#4A6BA5;
+  --hx-tint:#E9EFF7; --hx-bg:#F7F9FC; --accent:#F2A33C; --coral:#E9635B;
+  --ink:#1D2433; --mut:#66738A; --line:#D9E2EF; --white:#FFFFFF;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;background:#0E1830;font-family:'Noto Sans Thai',sans-serif;overflow:hidden;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+::selection{background:var(--accent);color:var(--hx-deep)}
+button:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+#toc::-webkit-scrollbar{width:8px}
+#toc::-webkit-scrollbar-thumb{background:#33456E;border-radius:99px}
+#toc::-webkit-scrollbar-track{background:transparent}
+#stage{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+#frame{position:relative;width:1280px;height:720px;transform-origin:center center;background:var(--white);box-shadow:0 20px 80px rgba(0,0,0,.5);border-radius:6px;overflow:hidden}
+.slide{position:absolute;inset:0;padding:52px 60px 58px;display:none;flex-direction:column;overflow:hidden}
+.slide.active{display:flex}
+.slide.dark{background:linear-gradient(135deg,var(--hx-dark) 0%,var(--hx-deep) 100%);color:var(--white)}
+.slide.light{background:var(--white)}
+
+.kicker{font-size:14px;font-weight:700;letter-spacing:.18em;color:var(--coral);text-transform:uppercase;margin-bottom:8px}
+.dark .kicker{color:var(--accent)}
+h1{font-size:42px;font-weight:800;color:var(--hx-dark);line-height:1.15}
+.dark h1{color:var(--white)}
+.card h3{font-size:20px;font-weight:700;color:var(--hx-dark);margin-bottom:8px}
+.card.navy h3{color:var(--accent)}
+
+.foot{position:absolute;left:0;right:0;bottom:0;padding:14px 60px 14px;display:flex;justify-content:space-between;font-size:11px;color:var(--mut);z-index:30;pointer-events:none;background:linear-gradient(0deg,var(--white) 55%,rgba(255,255,255,0))}
+.dark .foot{color:#8FA6CE;background:linear-gradient(0deg,#182948 55%,rgba(24,41,72,0))}
+.foot .brand b{color:var(--hx)} .dark .foot .brand b{color:var(--accent)}
+.cite{position:absolute;right:60px;bottom:38px;font-size:10.5px;font-style:italic;color:#93A1B8;max-width:70%;text-align:right;z-index:31;background:rgba(255,255,255,.88);padding:2px 8px;border-radius:6px}
+.dark .cite{color:#8FA6CE;background:rgba(24,41,72,.88)}
+
+.row{display:flex;gap:20px;flex:1;min-height:0}
+.col{flex:1;min-width:0}
+.card{background:var(--hx-bg);border:1px solid var(--line);border-radius:14px;padding:22px 24px}
+.card.navy{background:linear-gradient(150deg,var(--hx) 0%,var(--hx-dark) 100%);border:none;color:var(--white)}
+ul.b{list-style:none;margin-top:8px}
+ul.b li{position:relative;padding-left:18px;margin-bottom:9px;font-size:15.5px;line-height:1.45;color:var(--ink)}
+.card.navy ul.b li{color:var(--hx-tint)}
+ul.b li::before{content:"";position:absolute;left:0;top:9px;width:7px;height:7px;border-radius:50%;background:var(--coral)}
+.card.navy ul.b li::before{background:var(--accent)}
+.stat-big{font-size:56px;font-weight:800;color:var(--accent);line-height:1}
+.tagline{margin-top:auto;font-size:15px;font-style:italic;color:var(--mut);padding-top:10px}
+.tagline.strong{color:var(--coral);font-weight:600}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px;flex:1;min-height:0}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;flex:1;min-height:0}
+.chipnum{width:40px;height:40px;border-radius:50%;background:var(--hx);color:#fff;font-weight:700;font-size:18px;display:flex;align-items:center;justify-content:center;margin-bottom:12px}
+.chipnum.coral{background:var(--coral)}
+
+#bar{position:fixed;left:0;top:0;height:4px;background:linear-gradient(90deg,var(--accent),var(--coral));width:0;transition:width .35s cubic-bezier(.4,0,.2,1);z-index:90}
+::selection{background:rgba(242,163,60,.3)}
+body{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+.slide h1{text-wrap:balance}
+.slide p{text-wrap:pretty}
+button:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+#notes{position:fixed;left:0;right:0;bottom:0;background:rgba(24,41,72,.96);color:#EAF1FB;font-size:14px;line-height:1.5;padding:14px 60px;display:none;z-index:85;border-top:3px solid var(--accent)}
+#help{position:fixed;left:14px;top:12px;font-size:11px;color:#CFE0F5;background:rgba(24,41,72,.8);padding:4px 12px;border-radius:99px;z-index:90;cursor:default;transition:opacity .6s}
+#help.hide{opacity:0;pointer-events:none}
+/* ── Control bar ── */
+#ctrl{position:fixed;right:14px;top:10px;display:flex;gap:6px;align-items:center;z-index:95;background:rgba(24,41,72,.85);border:1px solid #33456E;border-radius:99px;padding:4px 8px;backdrop-filter:blur(12px) saturate(1.3);box-shadow:0 4px 18px rgba(10,20,40,.35)}
+#ctrl button{appearance:none;border:none;background:transparent;color:#CFE0F5;font-family:inherit;font-size:13px;font-weight:700;min-width:30px;height:28px;border-radius:99px;cursor:pointer;padding:0 8px;line-height:1}
+#ctrl button:hover{background:rgba(242,163,60,.25);color:#fff}
+#ctrl button.on{background:var(--accent);color:var(--hx-deep)}
+#ctrl .sep{width:1px;height:16px;background:#33456E}
+#ctrl #cnt{font-size:11.5px;color:#CFE0F5;padding:0 6px;font-variant-numeric:tabular-nums;white-space:nowrap}
+#ctrl #fsv{font-size:10.5px;color:#8FA6CE;min-width:34px;text-align:center}
+/* ── Edge nav arrows ── */
+.edge{position:fixed;top:0;bottom:0;width:9%;z-index:80;display:flex;align-items:center;cursor:pointer;opacity:0;transition:opacity .25s;border:none;background:linear-gradient(90deg,rgba(14,24,48,.35),transparent)}
+.edge:hover{opacity:1}
+.edge span{font-size:34px;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,.6);padding:0 12px}
+#navL{left:0}
+#navR{right:0;justify-content:flex-end;background:linear-gradient(270deg,rgba(14,24,48,.35),transparent)}
+@keyframes slideFade{from{opacity:0}to{opacity:1}}
+.slide.active{animation:slideFade .3s ease-out}
+@media (max-width:700px){#help{display:none}#ctrl #fsv{display:none}}
+@media print{#ctrl,.edge{display:none!important}}
+/* ── โหมดอ่านมือถือ (จอแคบ + portrait): reflow เป็นคอลัมน์เดียว ฟอนต์ขนาดอ่านจริง ── */
+html.mm,body.mm{overflow-y:auto!important;overflow-x:hidden;height:auto}
+body.mm #stage{position:static;display:block;height:auto!important}
+body.mm #frame{position:static;transform:none!important;width:100%;height:auto;box-shadow:none;border-radius:0;overflow:visible}
+body.mm .slide{position:relative;display:flex!important;flex-direction:column;width:100%;height:auto;min-height:0;inset:auto;padding:26px 18px 22px;margin-bottom:6px;animation:none!important;overflow:visible}
+body.mm .slide.hidden-slide{display:none!important}
+/* ยกเลิก animation + inline layout ที่ออกแบบมาเพื่อจอ 16:9 */
+body.mm .slide *{animation:none!important;opacity:1;transform:none}
+body.mm h1{font-size:24px!important;line-height:1.25}
+body.mm .kicker{font-size:11px}
+/* กริด/แถวทุกแบบ → คอลัมน์เดียว */
+body.mm .grid2,body.mm .grid3,body.mm .slide div[style*="grid-template-columns"]{display:flex!important;flex-direction:column!important;gap:12px!important}
+body.mm .row{flex-direction:column}
+body.mm .flowrow{flex-direction:column;gap:6px}
+body.mm .flowrow .tag{width:100%;padding:8px 14px}
+body.mm .pills{flex-wrap:wrap}
+/* การ์ดที่จัด layout แนวนอนด้วย inline flex (เช่น สไลด์ LLM, C-R-T-F, Takeaways) → พับเป็นแนวตั้ง */
+body.mm .slide .card[style*="display:flex"]{flex-direction:column!important;align-items:flex-start!important;gap:10px!important}
+body.mm .slide .card[style*="display:flex"]>.chipnum{margin-bottom:2px}
+/* กล่องแนวนอนที่ห่อการ์ดหลายใบ (journey, before/after) → เรียงลงล่าง */
+body.mm .slide div[style*="display:flex"]:has(>.card){flex-direction:column!important;align-items:stretch!important;gap:10px!important}
+/* ลูกศรคั่นระหว่างการ์ดแนวนอน ไม่มีความหมายในแนวตั้ง — ซ่อน (คงเฉพาะ ↓ ของ architecture/ladder) */
+body.mm .arrow{display:none!important}
+body.mm .aro{display:none!important}
+body.mm .archrow .aro{display:inline-block!important}
+/* ล้างความกว้าง/สูงตายตัวที่ฝังใน inline style */
+body.mm .slide div,body.mm .slide p,body.mm .slide b,body.mm .slide span,body.mm .slide i{width:auto!important;max-width:100%;height:auto!important;min-height:0!important}
+body.mm .slide div.chipnum,body.mm .slide span.chipnum{width:40px!important;height:40px!important;min-width:40px!important;min-height:40px!important;flex:0 0 40px!important;border-radius:50%!important}
+body.mm .slide div.icn,body.mm .slide span.icn{width:44px!important;height:44px!important;min-width:44px!important;min-height:44px!important;flex:0 0 44px!important}
+body.mm .slide svg{height:auto!important;max-height:180px}
+body.mm table.tbl{display:block;overflow-x:auto}
+/* footer/cite กลับเข้า flow ปกติ */
+/* จังหวะระยะห่างแนวตั้งสม่ำเสมอทุกสไลด์ (มือถือ) */
+body.mm .slide [style*="margin-top"]{margin-top:8px!important}
+body.mm .slide>[style*="margin-top"]{margin-top:16px!important}
+body.mm .slide .kicker{margin-bottom:6px}
+body.mm .slide h1{margin:0 0 4px}
+body.mm .foot{position:static;padding:14px 0 0;background:none!important;margin-top:14px;border-top:1px solid var(--line)}
+body.mm .dark .foot{border-top:1px solid #33456E}
+body.mm .cite{position:static;text-align:left;max-width:100%;margin-top:8px;display:inline-block}
+body.mm .tagline{margin-top:14px}
+body.mm .roadmap{margin-top:16px}
+/* ตัด margin ใหญ่ของสไลด์ divider/title ที่ออกแบบเพื่อจอ 16:9 */
+body.mm .slide>div[style*="display:flex"]{flex-direction:column!important;align-items:stretch!important;gap:14px!important}
+/* วงกลมต้องกลม — กันกฎ width:auto ทับ (avatar, เลขข้อ, จุดไอคอน) */
+body.mm .slide div[style*="border-radius:50%"],body.mm .slide span[style*="border-radius:50%"]{width:46px!important;height:46px!important;min-width:46px!important;max-width:46px!important;min-height:46px!important;flex:0 0 46px!important;align-self:flex-start!important;border-radius:50%!important}
+/* ระยะห่างแนวนอนที่ออกแบบไว้สำหรับจอกว้าง — ปลดในโหมดคอลัมน์ */
+body.mm .slide div[style*="margin-left:2"],body.mm .slide div[style*="margin-left:3"],body.mm .slide div[style*="margin-left:4"]{margin-left:0!important}
+body.mm .slide .card{width:100%!important}
+body.mm .slide div[style*="margin-top:150px"],body.mm .slide div[style*="margin-top:140px"],body.mm .slide div[style*="margin-top:130px"],body.mm .slide div[style*="margin-top:70px"]{margin-top:0!important}
+body.mm .slide div[style*="margin:auto"]{margin:0!important}
+body.mm h1[style*="font-size:84px"],body.mm h1[style*="font-size:68px"],body.mm h1[style*="font-size:64px"],body.mm h1[style*="font-size:60px"],body.mm h1[style*="font-size:56px"],body.mm h1[style*="font-size:52px"],body.mm h1[style*="font-size:46px"]{font-size:28px!important}
+body.mm .edge,body.mm #notes{display:none!important}
+body.mm #ctrl #bPrev,body.mm #ctrl #bNext,body.mm #ctrl #bTimer,body.mm #ctrl #bNotes,body.mm #ctrl #bFull{display:none}
+/* มือถือ: พื้นหลังเทา สไลด์เป็นการ์ด อ่านแยกใบชัดเจน */
+body.mm{background:#DEE7F3}
+body.mm .slide{margin:10px 10px 0;width:auto;border-radius:14px;box-shadow:0 2px 12px rgba(20,35,70,.10)}
+body.mm .slide:last-of-type{margin-bottom:80px}
+body.mm #ctrl{top:8px;right:8px;padding:5px 9px}
+body.mm #ctrl button{min-width:38px;height:36px;font-size:15px}
+/* ปุ่มกลับขึ้นบนสุด (เฉพาะโหมดอ่าน) */
+#topBtn{display:none;position:fixed;right:14px;bottom:18px;width:44px;height:44px;border-radius:50%;border:none;background:rgba(24,41,72,.88);color:#F2A33C;font-size:20px;z-index:95;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.25)}
+body.mm #topBtn{display:flex;align-items:center;justify-content:center}
+@media (max-width:700px){#toclist{grid-template-columns:1fr}#toc{padding:64px 16px 30px}}
+@media print{#topBtn{display:none!important}}
+#toc{position:fixed;inset:0;background:rgba(14,24,48,.97);z-index:88;display:none;overflow-y:auto;padding:56px 60px 40px}
+#toc.on{display:block}
+#toclist{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+#toclist a{display:block;background:rgba(255,255,255,.06);border:1px solid #33456E;border-radius:10px;padding:10px 14px;color:#EAF1FB;text-decoration:none;font-size:13px;line-height:1.4;cursor:pointer}
+#toclist a:hover{background:rgba(242,163,60,.15);border-color:var(--accent)}
+#toclist a b{color:var(--accent);margin-right:8px}
+#toclist a.grp{grid-column:1/-1;background:rgba(242,163,60,.14);border-color:var(--accent);font-weight:800;letter-spacing:.02em;margin-top:6px}
+#toclist a.hid{opacity:.45;border-style:dashed}
+#toclist a.hid::after{content:" · ซ่อนอยู่";color:var(--coral);font-size:11px}
+@media print{#toc{display:none!important}.hidden-slide{display:none!important}}
+
+.agrow{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:9px;padding:5px 12px}
+.agrow .t{background:var(--hx-dark);color:#fff;font-weight:700;font-size:11.5px;border-radius:6px;padding:3px 8px;min-width:50px;text-align:center}
+.agrow.hl .t{background:var(--coral)}
+.agrow.break{background:var(--hx-tint)} .agrow.break .t{background:var(--mut)}
+.agrow .n{flex:1;font-size:12.5px;color:var(--ink)} .agrow.hl .n{color:var(--coral);font-weight:700}
+.agrow .d{font-size:11px;color:var(--mut)}
+
+.pills{display:flex;gap:14px;margin-top:26px}
+.pill{border:1px solid #56719F;background:rgba(255,255,255,.08);color:#fff;border-radius:99px;padding:9px 26px;font-weight:700;font-size:16px}
+.pill.hot{background:var(--accent);border-color:var(--accent);color:var(--hx-deep)}
+.arrow{color:#9FB4D8;font-size:18px;align-self:center}
+
+.flowrow{display:flex;gap:14px;margin-bottom:10px;align-items:stretch}
+.flowrow .tag{width:210px;border-radius:10px;color:#fff;font-weight:700;font-size:14.5px;display:flex;align-items:center;padding:0 14px}
+.flowrow .desc{flex:1;background:var(--hx-bg);border:1px solid var(--line);border-radius:10px;display:flex;align-items:center;padding:10px 18px;font-size:14.5px;color:var(--ink)}
+.flowfill{display:flex;flex-direction:column;gap:10px;flex:1;min-height:0}
+.flowfill .flowrow{flex:1;margin-bottom:0;min-height:0}
+.roadmap{margin-top:auto;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.roadmap .lbl{font-size:13px;color:#8FA6CE;font-weight:700;margin-right:4px}
+.roadmap span.rchip{border:1px solid #3D577F;background:rgba(255,255,255,.06);color:#CADCFC;border-radius:99px;padding:6px 16px;font-size:13px}
+.slide.active .roadmap span.rchip{animation:fadeUp .4s both}
+.slide.active .roadmap span.rchip:nth-child(2){animation-delay:.08s}.slide.active .roadmap span.rchip:nth-child(3){animation-delay:.16s}
+.slide.active .roadmap span.rchip:nth-child(4){animation-delay:.24s}.slide.active .roadmap span.rchip:nth-child(5){animation-delay:.32s}
+.slide.active .roadmap span.rchip:nth-child(6){animation-delay:.4s}.slide.active .roadmap span.rchip:nth-child(7){animation-delay:.48s}
+.slide.active .roadmap span.rchip:nth-child(8){animation-delay:.56s}.slide.active .roadmap span.rchip:nth-child(9){animation-delay:.64s}
+
+table.tbl{width:100%;border-collapse:separate;border-spacing:0 7px}
+table.tbl th{background:var(--hx-dark);color:#fff;font-size:13.5px;text-align:left;padding:9px 14px}
+table.tbl th:first-child{border-radius:8px 0 0 8px} table.tbl th:last-child{border-radius:0 8px 8px 0}
+table.tbl td{background:var(--hx-bg);font-size:13px;padding:9px 14px;color:var(--ink);border-top:1px solid var(--line);border-bottom:1px solid var(--line);vertical-align:top}
+table.tbl td:first-child{border-left:1px solid var(--line);border-radius:8px 0 0 8px;font-weight:700;color:var(--hx-dark)}
+table.tbl td:last-child{border-right:1px solid var(--line);border-radius:0 8px 8px 0}
+table.tbl td.gate{color:var(--coral);font-weight:700}
+
+.ref{display:flex;gap:16px;background:var(--hx-bg);border:1px solid var(--line);border-radius:10px;padding:8px 16px;margin-bottom:7px;font-size:12px}
+.ref b{width:340px;flex-shrink:0;color:var(--hx-dark);font-size:12.5px}
+.ref span{color:var(--ink)} .ref i{color:var(--hx-mid)}
+
+.icn{width:44px;height:44px;border-radius:12px;background:var(--hx-tint);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.icn svg{width:26px;height:26px;stroke:var(--hx);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.icn.hot{background:#FDECEC}.icn.hot svg{stroke:var(--coral)}
+.doclink{display:inline-flex;align-items:center;gap:5px;margin-top:10px;font-size:11.5px;font-weight:600;color:var(--hx-mid);text-decoration:none;border:1px solid var(--line);border-radius:99px;padding:3px 12px;background:#fff}
+.doclink:hover{border-color:var(--hx);color:var(--hx)}
+.sample{background:#fff;border:1px solid var(--line);border-left:5px solid var(--hx);border-radius:10px;padding:12px 18px;margin-bottom:10px}
+.sample .lbl{font-size:12px;font-weight:700;color:var(--hx);margin-bottom:4px}
+.sample p{font-size:13.5px;color:var(--ink);line-height:1.5;font-style:italic}
+
+/* ===== Animations (เล่นซ้ำอัตโนมัติเมื่อเปิดสไลด์) ===== */
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@keyframes drawIn{from{stroke-dashoffset:500}to{stroke-dashoffset:0}}
+@keyframes pulseA{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.55;transform:scale(1.18)}}
+.slide.active .grid2>.card,.slide.active .grid3>.card{animation:fadeUp .45s both}
+.slide.active .grid2>.card:nth-child(2),.slide.active .grid3>.card:nth-child(2){animation-delay:.12s}
+.slide.active .grid2>.card:nth-child(3),.slide.active .grid3>.card:nth-child(3){animation-delay:.24s}
+.slide.active .grid2>.card:nth-child(4),.slide.active .grid3>.card:nth-child(4){animation-delay:.36s}
+.slide.active .grid3>.card:nth-child(5){animation-delay:.48s}
+.slide.active .grid3>.card:nth-child(6){animation-delay:.6s}
+.slide.active .flowrow{animation:fadeUp .5s both}
+.slide.active .flowrow:nth-child(2){animation-delay:.18s}
+.slide.active .flowrow:nth-child(3){animation-delay:.36s}
+.slide.active .flowrow:nth-child(4){animation-delay:.54s}
+.slide.active .flowrow:nth-child(5){animation-delay:.72s}
+.slide.active .agrow{animation:fadeUp .35s both}
+.slide.active .agrow:nth-child(2){animation-delay:.07s}.slide.active .agrow:nth-child(3){animation-delay:.14s}
+.slide.active .agrow:nth-child(4){animation-delay:.21s}.slide.active .agrow:nth-child(5){animation-delay:.28s}
+.slide.active .agrow:nth-child(6){animation-delay:.35s}.slide.active .agrow:nth-child(7){animation-delay:.42s}
+.slide.active .agrow:nth-child(8){animation-delay:.49s}
+.slide.active .archrow{animation:fadeUp .5s both}
+.slide.active .archrow:nth-child(2){animation-delay:.2s}.slide.active .archrow:nth-child(3){animation-delay:.4s}
+.slide.active .archrow:nth-child(4){animation-delay:.6s}.slide.active .archrow:nth-child(5){animation-delay:.8s}
+.slide.active .archrow:nth-child(6){animation-delay:1s}.slide.active .archrow:nth-child(7){animation-delay:1.2s}
+.slide.active .tlnode{animation:fadeUp .5s both}
+.slide.active .tlnode:nth-child(2){animation-delay:.25s}.slide.active .tlnode:nth-child(3){animation-delay:.5s}
+.slide.active .tlnode:nth-child(4){animation-delay:.75s}.slide.active .tlnode:nth-child(5){animation-delay:1s}
+.aro{display:inline-block;animation:pulseA 1.6s infinite}
+.slide.active .chaos line,.slide.active .hubline{stroke-dasharray:500;animation:drawIn 1.2s ease-out both}
+/* โหมดแสดงสไลด์ที่ซ่อน (ค่าเริ่มต้น: ปิด) */
+body.showhid .slide.hidden-slide.active{outline:3px dashed var(--coral);outline-offset:-3px}
+body.showhid.mm .slide.hidden-slide{display:flex!important;opacity:.92}
+@media print{body.showhid .hidden-slide{display:flex!important}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+@media print{
+  .slide .card,.slide .flowrow,.slide .agrow,.slide .archrow,.slide .tlnode{animation:none!important;opacity:1!important;transform:none!important}
+  html,body{overflow:visible;background:#fff}
+  #stage{position:static}
+  #frame{width:1280px;height:720px;box-shadow:none;border-radius:0;position:relative;transform:none!important}
+  .slide{display:flex!important;position:relative;width:1280px;height:720px;page-break-after:always}
+  #bar,#counter,#help,#notes{display:none!important}
+}
+
+/* ── Advanced tier identity: violet accent ── */
+:root{--coral:#6F53C4}
+#bar{background:#8B6FD8}
+#toclist a.grp{background:rgba(139,111,216,.16);border-color:#8B6FD8}
+.icn.hot{background:#EFEAFB}
+</style>
+</head>
+<body>
+<div id="bar"></div>
+<div id="help">← → เปลี่ยนสไลด์ · N บันทึกผู้สอน · O สารบัญ · H ซ่อนสไลด์นี้ · Shift+H แสดงที่ซ่อนทั้งหมด · F เต็มจอ · P พิมพ์ · ? ดูซ้ำ</div>
+<div id="ctrl">
+  <button id="bPrev" title="สไลด์ก่อนหน้า (←)">‹</button>
+  <span id="cnt">1 / 41</span>
+  <button id="bNext" title="สไลด์ถัดไป (→)">›</button>
+  <span class="sep"></span>
+  <button id="bTimer" title="จับเวลา (T เริ่ม/หยุด · Shift+T รีเซ็ต)">0:00</button>
+  <span class="sep"></span>
+  <button id="bFsDn" title="ลดขนาดตัวอักษร" style="font-size:11px">A−</button>
+  <span id="fsv">100%</span>
+  <button id="bFsUp" title="เพิ่มขนาดตัวอักษร" style="font-size:15px">A+</button>
+  <span class="sep"></span>
+  <button id="bNotes" title="บันทึกผู้สอน (N)" style="font-size:12px">🗒</button>
+  <button id="bShowHid" title="แสดง/ซ่อนสไลด์ที่ถูกซ่อนทั้งหมด (Shift+H) — ค่าเริ่มต้น: ปิด" style="font-size:12px">👁</button>
+  <button id="bToc" title="สารบัญ (O)">☰</button>
+  <button id="bFull" title="เต็มจอ (F)">⛶</button>
+</div>
+<button class="edge" id="navL" aria-label="ก่อนหน้า"><span>‹</span></button>
+<button class="edge" id="navR" aria-label="ถัดไป"><span>›</span></button>
+<button id="topBtn" aria-label="กลับขึ้นบนสุด">↑</button>
+<div id="toc"><div id="toclist"></div></div>
+<div id="stage"><div id="frame">
+
+<!-- 1 TITLE -->
+<section class="slide dark" data-notes="ต้อนรับ — ผู้เรียนทุกท่านต้องผ่าน workshop หลักมาแล้ว (เข้าใจ MCP ระดับผู้ใช้) วันนี้เปลี่ยนบทบาท: จากผู้ใช้ท่อ สู่ผู้สร้างท่อ เช็คความพร้อม: Node.js 18+, Claude Desktop, บัญชี Cloudflare (ฟรี)">
+  <div style="margin-top:70px">
+    <div class="kicker">Advanced Workshop · 3 Hours · Developer-leaning</div>
+    <h1 style="font-size:76px">Advanced MCP</h1>
+    <p style="font-size:21px;color:var(--hx-tint);margin-top:14px">จากผู้ใช้ท่อข้อมูล สู่ผู้สร้างท่อของตัวเอง — เขียน MCP Server จริง ปลอดภัยจริง ใช้งานได้ทั้งองค์กร</p>
+    <div class="pills">
+      <div class="pill">Build</div><div class="arrow">→</div>
+      <div class="pill">Secure</div><div class="arrow">→</div>
+      <div class="pill">Deploy</div><div class="arrow">→</div>
+      <div class="pill hot">Orchestrate</div>
+    </div>
+  </div>
+  <div style="margin-top:auto;color:#8FA6CE;font-size:14px">วิทยากร: ______________________ &nbsp;&nbsp; วันที่: ______________ &nbsp;&nbsp; เงื่อนไข: ผ่าน AI for MarTech Workshop</div>
+  <div class="foot"><div class="brand">Harmony<b>X</b> · Advanced MCP Workshop</div><div>1</div></div>
+</section>
+
+<!-- 2 RECAP/HOOK -->
+<section class="slide dark" data-notes="เชื่อมจาก workshop หลัก: ตอนนั้นเราใช้ MCP server สำเร็จรูป (LINE, connectors) — คำถามที่ค้างคือ 'แล้วข้อมูลเฉพาะของธุรกิจเราล่ะ' วันนี้ตอบด้วยการสร้างเอง ถามห้อง: ระบบใดในองค์กรที่อยากให้ AI เข้าถึงได้มากที่สุด — จดคำตอบไว้ใช้ตลอดวัน">
+  <div class="kicker">Recap · จุดที่เราค้างไว้</div>
+  <h1 style="font-size:44px">Workshop ที่แล้ว: ใช้ท่อสำเร็จรูป — วันนี้: สร้างท่อของตัวเอง</h1>
+  <div class="row" style="margin-top:26px">
+    <div class="col card" style="background:rgba(255,255,255,.07);border:1px solid #3D577F">
+      <h3 style="color:#fff">สิ่งที่ทำได้แล้ว (ระดับผู้ใช้)</h3>
+      <ul class="b" style="font-size:14px">
+        <li>เข้าใจ MCP = USB-C ของโลก AI</li>
+        <li>ใช้ connectors สำเร็จรูป (LINE, Drive, HubSpot)</li>
+        <li>ออกแบบ architecture บน canvas</li>
+        <li>Governance checklist 6 ข้อ</li>
+      </ul>
+    </div>
+    <div class="col card navy">
+      <h3>สิ่งที่ยังทำไม่ได้ (จนกว่าจะจบวันนี้)</h3>
+      <ul class="b" style="font-size:14px">
+        <li>เปิดข้อมูลเฉพาะของธุรกิจ (สินค้า สต็อก ออเดอร์) ให้ AI เรียกได้เอง</li>
+        <li>ควบคุมสิทธิ์และ audit ในระดับโค้ด</li>
+        <li>ให้ทั้งทีมเชื่อมใช้จาก Cowork ผ่าน server กลาง</li>
+        <li>ต่อหลาย server เป็นเวิร์กโฟลว์อัตโนมัติ</li>
+      </ul>
+    </div>
+  </div>
+  <p style="margin-top:auto;font-size:17px;font-weight:700;color:var(--accent)">คำถามประจำวัน: "ระบบใดในองค์กรท่าน ที่ถ้า AI เข้าถึงได้ จะเปลี่ยนวิธีทำงานมากที่สุด"</p>
+  <div class="foot"><div class="brand">Harmony<b>X</b> · Advanced MCP Workshop</div><div>2</div></div>
+</section>
+
+<!-- 3 AGENDA -->
+<section class="slide light" data-notes="เดินกำหนดการ 1 นาที — สัดส่วนปฏิบัติ ~60% ย้ำ: Lab 1 คือหัวใจ ทุกคนจะมี MCP server ของตัวเองรันได้จริงก่อนพัก">
+  <div class="kicker">Agenda</div><h1>กำหนดการ 3 ชั่วโมง — Build · Secure · Deploy · Orchestrate</h1>
+  <div style="margin-top:22px">
+    <div class="agrow"><div class="t">0:00</div><div class="n">เปิด + Recap + What's New in MCP (spec 2026-07-28)</div><div class="d">20 น.</div></div>
+    <div class="agrow hl"><div class="t">0:20</div><div class="n">★ BUILD: กายวิภาค server ฝั่งผู้สร้าง + SDK</div><div class="d">20 น.</div></div>
+    <div class="agrow hl"><div class="t">0:40</div><div class="n">★ Lab 1 — เขียน MCP Server เปิดข้อมูลสินค้า + เชื่อม Claude</div><div class="d">45 น.</div></div>
+    <div class="agrow break"><div class="t">1:25</div><div class="n">พัก</div><div class="d">10 น.</div></div>
+    <div class="agrow"><div class="t">1:35</div><div class="n">SECURE: ภัยเฉพาะ MCP + AuthZ ยุคใหม่ + checklist ระดับโค้ด</div><div class="d">25 น.</div></div>
+    <div class="agrow"><div class="t">2:00</div><div class="n">DEPLOY: stdio vs HTTP + stateless core</div><div class="d">15 น.</div></div>
+    <div class="agrow hl"><div class="t">2:15</div><div class="n">★ Lab 2 — Deploy ขึ้น Cloudflare Workers + เชื่อมข้ามเครื่อง</div><div class="d">30 น.</div></div>
+    <div class="agrow"><div class="t">2:45</div><div class="n">ORCHESTRATE: Tasks · MCP Apps · Multi-server + สรุป</div><div class="d">15 น.</div></div>
+  </div>
+  <p class="tagline">เงื่อนไขก่อนเรียน: ผ่าน AI for MarTech Workshop · Node.js 18+ · Claude Desktop · บัญชี Cloudflare (ฟรี)</p>
+  <div class="foot"><div class="brand">Harmony<b>X</b> · Advanced MCP Workshop</div><div>3</div></div>
+</section>
+
+<!-- 4 WHATS NEW -->
+<section class="slide light" data-notes="Spec 2026-07-28 คือการยกเครื่องใหญ่ที่สุดตั้งแต่เปิดตัว — เพิ่ง final ปลายเดือน ก.ค. 2026 เดินการ์ดละ 1 นาที เน้น 3 ตัวบน (กระทบการออกแบบ server ที่เราจะเขียนวันนี้) ตัวเลขและรายละเอียดตรวจสอบล่าสุดก่อนสอนเสมอ — ecosystem เปลี่ยนเร็ว">
+  <div class="kicker">What's New · MCP Spec 2026-07-28</div><h1>MCP ยกเครื่องใหญ่: 6 เรื่องที่ผู้สร้างต้องรู้</h1>
+  <div class="grid3" style="margin-top:20px;grid-template-rows:1fr 1fr">
+    <div class="card navy"><h3 style="font-size:16px">Stateless Core</h3><p style="font-size:12.5px;color:var(--hx-tint)">เลิกผูก session กับ server ตัวเดียว — scale บน HTTP/load balancer ธรรมดาได้ ปลดล็อก enterprise production จริง</p></div>
+    <div class="card navy"><h3 style="font-size:16px">Tasks Extension</h3><p style="font-size:12.5px;color:var(--hx-tint)">งาน async ระยะยาว มี retry/expiry — เช่น "วิเคราะห์คู่แข่งทุกคืน เสร็จแล้วแจ้งผล" ตรงกับงาน MarTech มาก</p></div>
+    <div class="card navy"><h3 style="font-size:16px">MCP Apps</h3><p style="font-size:12.5px;color:var(--hx-tint)">server ส่ง UI มา render ในแชทได้ — dashboard โต้ตอบได้จาก server ของแบรนด์เอง</p></div>
+    <div class="card"><h3 style="font-size:16px;color:var(--hx)">Extensions Framework</h3><p style="font-size:12.5px;color:var(--ink)">ความสามารถเสริมแยกเป็นโมดูล — core เบาลง เพิ่มเฉพาะที่ใช้</p></div>
+    <div class="card"><h3 style="font-size:16px;color:var(--hx)">Response Caching</h3><p style="font-size:12.5px;color:var(--ink)">ลด latency และต้นทุนเมื่อหลาย agent เรียกข้อมูลเดิมซ้ำ</p></div>
+    <div class="card"><h3 style="font-size:16px;color:var(--hx)">Deprecation Policy</h3><p style="font-size:12.5px;color:var(--ink)">มีนโยบายเลิกใช้อย่างเป็นทางการ — องค์กรวางแผนระยะยาวได้มั่นใจขึ้น</p></div>
+  </div>
+  <p class="tagline strong">สิ่งที่เขียนวันนี้ยึดแนว spec ใหม่ตั้งแต่ต้น — ไม่ต้องรื้อทีหลัง</p>
+  <div class="cite">ที่มา: Model Context Protocol Blog — 2026-07-28 Release Candidate & 2026 Roadmap — ดูสไลด์ References</div>
+  <div class="foot"><div class="brand">Harmony<b>X</b> · Advanced MCP Workshop</div><div>4</div></div>
+</section>
+
+<!-- 5 DIVIDER BUILD -->
+<section class="slide dark" data-notes="ช่วง Build 20 นาทีสอน + 45 นาที lab — เป้าหมาย: ทุกคนมี server ของตัวเองรันได้จริงก่อนพัก">
+  <div style="margin-top:150px">
+    <div class="kicker">Part 1 · Build</div>
+    <h1 style="font-size:64px">สร้างท่อแรกของคุณ</h1>
+    <p style="font-size:22px;color:var(--hx-tint);margin-top:12px">กายวิภาค MCP Server ฝั่งผู้สร้าง — และ Lab เขียนจริงใน 45 นาที</p>
+  </div>
+  <div class="roadmap"><span class="lbl">ในช่วงนี้:</span><span class="rchip">3 Primitives</span><span class="rchip">Request Lifecycle</span><span class="rchip">SDK + โครงโปรเจกต์</span><span class="rchip">Lab 1: Product Server</span></div>
+  <div class="foot"><div class="brand">Harmony<b>X</b> · Advanced MCP Workshop</div><div>5</div></div>
+</section>
+
+<!-- 6 PRIMITIVES -->
+<section class="slide light" data-notes="ฝั่งผู้ใช้เห็นแค่ tools — ฝั่งผู้สร้างมี 3 primitives เต็ม อธิบายด้วยตัวอย่างร้านค้า: tool=ค้นสินค้า resource=แคตตาล็อกทั้งไฟล์ prompt=สูตรวิเคราะห์ที่ทีมใช้ร่วมกัน กติกาออกแบบ: ตั้งชื่อ+คำอธิบาย tool ให้ AI เดาได้เอง เพราะ AI เลือกใช้จากคำอธิบายเท่านั้น">
+  <div class="kicker">Build · แนวคิดหลัก</div><h1>3 Primitives ที่ Server เปิดให้ AI ใช้</h1>
+  <div class="grid3" style="margin-top:20px">
+    <div class="card navy"><div class="chipnum coral">T</div><h3>Tools</h3><p style="color:var(--accent);font-weight:700;font-size:13.5px">ฟังก์ชันให้ AI "เรียกทำงาน"</p>
+      <ul class="b" style="font-size:13px"><li>search_products(query)</li><li>check_stock(sku)</li><li>get_promotions()</li><li>AI เลือกใช้เองจาก "คำอธิบาย" — เขียน description ให้ดีเท่ากับเขียน UX</li></ul></div>
+    <div class="card"><div class="chipnum">R</div><h3>Resources</h3><p style="color:var(--coral);font-weight:700;font-size:13.5px">ข้อมูลให้ AI "อ่านเป็นบริบท"</p>
+      <ul class="b" style="font-size:13px"><li>แคตตาล็อกสินค้า นโยบายร้าน</li><li>เหมาะกับข้อมูลที่อ่านทั้งก้อน ไม่ใช่ query</li><li>ระบุด้วย URI เช่น catalog://products</li></ul></div>
+    <div class="card"><div class="chipnum">P</div><h3>Prompts</h3><p style="color:var(--coral);font-weight:700;font-size:13.5px">แม่แบบคำสั่งสำเร็จรูป</p>
+      <ul class="b" style="font-size:13px"><li>"วิเคราะห์ยอดขายรายสัปดาห์" ฉบับองค์กร</li><li>ทีมใช้สูตรเดียวกัน ผลลัพธ์มาตรฐานเดียวกัน</li><li>= C-R-T-F ที่ฝังไว้ใน server</li></ul></div>
+  </div>
+  <p class="tagline strong">หลักออกแบบ: เปิดให้น้อยที่สุดที่ตอบโจทย์ (minimal surface) — เพิ่มทีหลังง่ายกว่าถอนออก</p>
+  <div class="foot"><div class="brand">Harmony<b>X</b> · Advanced MCP Workshop</div><div>6</div></div>
+</section>
+
+<!-- 7 LIFECYCLE -->
+<section class="slide light" data-notes="เดินตามเส้นทาง 1 คำถามแบบเดียวกับ workshop หลัก แต่คราวนี้เห็น 'ใต้ฝากระโปรง' — จุดที่ต้องจำ: AI เห็นแค่รายการ tools + description แล้วตัดสินใจเอง server เราคือผู้กำหนดขอบเขตว่าโลกของ AI กว้างแค่ไหน">
+  <div class="kicker">Build · Request Lifecycle</div><h1>เกิดอะไรขึ้นเมื่อ AI เรียก Server ของเรา</h1>
+  <div class="flowfill" style="margin-top:20px">
+    <div class="flowrow"><div class="tag" style="background:var(--hx-dark)">1 · Initialize</div><div class="desc">Client (Claude) เชื่อมต่อ server — แลก capability กันว่าอีกฝั่งทำอะไรได้บ้าง</div></div>
+    <div class="flowrow"><div class="tag" style="background:var(--hx)">2 · Discovery</div><div class="desc">Claude ขอรายการ tools/resources/prompts — เห็นเพียง "ชื่อ + คำอธิบาย + schema" ที่เราประกาศ</div></div>
+    <div class="flowrow"><div class="tag" style="background:var(--coral)">3 · Selection</div><div class="desc">ผู้ใช้ถาม "ครีมกันแดดเหลือไหม" → โมเดลอ่านคำอธิบาย tools แล้วเลือก check_stock เอง</div></div>
+    <div class="flowrow"><div class="tag" style="background:var(--coral)">4 · Execution</div><div class="desc">server รันฟังก์ชัน ตรวจ input → คืนผลเป็น structured content (+ ตรงนี้คือจุดใส่ validation และ audit log)</div></div>
+    <div class="flowrow"><div class="tag" style="background:var(--hx-dark)">5 · Response</div><div class="desc">โมเดลนำผลไปตอบผู้ใช้ — ถูกต้องเท่าที่ข้อมูลจาก server เราถูกต้อง</div></div>
+  </div>
+  <p class="tagline strong">บทบาทใหม่ของท่าน: ไม่ใช่แค่เขียนโค้ด แต่คือผู้ออกแบบ "ขอบเขตโลก" ที่ AI มองเห็น</p>
+  <div class="foot"><div class="brand">Harmony<b>X</b> · Advanced MCP Workshop</div><div>7</div></div>
+</section>
+
+<!-- 8 SDK -->
+<section class="slide light" data-notes="โชว์โค้ดจริงจาก starter — ชี้ 3 จุด: (1) tool หนึ่งตัว = ชื่อ + description + schema + handler (2) description คือ UX ของ AI (3) โค้ดสั้นกว่าที่คิดมาก ภาษาเลือกตามทีม: TS แนะนำสำหรับ production, Python ถนัด data team">
+  <div class="kicker">Build · SDK</div><h1>โครงโปรเจกต์จริง — สั้นกว่าที่คิด</h1>
+  <div class="row" style="margin-top:18px">
+    <div class="col" style="flex:1.5">
+      <div class="sample" style="border-left-color:var(--coral)"><div class="lbl" style="color:var(--coral)">server.mjs — ประกาศ 1 tool (ตัดจาก starter)</div>
+        <p style="font-style:normal;font-family:monospace;font-size:12px;line-height:1.65">server.registerTool("check_stock", {<br>&nbsp;&nbsp;description: "ตรวจสอบสต็อกสินค้าจากรหัส SKU<br>&nbsp;&nbsp;&nbsp;&nbsp;ใช้เมื่อลูกค้าถามว่าสินค้ามีของหรือไม่",<br>&nbsp;&nbsp;inputSchema: { sku: z.string() }<br>}, async ({ sku }) => {<br>&nbsp;&nbsp;const p = products.find(x => x.sku === sku);<br>&nbsp;&nbsp;audit("check_stock", sku); // governance ในโค้ด<br>&nbsp;&nbsp;return { content: [{ type: "text",<br>&nbsp;&nbsp;&nbsp;&nbsp;text: p ? `${p.name}: ${p.stock} ชิ้น` : "ไม่พบสินค้า" }] };<br>});</p></div>
+    </div>
+    <div class="col card navy">
+      <h3>เลือกเครื่องมือ</h3>
+      <ul class="b" style="font-size:13px">
+        <li><b>TypeScript SDK</b> — แนะนำสำหรับ production, type-safe, ecosystem ใหญ่สุด</li>
+        <li><b>Python SDK</b> — เหมาะทีม data/analytics ที่ถนัด Python</li>
+        <li><b>MCP Inspector</b> — เครื่องมือทดสอบ server แบบ interactive ก่อนต่อกับ Claude</li>
+      </ul>
+      <p style="font-size:12.5px;color:var(--accent);font-weight:700;margin-top:12px">เคล็ดลับเวิร์กช็อปนี้: ใช้ Claude Code ช่วย vibe-code ส่วนขยาย — แต่ต้องอ่านทุกบรรทัดที่มันเขียนให้เข้าใจ</p>
+    </div>
+  </div>
+  <p class="tagline">description ของ tool คือสิ่งที่ AI ใช้ตัดสินใจ — เขียนด้วยความใส่ใจเท่ากับเขียน microcopy ให้ลูกค้า</p>
+  <div class="foot"><div class="brand">Harmony<b>X</b> · Advanced MCP Workshop</div><div>8</div></div>
+</section>
+
+<!-- 9 LAB 1 -->
+<section class="slide light" data-notes="Lab หัวใจของวัน — แจก mcp_server_starter ทุกขั้นอยู่ใน README เดินช่วยทั่วห้อง จุดติดบ่อย: path ใน config ของ Claude Desktop ผิด / ลืม restart Claude ทีมที่เสร็จเร็ว: challenge เพิ่ม tool ใหม่ด้วยตนเองหรือ vibe-code">
+  <div class="kicker">Lab 1 · Build · 45 นาที</div><h1>Lab 1: Your First MCP Server — Product Data</h1>
+  <div class="row" style="margin-top:18px">
+    <div class="col card" style="flex:1.5">
+      <h3>ขั้นตอน (เดี่ยวหรือจับคู่)</h3>
+      <ul class="b" style="font-size:13.5px">
+        <li><b>Step 1 (5 นาที):</b> เปิด mcp_server_starter → npm install → npm start — server รันพร้อม 3 tools (search_products, check_stock, get_promotions)</li>
+        <li><b>Step 2 (10 นาที):</b> ทดสอบด้วย MCP Inspector — เรียกทุก tool ดู request/response จริง</li>
+        <li><b>Step 3 (10 นาที):</b> เชื่อมเข้า Claude Desktop (แก้ config ตาม README) → restart → ถาม "ครีมกันแดดตัวไหนมีของ"</li>
+        <li><b>Step 4 (15 นาที) — Challenge:</b> เพิ่ม tool ของท่านเอง 1 ตัว เช่น get_bestsellers หรือเปลี่ยน products.json เป็นข้อมูลธุรกิจจริงของท่าน</li>
+        <li><b>Step 5 (5 นาที):</b> แลกเปลี่ยน — โชว์ tool ที่เพิ่มให้เพื่อนข้างเคียง</li>
+      </ul>
+    </div>
+    <div class="col card navy">
+      <h3>เกณฑ์ความสำเร็จ</h3>
+      <ul class="b" style="font-size:13px">
+        <li>Claude เรียก tool ของท่านได้เองโดยไม่ต้องบอกชื่อ tool</li>
+        <li>ถามสิ่งที่ไม่มีข้อมูล — AI ตอบตามจริง ไม่มโน</li>
+        <li>audit log ปรากฏทุกครั้งที่ tool ถูกเรียก</li>
+      </ul>
+      <h3 style="margin-top:14px">สิ่งที่ต้องมี</h3>
+      <ul class="b" style="font-size:13px">
+        <li>Node.js 18+ · Claude Desktop</li>
+        <li>starter: mcp_server_starter</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot"><div class="brand">Harmony<b>X</b> · Advanced MCP Workshop</div><div>9</div></div>
+</section>
+
+<!-- 10 DIVIDER SECURE -->
+<section class="slide dark" data-notes="หลังพัก — ทุกคนมี server แล้ว คำถามต่อไป: ปล่อยให้ AI เรียกอะไรก็ได้ปลอดภัยหรือไม่ ช่วงนี้ 25 นาที สำคัญมากสำหรับการใช้จริงในองค์กร">
+  <div style="margin-top:150px">
+    <div class="kicker">Part 2 · Secure</div>
+    <h1 style="font-size:64px">ท่อที่ไม่มีวาล์ว คือท่อที่อันตราย</h1>
+    <p style="font-size:22px;color:var(--hx-tint);margin-top:12px">ภัยเฉพาะของ MCP และการป้องกันในระดับโค้ด</p>
+  </div>
+  <div class="roadmap"><span class="lbl">ในช่วงนี้:</span><span class="rchip">4 ภัยเฉพาะ MCP</span><span class="rchip">AuthZ ยุคใหม่ (OAuth/DPoP)</span><span class="rchip">Checklist ระดับโค้ด</span></div>
+  <div class="foot"><div class="brand">Harmony<b>X</b> · Advanced MCP Workshop</div><div>10</div></div>
+</section>
+
+<!-- 11 THREATS -->
+<section class="slide light" data-notes="4 ภัยที่ต่างจาก web security ทั่วไป — เล่าการ์ดละ 1.5 นาที พร้อมตัวอย่าง เน้น Tool Description Injection เพราะเข้าใจยากสุด: AI อ่านคำอธิบาย tool เป็นคำสั่ง — server แปลกปลอมจึงฝังคำสั่งร้ายในคำอธิบายได้">
+  <div class="kicker">Secure · ภัยเฉพาะ MCP</div><h1>4 ภัยที่ Web Security เดิมไม่ครอบคลุม</h1>
+  <div class="grid2" style="margin-top:20px">
+    <div class="card navy"><h3 style="font-size:16px">1 · Tool Description Injection</h3><p style="font-size:12.5px;color:var(--hx-tint)">server ปลอมฝังคำสั่งร้ายไว้ใน "คำอธิบาย tool" — AI อ่านแล้วทำตามโดยผู้ใช้ไม่เห็น | ป้องกัน: ใช้ server จากแหล่งเชื่อถือได้/ตรวจ description ก่อนติดตั้ง</p></div>
+    <div class="card"><h3 style="font-size:16px;color:var(--coral)">2 · Confused Deputy</h3><p style="font-size:12.5px;color:var(--ink)">AI ถือสิทธิ์สูงถูกหลอก (ผ่านเนื้อหาที่อ่าน เช่น อีเมล/รีวิว) ให้ใช้สิทธิ์นั้นทำงานแทนผู้โจมตี | ป้องกัน: least privilege + ยืนยันมนุษย์ก่อน action สำคัญ</p></div>
+    <div class="card"><h3 style="font-size:16px;color:var(--coral)">3 · Token Passthrough</h3><p style="font-size:12.5px;color:var(--ink)">ส่ง token ผู้ใช้ทะลุผ่าน server ไปยังระบบปลายทางตรงๆ — ตรวจสอบย้อนไม่ได้ เพิกถอนยาก | ป้องกัน: server ถือ credential ของตัวเอง แลกสิทธิ์อย่างถูกต้อง</p></div>
+    <div class="card"><h3 style="font-size:16px;color:var(--coral)">4 · Rug Pull</h3><p style="font-size:12.5px;color:var(--ink)">server ที่เคยดี อัปเดตเวอร์ชันใหม่แล้วเปลี่ยนพฤติกรรม | ป้องกัน: pin เวอร์ชัน + review ก่อนอัปเดต + registry ที่ audit แล้ว</p></div>
+  </div>
+  <p class="tagline strong">แนวเดียวกับ OWASP LLM Top 10 ที่เรียนใน workshop หลัก — แต่คราวนี้ท่านคือผู้รับผิดชอบฝั่ง server</p>
+  <div class="foot"><div class="brand">Harmony<b>X</b> · Advanced MCP Workshop</div><div>11</div></div>
+</section>
+
+<!-- 12 AUTHZ -->
+<section class="slide light" data-notes="spec ใหม่ align กับ OAuth/OIDC มากขึ้น — ระดับ workshop: เข้าใจ concept + ทำ 2 อย่างแรกให้เป็น ส่วน DPoP/Workload Identity ให้รู้ว่ามีและใช้เมื่อไหร่ (มอบทีม security/infra)">
+  <div class="kicker">Secure · Authorization</div><h1>ยืนยันตัวตนและสิทธิ์ — ทำแค่ไหนถึงพอ</h1>
+  <div class="flowfill" style="margin-top:20px">
+    <div class="flowrow"><div class="tag" style="background:var(--hx-dark)">ระดับ 1 · Lab วันนี้</div><div class="desc">API key ต่อ client + audit log ทุก call — พอสำหรับ internal tool ที่ข้อมูลไม่อ่อนไหว</div></div>
+    <div class="flowrow"><div class="tag" style="background:var(--hx)">ระดับ 2 · ทีมในองค์กร</div><div class="desc">OAuth 2.1: ผู้ใช้ login ผ่าน identity ขององค์กร server ตรวจ scope รายคน — spec ใหม่กำหนดแนวนี้เป็นมาตรฐาน</div></div>
+    <div class="flowrow"><div class="tag" style="background:var(--coral)">ระดับ 3 · ข้อมูลอ่อนไหว/ภายนอก</div><div class="desc">DPoP (พิสูจน์ผู้ถือ token ตัวจริง) + fine-grained scopes ต่อ tool — token ถูกขโมยก็ใช้ไม่ได้</div></div>
+    <div class="flowrow"><div class="tag" style="background:var(--hx-dark)">ระดับ 4 · Machine-to-Machine</div><div class="desc">Workload Identity Federation — agent/ระบบคุยกันเองโดยไม่ฝัง secret ในโค้ด (มอบทีม infra)</div></div>
+  </div>
+  <p class="tagline strong">หลักคิด: เริ่มที่ระดับต่ำสุดที่ปลอดภัยพอ แล้วยกระดับตามความอ่อนไหวของข้อมูล — อย่า over-engineer วันแรก</p>
+  <div class="cite">ที่มา: MCP 2026 Roadmap — Authorization alignment (OAuth/OIDC, DPoP, Workload Identity)</div>
+  <div class="foot"><div class="brand">Harmony<b>X</b> · Advanced MCP Workshop</div><div>12</div></div>
+</section>
+
+<!-- 13 CODE CHECKLIST -->
+<section class="slide light" data-notes="เชื่อม governance checklist จาก workshop หลัก (ระดับนโยบาย) สู่ระดับโค้ด — ทั้ง 6 ข้อมีตำแหน่งชัดในโค้ด starter ชี้ให้ดูว่า audit() อยู่ตรงไหนใน Lab 1">
+  <div class="kicker">Secure · ระดับโค้ด</div><h1>Governance 6 ข้อ — แปลเป็นโค้ดตรงไหน</h1>
+  <table class="tbl" style="margin-top:18px">
+    <tr><th style="width:30%">ข้อ (จาก workshop หลัก)</th><th>ตำแหน่งในโค้ด server ของท่าน</th></tr>
+    <tr><td>Least Privilege</td><td>ประกาศเฉพาะ tools ที่จำเป็น · แยก read/write server คนละตัว · scope ต่อ tool</td></tr>
+    <tr><td>Audit Log</td><td>ฟังก์ชัน audit() ใน handler ทุกตัว — ใคร เรียกอะไร เมื่อไหร่ พารามิเตอร์ใด</td></tr>
+    <tr><td>PDPA Consent</td><td>กรองฟิลด์ส่วนบุคคลออกก่อนคืนผล (data minimization ในชั้น response)</td></tr>
+    <tr><td>Human-in-the-loop</td><td>tools ฝั่ง action คืนสถานะ "รออนุมัติ" — ไม่ execute ตรง</td></tr>
+    <tr><td>Data Quality Gate</td><td>validate input ด้วย schema (zod) + ตรวจความสดของข้อมูลก่อนตอบ</td></tr>
+    <tr><td>Kill Switch</td><td>environment flag ปิด server/tool ได้ทันทีโดยไม่ deploy ใหม่</td></tr>
+  </table>
+  <p class="tagline strong">นโยบายที่ไม่อยู่ในโค้ด คือนโยบายที่ไม่มีจริง</p>
+  <div class="foot"><div class="brand">Harmony<b>X</b> · Advanced MCP Workshop</div><div>13</div></div>
+</section>
+
+<!-- 14 DIVIDER DEPLOY -->
+<section class="slide dark" data-notes="15 นาทีแนวคิด + 30 นาที lab — เป้าหมาย: server จาก Lab 1 ขึ้น cloud ให้เพื่อนต่างเครื่องเชื่อมได้">
+  <div style="margin-top:150px">
+    <div class="kicker">Part 3 · Deploy</div>
+    <h1 style="font-size:64px">จากเครื่องเรา สู่ทั้งทีม</h1>
+    <p style="font-size:22px;color:var(--hx-tint);margin-top:12px">stdio vs HTTP · stateless core · ขึ้น Cloudflare Workers ใน 30 นาที</p>
+  </div>
+  <div class="roadmap"><span class="lbl">ในช่วงนี้:</span><span class="rchip">Local vs Remote</span><span class="rchip">Stateless = Scale ได้จริง</span><span class="rchip">Lab 2: Deploy จริง</span></div>
+  <div class="foot"><div class="brand">Harmony<b>X</b> · Advanced MCP Workshop</div><div>14</div></div>
+</section>
+
+<!-- 15 TRANSPORT -->
+<section class="slide light" data-notes="เทียบสองโหมดด้วยเกณฑ์การใช้งานจริง — จุดขายของ spec ใหม่: stateless core ทำให้ remote server ทำงานหลัง load balancer ธรรมดาได้ ไม่ต้องมี sticky session — นี่คือเหตุผลที่ปี 2026 คือปีของ remote MCP">
+  <div class="kicker">Deploy · Transport</div><h1>Local (stdio) vs Remote (HTTP) — เลือกอย่างไร</h1>
+  <div class="row" style="margin-top:20px">
+    <div class="col card">
+      <h3 style="color:var(--hx)">Local · stdio</h3>
+      <p style="font-size:13px;color:var(--mut);margin-bottom:8px">server รันบนเครื่องผู้ใช้ Claude เรียกผ่าน process โดยตรง</p>
+      <ul class="b" style="font-size:13.5px">
+        <li>เหมาะ: เครื่องมือส่วนตัว ข้อมูลบนเครื่อง เริ่มเรียนรู้ (Lab 1)</li>
+        <li>ข้อจำกัด: ติดตั้งรายเครื่อง อัปเดตยาก ไม่แชร์ทีม</li>
+      </ul>
+    </div>
+    <div class="col card navy">
+      <h3>Remote · Streamable HTTP</h3>
+      <p style="font-size:13px;color:#9FB4D8;margin-bottom:8px">server อยู่บน cloud ทั้งทีมเชื่อมที่เดียวกัน</p>
+      <ul class="b" style="font-size:13.5px">
+        <li>เหมาะ: ใช้ทั้งทีม/องค์กร ข้อมูลกลาง อัปเดตครั้งเดียวได้ทุกคน</li>
+        <li>Spec 2026: stateless core → scale หลัง load balancer ธรรมดา ไม่ต้อง sticky session</li>
+        <li>ต้องมี: auth (ระดับ 2 ขึ้นไป) + HTTPS + monitoring</li>
+      </ul>
+    </div>
+  </div>
+  <p class="tagline strong">เส้นทางมาตรฐาน: พัฒนาบน stdio → ทดสอบผ่าน → deploy remote — คือสิ่งที่เรากำลังจะทำใน Lab 2</p>
+  <div class="foot"><div class="brand">Harmony<b>X</b> · Advanced MCP Workshop</div><div>15</div></div>
+</section>
+
+<!-- 16 LAB 2 -->
+<section class="slide light" data-notes="ใช้ Cloudflare Workers เพราะ free tier พอสำหรับ workshop และ deploy เร็วสุด — เตรียม wrangler ล่วงหน้าใน starter จุดติดบ่อย: login Cloudflare ครั้งแรก / ชื่อ worker ซ้ำ ให้เติมเลขท้าย ทดสอบ flow เต็มก่อนวันจริงเสมอ">
+  <div class="kicker">Lab 2 · Deploy · 30 นาที</div><h1>Lab 2: Ship It — ขึ้น Cloudflare Workers</h1>
+  <div class="row" style="margin-top:18px">
+    <div class="col card" style="flex:1.5">
+      <h3>ขั้นตอน (ทีมเดิมจาก Lab 1)</h3>
+      <ul class="b" style="font-size:13.5px">
+        <li><b>Step 1 (5 นาที):</b> npx wrangler login — ผูกบัญชี Cloudflare (ฟรี)</li>
+        <li><b>Step 2 (10 นาที):</b> npm run deploy — starter เตรียม config ไว้แล้ว ได้ URL server ของท่าน</li>
+        <li><b>Step 3 (5 นาที):</b> เพิ่ม API key ผ่าน wrangler secret + ทดสอบเรียกด้วย Inspector</li>
+        <li><b>Step 4 (10 นาที) — Cross-connect:</b> แลก URL กับทีมข้างเคียง เชื่อม server ของกันและกันจาก Claude — ถามข้อมูลร้าน "ของเพื่อน"</li>
+      </ul>
+    </div>
+    <div class="col card navy">
+      <h3>เกณฑ์ความสำเร็จ</h3>
+      <ul class="b" style="font-size:13px">
+        <li>server ตอบจาก URL สาธารณะ (ไม่ใช่เครื่องตัวเอง)</li>
+        <li>เรียกโดยไม่มี key → ถูกปฏิเสธ</li>
+        <li>เพื่อนต่างเครื่องใช้งาน tools ของท่านได้</li>
+      </ul>
+      <p style="font-size:12.5px;color:var(--accent);font-weight:700;margin-top:12px">โมเมนต์สำคัญของวัน: เห็นข้อมูลของเราถูก AI ของคนอื่นเรียกใช้อย่างปลอดภัย — นั่นคือ MCP ที่แท้จริง</p>
+    </div>
+  </div>
+  <div class="foot"><div class="brand">Harmony<b>X</b> · Advanced MCP Workshop</div><div>16</div></div>
+</section>
+
+<!-- 17 DIVIDER ORCHESTRATE -->
+<section class="slide dark" data-notes="ช่วงปิด 15 นาที — เปิดโลกว่าที่สร้างวันนี้ต่อยอดไปถึงไหน: Tasks, Apps, multi-server แล้วปิดด้วย production checklist">
+  <div style="margin-top:150px">
+    <div class="kicker">Part 4 · Orchestrate</div>
+    <h1 style="font-size:60px">จากหนึ่งท่อ สู่ระบบประปา</h1>
+    <p style="font-size:22px;color:var(--hx-tint);margin-top:12px">Tasks · MCP Apps · Multi-server workflow — และเส้นทางสู่ production</p>
+  </div>
+  <div class="roadmap"><span class="lbl">ในช่วงนี้:</span><span class="rchip">Tasks: งานข้ามคืน</span><span class="rchip">MCP Apps: UI ในแชท</span><span class="rchip">Multi-server</span><span class="rchip">Production Checklist</span></div>
+  <div class="foot"><div class="brand">Harmony<b>X</b> · Advanced MCP Workshop</div><div>17</div></div>
+</section>
+
+<!-- 18 TASKS+APPS -->
+<section class="slide light" data-notes="สองความสามารถใหม่จาก spec 2026 ที่เปิดประตูงาน MarTech — Tasks: ตัวอย่าง nightly competitor scan Apps: dashboard ของแบรนด์ใน Claude ย้ำสถานะ: extension ใหม่มาก ตรวจสอบความพร้อมของ client ก่อนใช้จริง">
+  <div class="kicker">Orchestrate · ความสามารถใหม่</div><h1>Tasks และ MCP Apps — ประตูสู่งานที่ใหญ่ขึ้น</h1>
+  <div class="row" style="margin-top:20px">
+    <div class="col card navy">
+      <h3>Tasks — งานที่นานกว่าหนึ่งคำตอบ</h3>
+      <ul class="b" style="font-size:13.5px">
+        <li>สั่งงานยาวแบบ async: รับงาน → ทำเบื้องหลัง → แจ้งผลเมื่อเสร็จ (มี retry/expiry ในตัว)</li>
+        <li>ตัวอย่าง MarTech: "สแกนราคาคู่แข่งทุกคืน 02:00 สรุปความเคลื่อนไหวเป็นรายงานเช้า"</li>
+        <li>แทนที่ cron + ระบบแจ้งเตือนที่ต้องเขียนเองทั้งหมด</li>
+      </ul>
+    </div>
+    <div class="col card">
+      <h3 style="color:var(--hx)">MCP Apps — UI จาก server ของเรา</h3>
+      <ul class="b" style="font-size:13.5px">
+        <li>server ส่งหน้าจอโต้ตอบไป render ในแชทได้ ไม่ใช่แค่ข้อความ</li>
+        <li>ตัวอย่าง: ถามยอดขาย → ได้ dashboard ที่กดดูรายละเอียดต่อได้ทันที</li>
+        <li>แบรนด์ควบคุมประสบการณ์เองแม้อยู่ในหน้าต่างแชทของ AI</li>
+      </ul>
+    </div>
+  </div>
+  <p class="tagline strong">ทั้งสองยังใหม่มาก (spec เพิ่ง final) — รู้จักไว้ก่อน ใช้จริงเมื่อ client รองรับเต็มรูปแบบ</p>
+  <div class="cite">ที่มา: MCP 2026-07-28 Release Candidate — Tasks & MCP Apps extensions</div>
+  <div class="foot"><div class="brand">Harmony<b>X</b> · Advanced MCP Workshop</div><div>18</div></div>
+</section>
+
+<!-- 19 MULTI-SERVER -->
+<section class="slide light" data-notes="ภาพจบของเส้นทาง: Claude กลางเชื่อมหลาย server ทำงานเป็นเวิร์กโฟลว์ — ตัวอย่างเดินเรื่อง: คำสั่งเดียว 'สรุปยอดเมื่อวาน หาสาเหตุ แจ้งทีม' วิ่งผ่าน 3 servers ชี้ว่า architecture นี้คือบันได Enterprise ขั้น 4 (Agentic Organization) จาก workshop หลัก">
+  <div class="kicker">Orchestrate · Multi-server</div><h1>หลาย Server ทำงานร่วมกัน — Agentic Workflow จริง</h1>
+  <svg viewBox="0 0 1160 300" style="width:100%;flex:1;min-height:0;margin-top:14px" preserveAspectRatio="xMidYMid meet" aria-label="Claude เชื่อมหลาย MCP server เป็นเวิร์กโฟลว์">
+    <g font-family="Noto Sans Thai" font-weight="700">
+      <rect x="460" y="110" width="240" height="80" rx="16" fill="#345589"/>
+      <text x="580" y="145" font-size="20" fill="#fff" text-anchor="middle">Claude Cowork</text>
+      <text x="580" y="170" font-size="12" fill="#CADCFC" text-anchor="middle" font-weight="400">ผู้ประสานงานกลาง</text>
+      <rect x="40" y="30" width="260" height="64" rx="12" fill="#E9EFF7" stroke="#C9D6EA"/>
+      <text x="170" y="57" font-size="15" fill="#22375C" text-anchor="middle">Sales Data Server</text>
+      <text x="170" y="78" font-size="11" fill="#66738A" text-anchor="middle" font-weight="400">ยอดขาย Shopee/Lazada (Lab 1 ของท่าน)</text>
+      <rect x="40" y="210" width="260" height="64" rx="12" fill="#E9EFF7" stroke="#C9D6EA"/>
+      <text x="170" y="237" font-size="15" fill="#22375C" text-anchor="middle">Ads Server</text>
+      <text x="170" y="258" font-size="11" fill="#66738A" text-anchor="middle" font-weight="400">spend / CPC / audience</text>
+      <rect x="860" y="30" width="260" height="64" rx="12" fill="#22375C"/>
+      <text x="990" y="57" font-size="15" fill="#F2A33C" text-anchor="middle">LINE Server</text>
+      <text x="990" y="78" font-size="11" fill="#CADCFC" text-anchor="middle" font-weight="400">แจ้งทีม + ตอบลูกค้า (จาก workshop หลัก)</text>
+      <rect x="860" y="210" width="260" height="64" rx="12" fill="#E9EFF7" stroke="#C9D6EA"/>
+      <text x="990" y="237" font-size="15" fill="#22375C" text-anchor="middle">CDP Server</text>
+      <text x="990" y="258" font-size="11" fill="#66738A" text-anchor="middle" font-weight="400">โปรไฟล์ลูกค้า / segments</text>
+    </g>
+    <g stroke="#E9635B" stroke-width="2.5" fill="none">
+      <path d="M300 62 L460 130"/><path d="M300 242 L460 170"/>
+      <path d="M700 130 L860 62"/><path d="M700 170 L860 242"/>
+    </g>
+    <g fill="#F2A33C">
+      <circle r="6"><animateMotion dur="2.2s" repeatCount="indefinite" path="M300,62 L460,130"/></circle>
+      <circle r="6"><animateMotion dur="2.2s" begin="0.55s" repeatCount="indefinite" path="M300,242 L460,170"/></circle>
+      <circle r="6"><animateMotion dur="2.2s" begin="1.1s" repeatCount="indefinite" path="M700,130 L860,62"/></circle>
+      <circle r="6"><animateMotion dur="2.2s" begin="1.65s" repeatCount="indefinite" path="M700,170 L860,242"/></circle>
+    </g>
+  </svg>
+  <p class="tagline strong">คำสั่งเดียว: "สรุปยอดเมื่อวาน หาสาเหตุ แจ้งทีม" — Claude เรียก 3 servers ต่อกันเองครบวงจร = บันได Enterprise ขั้นที่ 4</p>
+  <div class="foot"><div class="brand">Harmony<b>X</b> · Advanced MCP Workshop</div><div>19</div></div>
+</section>
+
+<!-- 20 PRODUCTION PATH -->
+<section class="slide light" data-notes="ปิดด้วยแผนปฏิบัติ — จาก server ที่เขียนวันนี้สู่ production ใน 30 วัน + registry Q4 2026 เป็นจังหวะดีในการเตรียม server องค์กรให้พร้อมเผยแพร่ภายใน ให้เขียน commitment เหมือน workshop หลัก">
+  <div class="kicker">Wrap-up · Production Path</div><h1>จากวันนี้สู่ Production — แผน 30 วัน</h1>
+  <div style="margin-top:20px;display:flex;flex-direction:column;gap:14px;flex:1">
+    <div class="card" style="display:flex;gap:20px;align-items:center"><div style="background:var(--hx-dark);color:#fff;font-weight:700;font-size:14px;border-radius:9px;padding:9px 16px;width:130px;text-align:center;flex-shrink:0">สัปดาห์ 1</div><b style="width:210px;font-size:16px;color:var(--hx-dark);flex-shrink:0">เปลี่ยนเป็นข้อมูลจริง</b><p style="font-size:13.5px;color:var(--ink)">แทน products.json ด้วยการต่อฐานข้อมูล/API จริงขององค์กร (read-only ก่อน) — ขอบเขตเล็ก ข้อมูลไม่อ่อนไหว</p></div>
+    <div class="card" style="display:flex;gap:20px;align-items:center"><div style="background:var(--hx);color:#fff;font-weight:700;font-size:14px;border-radius:9px;padding:9px 16px;width:130px;text-align:center;flex-shrink:0">สัปดาห์ 2-3</div><b style="width:210px;font-size:16px;color:var(--hx-dark);flex-shrink:0">ยกระดับ Auth + ทดลองทีมเล็ก</b><p style="font-size:13.5px;color:var(--ink)">จาก API key → OAuth ระดับ 2 · ให้ทีม 3-5 คนใช้จริงผ่าน Cowork · เก็บ audit log ไปรีวิวรายสัปดาห์</p></div>
+    <div class="card navy" style="display:flex;gap:20px;align-items:center"><div style="background:var(--coral);color:#fff;font-weight:700;font-size:14px;border-radius:9px;padding:9px 16px;width:130px;text-align:center;flex-shrink:0">สัปดาห์ 4</div><b style="width:210px;font-size:16px;color:#fff;flex-shrink:0">วัดผล + ขยาย</b><p style="font-size:13.5px;color:var(--hx-tint)">วัดเวลาที่ประหยัด/คุณภาพคำตอบเทียบก่อนมี server · ตัดสินใจขยาย tools หรือเพิ่ม server ตัวที่สอง · เตรียมพร้อมสำหรับ curated registry (Q4 2026)</p></div>
+  </div>
+  <p class="tagline strong">Commitment: "ภายใน 30 วัน server ตัวแรกขององค์กรฉันจะเปิดข้อมูล ______ ให้ทีมใช้ผ่าน Cowork"</p>
+  <div class="foot"><div class="brand">Harmony<b>X</b> · Advanced MCP Workshop</div><div>20</div></div>
+</section>
+
+<!-- 21 REFERENCES -->
+<section class="slide light" data-notes="แหล่งอ้างอิง — spec เพิ่ง final ปลายเดือนนี้ ควรตรวจความเป็นปัจจุบันก่อนสอนทุกครั้ง">
+  <div class="kicker">References</div><h1>แหล่งอ้างอิง</h1>
+  <div style="margin-top:16px">
+    <div class="ref"><b>MCP Spec 2026-07-28: stateless core, Tasks, MCP Apps, extensions, caching</b><span>Model Context Protocol Blog — "The 2026-07-28 MCP Specification Release Candidate" <i>blog.modelcontextprotocol.io/posts/2026-07-28-release-candidate</i></span></div>
+    <div class="ref"><b>2026 Roadmap: transport scalability, authorization (DPoP, Workload Identity), curated registry Q4 2026</b><span>Model Context Protocol Blog — "The 2026 MCP Roadmap" <i>blog.modelcontextprotocol.io/posts/2026-mcp-roadmap</i></span></div>
+    <div class="ref"><b>การเปลี่ยนแปลงเชิงเทคนิคและผลกระทบ</b><span>Stacktree — "MCP 2026-07-28 spec: what changed, what breaks"; WorkOS — "Everything your team needs to know about MCP in 2026" <i>stacktr.ee/blog/mcp-2026-spec-changes · workos.com/blog</i></span></div>
+    <div class="ref"><b>SDK และเครื่องมือ</b><span>MCP TypeScript/Python SDK + MCP Inspector — เอกสารทางการ <i>modelcontextprotocol.io · github.com/modelcontextprotocol</i></span></div>
+    <div class="ref"><b>ความปลอดภัย</b><span>OWASP — Top 10 for LLM Applications; MCP Security Best Practices (spec) <i>owasp.org · modelcontextprotocol.io/specification</i></span></div>
+  </div>
+  <p class="tagline" style="font-size:12.5px">เข้าถึงข้อมูล: กรกฎาคม 2026 — spec เพิ่ง final ควรตรวจสอบความเป็นปัจจุบันก่อนการสอนแต่ละรอบ</p>
+  <div class="foot"><div class="brand">Harmony<b>X</b> · Advanced MCP Workshop</div><div>21</div></div>
+</section>
+
+<!-- 22 THANK YOU -->
+<section class="slide dark" data-notes="ปิด — ทุกคนกลับบ้านพร้อม server ที่รันอยู่บน cloud จริง แจ้งช่องทางถามต่อ + เก็บ feedback">
+  <div style="margin:auto;text-align:center">
+    <h1 style="font-size:64px">ขอบคุณ</h1>
+    <p style="font-size:20px;color:var(--hx-tint);margin-top:16px">Advanced MCP — Build · Secure · Deploy · Orchestrate</p>
+    <p style="font-size:16px;color:var(--accent);margin-top:28px">วันนี้ท่านไม่ได้แค่เรียนรู้ MCP — ท่านมี server ของตัวเองรันอยู่บน cloud แล้ว</p>
+    <p style="font-size:15px;color:var(--hx-tint);margin-top:10px">starter code + เอกสาร: [ QR / ลิงก์ ]</p>
+    <p style="font-size:14px;color:#8FA6CE;margin-top:14px">Harmony<b style="color:var(--accent)">X</b> Solution · harmonyx.co · hello@harmonyx.co</p>
+  </div>
+  <div class="foot"><div class="brand">Harmony<b>X</b> · Advanced MCP Workshop</div><div>22</div></div>
+</section>
+
+</div></div>
+<div id="notes"></div>
+<script>
+const slides=[...document.querySelectorAll('.slide')];
+let cur=0;
+const bar=document.getElementById('bar'),counter=document.getElementById('cnt'),notes=document.getElementById('notes');
+let notesOn=false;
+let showHidden=false; // ค่าเริ่มต้น: ปิด (ไม่จำค่า — รีเซ็ตทุกครั้งที่เปิด)
+const isHidden=i=>slides[i].classList.contains('hidden-slide')&&!showHidden;
+const visCount=()=>showHidden?slides.length:slides.filter(s=>!s.classList.contains('hidden-slide')).length;
+const visPos=i=>showHidden?(i+1):slides.slice(0,i+1).filter(s=>!s.classList.contains('hidden-slide')).length;
+function show(i){
+  cur=Math.max(0,Math.min(slides.length-1,i));
+  slides.forEach((s,j)=>s.classList.toggle('active',j===cur));
+  bar.style.width=(visPos(cur)/visCount()*100)+'%';
+  counter.textContent=isHidden(cur)?('ซ่อน · '+(cur+1)):(visPos(cur)+' / '+visCount());
+  notes.textContent=slides[cur].dataset.notes||'';
+  notes.style.display=notesOn&&notes.textContent?'block':'none';
+  document.getElementById('bNotes').classList.toggle('on',notesOn);
+  if(document.body.classList.contains('mm'))counter.textContent='เลื่อนดู · '+visCount()+' สไลด์';
+  location.hash=cur+1;
+}
+// เดินหน้า/ถอยหลังโดยข้ามสไลด์ที่ซ่อน (ยังเปิดดูได้ผ่านสารบัญ)
+function step(dir){
+  let i=cur+dir;
+  while(i>=0&&i<slides.length&&isHidden(i))i+=dir;
+  if(i>=0&&i<slides.length)show(i);
+}
+/* ── ซ่อน/แสดงสไลด์ด้วยปุ่ม H — จำค่าไว้ในเบราว์เซอร์ ── */
+const hideOv=JSON.parse(localStorage.getItem('advDeckHiddenOv')||'{}');
+Object.entries(hideOv).forEach(([i,v])=>slides[+i]&&slides[+i].classList.toggle('hidden-slide',v));
+function toggleHide(){
+  const v=!isHidden(cur);
+  slides[cur].classList.toggle('hidden-slide',v);
+  hideOv[cur]=v;
+  localStorage.setItem('advDeckHiddenOv',JSON.stringify(hideOv));
+  const a=toclist.children[cur];
+  if(a)a.classList.toggle('hid',v);
+  show(cur);fit();
+}
+/* ── ปรับขนาดตัวอักษร (A− / A+) ── */
+const FS_STEPS=[0.85,0.92,1,1.06,1.12,1.18];
+let fsIdx=parseInt(localStorage.getItem('advDeckFs')||'2');
+const fsOrig=new WeakMap();
+function applyFS(){
+  fsIdx=Math.max(0,Math.min(FS_STEPS.length-1,fsIdx));
+  const f=FS_STEPS[fsIdx];
+  document.querySelectorAll('#frame .slide, #frame .slide *').forEach(el=>{
+    if(el.tagName==='svg'||el.closest('svg'))return; // ไม่ปรับข้อความใน SVG diagram
+    if(!fsOrig.has(el)){
+      const fs=parseFloat(getComputedStyle(el).fontSize);
+      fsOrig.set(el,fs/FS_STEPS[2]);
+    }
+    el.style.fontSize=(fsOrig.get(el)*f)+'px';
+  });
+  document.getElementById('fsv').textContent=Math.round(f*100)+'%';
+  localStorage.setItem('advDeckFs',fsIdx);
+}
+function fit(){
+  const f=document.getElementById('frame');
+  const st=document.getElementById('stage');
+  const vv=window.visualViewport;
+  const vw=vv?vv.width:document.documentElement.clientWidth;
+  const vh=vv?vv.height:document.documentElement.clientHeight;
+  const mobilePortrait=vw<700&&vh>vw;
+  document.body.classList.toggle('mm',mobilePortrait);
+  document.documentElement.classList.toggle('mm',mobilePortrait);
+  if(mobilePortrait){
+    // โหมดอ่าน: reflow คอลัมน์เดียว ไม่ย่อส่วน — ตัวอักษรขนาดจริง
+    f.style.transform='none';
+    const visible=visCount();
+    counter.textContent='เลื่อนดู · '+visible+' สไลด์';
+    return;
+  }
+  st.style.height='';
+  const pad=vw<700?1.0:1.015;
+  const sc=Math.min(vw/(1280*pad),vh/(720*pad));
+  f.style.transform='scale('+sc+')';
+  show(cur); // คืนค่าตัวนับ/สถานะเมื่อกลับสู่โหมดนำเสนอ
+}
+addEventListener('resize',fit);
+addEventListener('orientationchange',()=>setTimeout(fit,150));
+document.addEventListener('fullscreenchange',()=>setTimeout(fit,50));
+if(window.visualViewport)visualViewport.addEventListener('resize',fit);
+const toc=document.getElementById('toc'),toclist=document.getElementById('toclist');
+slides.forEach((s,i)=>{
+  const t=s.querySelector('h1'),k=s.querySelector('.kicker');
+  const a=document.createElement('a');
+  if(s.classList.contains('hidden-slide'))a.className='hid';
+  // สไลด์ divider (Part/Bonus) แสดงเป็นหัวข้อกลุ่มในสารบัญ
+  if(s.classList.contains('dark')&&k&&/^(Part|Bonus)/.test(k.textContent.trim()))a.classList.add('grp');
+  a.innerHTML='<b>'+(i+1)+'</b>'+(k?k.textContent+' — ':'')+(t?t.textContent:'');
+  a.onclick=()=>{
+    toc.classList.remove('on');
+    if(document.body.classList.contains('mm'))slides[i].scrollIntoView({behavior:'smooth',block:'start'});
+    else show(i);
+  };
+  toclist.appendChild(a);
+});
+addEventListener('keydown',e=>{
+  if(e.key==='Escape'){toc.classList.remove('on');return;}
+  if(toc.classList.contains('on'))return;
+  if(e.key==='ArrowRight'||e.key===' '||e.key==='PageDown')step(1);
+  else if(e.key==='ArrowLeft'||e.key==='PageUp')step(-1);
+  else if(e.key==='Home')show(0);
+  else if(e.key==='End')show(slides.length-1);
+  else if(e.key.toLowerCase()==='n'){notesOn=!notesOn;show(cur);}
+  else if(e.key==='T'&&e.shiftKey){tReset();}
+  else if(e.key==='H'&&e.shiftKey){toggleShowHidden();}
+  else if(e.key.toLowerCase()==='t'){tToggle();}
+  else if(e.key.toLowerCase()==='h'&&!e.shiftKey){toggleHide();}
+  else if(e.key==='?'){const hp=document.getElementById('help');hp.classList.remove('hide');setTimeout(()=>hp.classList.add('hide'),7000);}
+  else if(e.key.toLowerCase()==='o'){toc.classList.toggle('on');}
+  else if(e.key.toLowerCase()==='f'){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();}
+  else if(e.key.toLowerCase()==='p'){print();}
+});
+document.getElementById('frame').addEventListener('click',e=>{
+  if(document.body.classList.contains('mm'))return; // โหมดอ่าน: เลื่อนตามปกติ
+  if(e.target.closest('a'))return;
+  if(getSelection().toString())return;
+  if(e.clientX>innerWidth/2)step(1);else step(-1);
+});
+let tx=null;
+addEventListener('touchstart',e=>tx=e.touches[0].clientX);
+addEventListener('touchend',e=>{
+  if(document.body.classList.contains('mm'))return; // โหมดอ่าน: ใช้ scroll แทน swipe
+  if(tx===null)return;
+  const dx=e.changedTouches[0].clientX-tx;
+  if(Math.abs(dx)>50)step(dx<0?1:-1);
+  tx=null;
+});
+/* ── ปุ่มควบคุม ── */
+document.getElementById('bPrev').onclick=()=>step(-1);
+document.getElementById('bNext').onclick=()=>step(1);
+document.getElementById('navL').onclick=()=>step(-1);
+document.getElementById('navR').onclick=()=>step(1);
+document.getElementById('bFsDn').onclick=()=>{fsIdx--;applyFS();};
+document.getElementById('bFsUp').onclick=()=>{fsIdx++;applyFS();};
+document.getElementById('bNotes').onclick=()=>{notesOn=!notesOn;show(cur);};
+document.getElementById('bToc').onclick=()=>toc.classList.toggle('on');
+document.getElementById('bFull').onclick=()=>{document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();};
+setTimeout(()=>document.getElementById('help').classList.add('hide'),7000);
+/* ── นาฬิกาจับเวลาวิทยากร (T เริ่ม/หยุด · Shift+T รีเซ็ต) ── */
+let tSec=0,tRun=false,tInt=null;
+const bT=document.getElementById('bTimer');
+function tShow(){
+  const h=Math.floor(tSec/3600),m=Math.floor(tSec%3600/60),s=tSec%60;
+  bT.textContent=(h?h+':'+String(m).padStart(2,'0'):m)+':'+String(s).padStart(2,'0');
+  bT.classList.toggle('on',tRun);
+  bT.style.color=tSec>=12600?'#E9635B':''; // เกิน 3.5 ชม. เตือนสีแดง
+}
+function tToggle(){
+  tRun=!tRun;
+  if(tRun)tInt=setInterval(()=>{tSec++;tShow();},1000);
+  else clearInterval(tInt);
+  tShow();
+}
+function tReset(){tRun=false;clearInterval(tInt);tSec=0;tShow();}
+bT.onclick=tToggle;
+/* ── แสดง/ซ่อน สไลด์ที่ถูกซ่อนทั้งหมด (ค่าเริ่มต้น: ปิด) ── */
+function toggleShowHidden(){
+  showHidden=!showHidden;
+  document.body.classList.toggle('showhid',showHidden);
+  document.getElementById('bShowHid').classList.toggle('on',showHidden);
+  if(!showHidden&&slides[cur].classList.contains('hidden-slide'))step(1); // ปิดโหมดขณะอยู่บนสไลด์ซ่อน → เลื่อนไปสไลด์ถัดไป
+  else show(cur);
+  fit();
+}
+document.getElementById('bShowHid').onclick=toggleShowHidden;
+/* ── ซ่อนแถบควบคุมอัตโนมัติเมื่อ fullscreen และเมาส์นิ่ง 3 วินาที ── */
+let idleT=null;
+function idleArm(){
+  const c1=document.getElementById('ctrl');
+  c1.style.opacity='1';c1.style.transition='opacity .4s';
+  clearTimeout(idleT);
+  if(document.fullscreenElement)idleT=setTimeout(()=>{c1.style.opacity='0';},3000);
+}
+addEventListener('mousemove',idleArm);
+document.addEventListener('fullscreenchange',idleArm);
+/* ── โหมดอ่านมือถือ: progress ตามการเลื่อน + ตัวนับรู้ตำแหน่ง + ปุ่มขึ้นบน ── */
+document.getElementById('topBtn').onclick=()=>scrollTo({top:0,behavior:'smooth'});
+addEventListener('scroll',()=>{
+  if(!document.body.classList.contains('mm'))return;
+  const d=document.documentElement;
+  const p=d.scrollHeight>d.clientHeight?(scrollY/(d.scrollHeight-d.clientHeight)):0;
+  bar.style.width=(p*100)+'%';
+},{passive:true});
+const io=new IntersectionObserver(es=>{
+  if(!document.body.classList.contains('mm'))return;
+  es.forEach(en=>{
+    if(en.isIntersecting){
+      const i=slides.indexOf(en.target);
+      counter.textContent=visPos(i)+' / '+visCount();
+    }
+  });
+},{threshold:0.35});
+slides.forEach(s=>io.observe(s));
+fit();
+show(parseInt(location.hash.slice(1))-1||0);
+if(fsIdx!==2)applyFS();else document.getElementById('fsv').textContent='100%';
+</script>
+</body>
+</html>
