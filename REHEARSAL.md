@@ -95,6 +95,9 @@ npx cloudflared tunnel --url http://localhost:3000
 
 ## Session 2 · Advanced MCP
 
+> 🧹 **ก่อนเริ่มทุกครั้ง:** `cd s2-mcp/showcase && npm run reset-orders`
+> ล้างออเดอร์ที่เกิดตอนซ้อม — ไม่งั้นวันงานจะมี ORD ค้างจากรอบก่อนปนอยู่
+
 ### ▌D2.1 — Lab MCP-1: Build (stdio)  + เพิ่ม tool สด
 ```
 cd s2-mcp/local && npm install && npm start        # 3 tools พร้อม
