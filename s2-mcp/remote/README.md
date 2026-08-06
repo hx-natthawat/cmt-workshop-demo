@@ -87,6 +87,19 @@ npm run deploy
 
 ได้ URL รูปแบบ `https://glow-beauty-mcp.<subdomain>.workers.dev` → endpoint คือ `https://.../mcp`
 
+**Deploy จริงของงาน CMT 2026** (custom domain ตั้งไว้ใน `wrangler.jsonc` แล้ว):
+
+| | |
+|---|---|
+| endpoint | `https://cmt2026-ex-mcp.harmonyx.co/mcp` |
+| บัญชี Cloudflare | Harmonyx (`60b088834829272a6ee94498be2ea356`) |
+
+มีหลายบัญชีในเครื่องเดียวกัน ต้องระบุบัญชีทุกครั้ง:
+```bash
+CLOUDFLARE_ACCOUNT_ID=60b088834829272a6ee94498be2ea356 npm run deploy
+CLOUDFLARE_ACCOUNT_ID=60b088834829272a6ee94498be2ea356 npx wrangler secret put DEMO_API_KEY
+```
+
 ทดสอบจากเครื่องที่สอง (งาน D-3): ใช้ curl ชุดเดียวกับด้านบน เปลี่ยน URL เป็นของจริง
 ต้องผ่านทั้ง 2 กรณี: key ถูก → ตอบปกติ, key ผิด/ไม่ส่ง → `401`
 

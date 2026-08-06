@@ -87,11 +87,13 @@ npm run inspect                                      # MCP Inspector
 ### ▌D2.2 — Lab MCP-2: Deploy remote (Cloudflare Workers)
 ```
 cd s2-mcp/remote && npm install
-npx wrangler login
+export CLOUDFLARE_ACCOUNT_ID=60b088834829272a6ee94498be2ea356   # บัญชี Harmonyx (เครื่องนี้มี 41 บัญชี ต้องระบุ)
 npx wrangler secret put DEMO_API_KEY                 # key ไม่ขึ้นจอ
 npm run deploy
 ```
-- [ ] ได้ URL `https://glow-beauty-mcp.<subdomain>.workers.dev`
+> ✅ **deploy ไว้แล้วเมื่อ 2026-08-06** → `https://cmt2026-ex-mcp.harmonyx.co/mcp` (custom domain)
+> วันงานแค่ตรวจว่ายังตอบอยู่ ไม่ต้อง deploy ใหม่
+- [ ] endpoint ตอบ: `https://cmt2026-ex-mcp.harmonyx.co/mcp`
 - [ ] ทดสอบจากเครื่องที่สอง: `REMOTE_MCP_URL=https://.../mcp DEMO_API_KEY=<key> ./smoke-test.sh`
 - [ ] key ผิด → 401 · key ถูก → serverInfo `glow-beauty-products`
 - 🔻 fallback: deploy พัง → เปิดวิดีโอ + โชว์ local (D2.1) ว่าโค้ดชุดเดียวกัน
