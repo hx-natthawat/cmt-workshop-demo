@@ -108,5 +108,21 @@ CLOUDFLARE_ACCOUNT_ID=60b088834829272a6ee94498be2ea356 npx wrangler secret put D
 เพิ่มใน Claude Desktop / Claude Code เป็น remote MCP server:
 
 ```bash
-claude mcp add --transport http glow-beauty https://glow-beauty-mcp.<subdomain>.workers.dev/mcp --header "Authorization: Bearer <key>"
+claude mcp add --transport http glow-beauty https://cmt2026-ex-mcp.harmonyx.co/mcp --header "Authorization: Bearer <key>"
+```
+
+แทน `<key>` ด้วยคีย์ที่วิทยากรแจกในห้อง · ตรวจว่าต่อติดด้วย `claude mcp list`
+
+ถ้าใช้ Claude Desktop ให้เพิ่มใน config แทน:
+
+```jsonc
+{
+  "mcpServers": {
+    "glow-beauty": {
+      "type": "http",
+      "url": "https://cmt2026-ex-mcp.harmonyx.co/mcp",
+      "headers": { "Authorization": "Bearer <key>" }
+    }
+  }
+}
 ```
