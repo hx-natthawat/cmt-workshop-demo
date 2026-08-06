@@ -6,7 +6,7 @@ This is a monorepo of small, self-contained projects. Each one runs independentl
 
 | | |
 |---|---|
-| Runtime | Node.js 20 or later (required by Cloudflare Workers tooling) |
+| Runtime | Node.js 22 or later (required by `wrangler` and `@line/bot-sdk`) |
 | Model | `claude-sonnet-5` via `@anthropic-ai/sdk` |
 | Tests | 62 cases in CI (no API key required) plus `smoke-test.sh` covering 8 areas |
 | CI | GitHub Actions — 4 jobs, no secrets required, runs on forks as-is |

@@ -12,5 +12,8 @@
     "@anthropic-ai/sdk": "^0.113.0",
     "@modelcontextprotocol/sdk": "^1.29.0",
     "zod": "^4.4.3"
+  },
+  "engines": {
+    "node": ">=18"
   }
 }
