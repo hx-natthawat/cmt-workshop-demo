@@ -24,19 +24,26 @@ const app = express();
 
 app.post('/webhook', middleware(lineConfig), async (req, res) => {
   res.sendStatus(200);
+  // log ทุก event ที่เข้ามา — ช่วยดีบักหน้างาน (เห็นทันทีว่า LINE ส่งมาถึงจริงไหม)
+  const n = req.body.events?.length ?? 0;
+  console.log(`📩 webhook: ${n} event${n ? ' · ' + req.body.events.map((e) => e.type).join(',') : ' (verify/ping)'}`);
   for (const event of req.body.events) {
     try {
       if (event.type === 'message' && event.message.type === 'text') {
         const userId = event.source?.userId;
+        console.log(`   💬 "${event.message.text}"`);
         const out = await agent.runAgent(event.message.text);
+        console.log(`   🔧 tools: ${out.toolCalls.map((c) => c.name).join(', ') || '(ไม่เรียก)'}`);
         store.logVoc({ userId, channel: 'line', text: event.message.text, tools: out.toolCalls.map((c) => c.name) });
         captureRestock(event.message.text, userId);
-        await line.replyMessage({ replyToken: event.replyToken, messages: render(out).slice(0, 5) });
+        const msgs = render(out).slice(0, 5);
+        await line.replyMessage({ replyToken: event.replyToken, messages: msgs });
+        console.log(`   ✅ ตอบกลับ ${msgs.length} message (${msgs.map((m) => m.type).join('+')})`);
       } else if (event.type === 'postback') {
         await handlePostback(event);
       }
     } catch (err) {
-      console.error('handler error:', err.message);
+      console.error('   ❌ handler error:', err.message);
     }
   }
 });

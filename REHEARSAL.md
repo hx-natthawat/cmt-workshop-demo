@@ -56,6 +56,12 @@ npx cloudflared tunnel --url http://localhost:3000
 ```
 ตั้ง URL + `/webhook` ใน LINE Developers Console → Verify → เปิด Use webhook → **ปิด auto-reply ใน OA Manager** (ลืมบ่อยสุด)
 
+> ⚠️ **quick tunnel ของ cloudflared ตายเงียบได้** — เจอมาแล้วจริง: process ยังรัน log ยังบอก
+> "Registered tunnel connection" แต่โดเมนหายจาก DNS แล้ว (`COULD_NOT_CONNECT — Unknown host`)
+> อาการคือทุกอย่างฝั่งเรา "ดูปกติหมด" แต่ข้อความไม่เคยมาถึง
+> 👉 **ก่อนขึ้นเวทีให้กด Verify ซ้ำเสมอ** ถ้าไม่เขียว = รีสตาร์ต tunnel แล้วตั้ง URL ใหม่
+> 👉 ดูใน terminal ต้องเห็น `📩 webhook: ...` ทุกครั้งที่มีคนทัก ถ้าไม่ขึ้น = ของไม่ถึงบอท
+
 ทดสอบ **4 คำถามบังคับ**:
 - [ ] "ครีมกันแดดผิวมัน" → แนะนำ GB-002
 - [ ] "มีโปรอะไร" → คืนโปรโมชันจริง
