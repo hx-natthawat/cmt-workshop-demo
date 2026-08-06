@@ -54,25 +54,58 @@ Copy each project's `.env.example` and fill in the values. The real files are gi
 
 ## Architecture
 
-```
-                    ┌──────────────────────── Channels ────────────────────────┐
-   LINE Messaging ──┤  line-bot        context embedded in the system prompt   │
-                    │  line-bot-mcp    calls MCP tools                         │
-                    │  line-bot-rich   MCP plus Flex, Quick Reply, Postback    │
-   Browser ─────────┤  webchat.mjs     same capabilities, different rendering  │
-                    │  console.mjs     operator console (localhost only)       │
-                    └──────────────────────────┬───────────────────────────────┘
-                                               │  agent.js — shared agentic loop
-                                               ▼
-                    ┌─────────────────── MCP servers (stdio) ──────────────────┐
-                    │  showcase    7 tools, 1 resource, 1 prompt               │
-                    │  local       3 tools — the minimal example               │
-                    │  analytics   reads the real customer_data.csv            │
-                    │  guarded     demonstrates kill switch, readonly, audit   │
-                    └──────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TB
+    LINE(["LINE Messaging API"])
+    BROWSER(["Browser"])
 
-                    remote/  the same server exposed over Streamable HTTP on Workers
+    subgraph CH["Channels"]
+        direction TB
+        B1["line-bot<br/>context in system prompt"]
+        B2["line-bot-mcp<br/>own loop, calls MCP"]
+        B3["line-bot-rich<br/>Flex · Quick Reply · Postback"]
+        WC["webchat.mjs<br/>browser rendering"]
+        CO["console.mjs<br/>operator console, no model"]
+    end
+
+    AGENT["agent.js<br/>shared agentic loop<br/>render.js · flex.js · store.js"]
+    CLAUDE(["Anthropic API<br/>claude-sonnet-5"])
+
+    subgraph MCP["MCP servers · stdio"]
+        direction TB
+        SHOW["showcase<br/>7 tools · resource · prompt"]
+        LOC["local<br/>3 tools, minimal example"]
+        ANA["analytics<br/>reads customer_data.csv"]
+        GUA["guarded<br/>kill switch · readonly · audit"]
+    end
+
+    ORCH["multi/orchestrate.mjs<br/>routes across servers"]
+    REMOTE["remote<br/>Streamable HTTP on Workers<br/>API key required"]
+    DATA[("products.json<br/>orders · customer_data.csv")]
+
+    LINE --> B1 & B2 & B3
+    BROWSER --> WC & CO
+
+    B1 --> CLAUDE
+    B2 --> CLAUDE
+    B3 --> AGENT
+    WC --> AGENT
+    AGENT --> CLAUDE
+
+    B2 --> SHOW
+    AGENT --> SHOW
+    ORCH --> ANA & SHOW
+    ORCH --> CLAUDE
+
+    CO -.reads.-> DATA
+    SHOW --> DATA
+    LOC --> DATA
+    ANA --> DATA
+    GUA --> DATA
+    REMOTE --> DATA
 ```
+
+`line-bot` answers from prompt context alone. `line-bot-mcp` runs its own loop against the showcase server. `line-bot-rich` and `webchat.mjs` share `agent.js`, so both channels behave identically and differ only in rendering. The operator console never calls the model — it reads the same data files directly and talks to the LINE API for delivery.
 
 ### Design principles
 
