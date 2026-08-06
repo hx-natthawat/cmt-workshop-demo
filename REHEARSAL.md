@@ -42,6 +42,27 @@ Checklist หน้าเดียวสำหรับซ้อมจริง 
 - [ ] `roi_calculator.html` (B) — ROAS/ROI/CPO/break-even คำนวณสด
 - [ ] `mini_dashboard.html` (C) — ข้อมูลจริง 300 ราย + RFM + กราฟช่องทาง
 
+### ▌โชว์ LINE bot 3 ระดับต่อกัน (progression) — tunnel เดียว webhook เดียว
+
+```bash
+cd s1-martech
+./switch-bot.sh 1     # context ใน prompt — ตอบได้แต่ไม่มีข้อมูลจริง
+./switch-bot.sh 2     # เรียก MCP tools — ตัวเลขสต็อก/โปรฯ จริง แต่ยังเป็นข้อความล้วน
+./switch-bot.sh 3     # Flex + Quick Reply + ปุ่มยืนยัน (governance)
+./switch-bot.sh status
+```
+ทุกระดับใช้ **พอร์ต 3000 ตัวเดียว** → tunnel ตัวเดียว webhook ตัวเดียว
+**ไม่ต้องแก้อะไรใน LINE Console ระหว่างสลับ** — ผู้ชมเห็นความต่างในห้องแชทเดิม
+
+คำถามที่ใช้เทียบให้เห็นชัด: *"ครีมกันแดด GB-002 เหลือกี่ชิ้น"*
+| ระดับ | สิ่งที่ผู้ชมเห็น |
+|---|---|
+| 1 | ตอบจากข้อมูลใน prompt — ไม่รู้สต็อกจริง |
+| 2 | เรียก `check_stock` → ตัวเลขจริงจากระบบ |
+| 3 | ตัวเลขจริง **+ การ์ดสินค้า + ปุ่มสั่งซื้อ** |
+
+---
+
 ### ▌D1.4 — LINE Bot end-to-end  ⚠️ พังง่ายสุด — ซ้อมเต็ม flow ≥2 รอบ
 
 **ก่อนต่อ tunnel ทุกครั้ง** (ถ้าจะเดโมตัว rich — เร็วกว่ามานั่งหาสาเหตุตอนบอทเงียบ):
@@ -56,6 +77,12 @@ npx cloudflared tunnel --url http://localhost:3000
 ```
 ตั้ง URL + `/webhook` ใน LINE Developers Console → Verify → เปิด Use webhook → **ปิด auto-reply ใน OA Manager** (ลืมบ่อยสุด)
 
+> ⚠️ **quick tunnel ของ cloudflared ตายเงียบได้** — เจอมาแล้วจริง: process ยังรัน log ยังบอก
+> "Registered tunnel connection" แต่โดเมนหายจาก DNS แล้ว (`COULD_NOT_CONNECT — Unknown host`)
+> อาการคือทุกอย่างฝั่งเรา "ดูปกติหมด" แต่ข้อความไม่เคยมาถึง
+> 👉 **ก่อนขึ้นเวทีให้กด Verify ซ้ำเสมอ** ถ้าไม่เขียว = รีสตาร์ต tunnel แล้วตั้ง URL ใหม่
+> 👉 ดูใน terminal ต้องเห็น `📩 webhook: ...` ทุกครั้งที่มีคนทัก ถ้าไม่ขึ้น = ของไม่ถึงบอท
+
 ทดสอบ **4 คำถามบังคับ**:
 - [ ] "ครีมกันแดดผิวมัน" → แนะนำ GB-002
 - [ ] "มีโปรอะไร" → คืนโปรโมชันจริง
@@ -67,6 +94,9 @@ npx cloudflared tunnel --url http://localhost:3000
 ---
 
 ## Session 2 · Advanced MCP
+
+> 🧹 **ก่อนเริ่มทุกครั้ง:** `cd s2-mcp/showcase && npm run reset-orders`
+> ล้างออเดอร์ที่เกิดตอนซ้อม — ไม่งั้นวันงานจะมี ORD ค้างจากรอบก่อนปนอยู่
 
 ### ▌D2.1 — Lab MCP-1: Build (stdio)  + เพิ่ม tool สด
 ```
@@ -81,11 +111,13 @@ npm run inspect                                      # MCP Inspector
 ### ▌D2.2 — Lab MCP-2: Deploy remote (Cloudflare Workers)
 ```
 cd s2-mcp/remote && npm install
-npx wrangler login
+export CLOUDFLARE_ACCOUNT_ID=60b088834829272a6ee94498be2ea356   # บัญชี Harmonyx (เครื่องนี้มี 41 บัญชี ต้องระบุ)
 npx wrangler secret put DEMO_API_KEY                 # key ไม่ขึ้นจอ
 npm run deploy
 ```
-- [ ] ได้ URL `https://glow-beauty-mcp.<subdomain>.workers.dev`
+> ✅ **deploy ไว้แล้วเมื่อ 2026-08-06** → `https://cmt2026-ex-mcp.harmonyx.co/mcp` (custom domain)
+> วันงานแค่ตรวจว่ายังตอบอยู่ ไม่ต้อง deploy ใหม่
+- [ ] endpoint ตอบ: `https://cmt2026-ex-mcp.harmonyx.co/mcp`
 - [ ] ทดสอบจากเครื่องที่สอง: `REMOTE_MCP_URL=https://.../mcp DEMO_API_KEY=<key> ./smoke-test.sh`
 - [ ] key ผิด → 401 · key ถูก → serverInfo `glow-beauty-products`
 - 🔻 fallback: deploy พัง → เปิดวิดีโอ + โชว์ local (D2.1) ว่าโค้ดชุดเดียวกัน

@@ -6,6 +6,8 @@
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "glow-beauty-mcp",
 	"main": "src/index.ts",
+	// custom domain สำหรับ workshop — จำง่ายกว่า *.workers.dev เวลาให้ผู้เรียนพิมพ์ตาม
+	"routes": [{ "pattern": "cmt2026-ex-mcp.harmonyx.co", "custom_domain": true }],
 	"compatibility_date": "2025-03-10",
 	"compatibility_flags": ["nodejs_compat"],
 	"migrations": [
