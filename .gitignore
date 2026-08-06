@@ -12,3 +12,6 @@ s2-mcp/multi/trace.html
 
 # ออเดอร์ที่เกิดระหว่างเดโม (ข้อมูลชั่วคราว)
 s2-mcp/showcase/data/
+
+# key ชั่วคราวที่ dev-all.sh สุ่มให้ตอนไม่มี .dev.vars
+.dev-remote-key

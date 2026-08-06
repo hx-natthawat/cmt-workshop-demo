@@ -176,6 +176,15 @@ node s3-economy/storefront/audit-gates.mjs        # ตรวจไฟล์ใ�
 node s3-economy/storefront/audit-gates.mjs https://example.com   # ตรวจเว็บจริง
 ```
 
+### สตาร์ตทุกอย่างพร้อมกัน
+
+```bash
+./dev-all.sh                 # bot ระดับ 3 + vibe + storefront + remote MCP
+BOT=1 ./dev-all.sh           # เลือกระดับ bot
+SKIP_REMOTE=1 ./dev-all.sh   # ข้าม wrangler (ขึ้นเร็วกว่ามาก)
+```
+ข้ามบริการที่ยังไม่พร้อมให้เอง (ไม่มี `node_modules` / ไม่มี `.env`) แล้วบอกว่าข้ามเพราะอะไร
+
 ### พอร์ตที่ใช้
 
 | พอร์ต | บริการ |
