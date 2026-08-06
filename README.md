@@ -1,32 +1,33 @@
 # CMT Workshop Demos
 
-ชุดโค้ดตัวอย่างที่รันได้จริงสำหรับสอนเรื่อง **AI ในงานการตลาด · Model Context Protocol · Agent Economy**
-เป็น monorepo ของโปรเจกต์เล็กๆ ที่แยกกันสมบูรณ์ — หยิบไปใช้ทีละตัวได้ ไม่ต้องรันทั้งหมด
+Runnable reference implementations used to teach **AI for marketing operations**, **the Model Context Protocol (MCP)**, and **agent-readiness for brands**.
+
+This is a monorepo of small, self-contained projects. Each one runs independently — install and run only what you need.
 
 | | |
 |---|---|
-| Runtime | Node.js 20+ (Cloudflare Workers ใช้ 20+ เท่านั้น) |
-| โมเดล | `claude-sonnet-5` ผ่าน `@anthropic-ai/sdk` |
-| เทสต์ | 62 เคสใน CI (ไม่ต้องมี API key) + `smoke-test.sh` 8 ด่าน |
-| CI | GitHub Actions — 4 jobs ไม่ใช้ secret ใดๆ fork ไปรันได้ทันที |
+| Runtime | Node.js 20 or later (required by Cloudflare Workers tooling) |
+| Model | `claude-sonnet-5` via `@anthropic-ai/sdk` |
+| Tests | 62 cases in CI (no API key required) plus `smoke-test.sh` covering 8 areas |
+| CI | GitHub Actions — 4 jobs, no secrets required, runs on forks as-is |
 
 ---
 
-## เริ่มต้น
+## Getting started
 
 ```bash
 git clone git@github.com:hx-natthawat/cmt-workshop-demo.git
 cd cmt-workshop-demo
 ```
 
-แต่ละโปรเจกต์มี `package.json` ของตัวเอง ติดตั้งเฉพาะตัวที่จะใช้:
+Every project carries its own `package.json`. Install only what you intend to run:
 
 ```bash
-npm install --prefix s2-mcp/local          # MCP server ตัวเล็กสุด เริ่มที่นี่ได้
+npm install --prefix s2-mcp/local              # smallest MCP server — a good starting point
 npm install --prefix s1-martech/line-bot-rich
 ```
 
-หรือติดตั้งทุกตัวรวดเดียว:
+To install everything at once:
 
 ```bash
 for d in s1-martech/line-bot s1-martech/line-bot-mcp s1-martech/line-bot-rich \
@@ -35,217 +36,217 @@ for d in s1-martech/line-bot s1-martech/line-bot-mcp s1-martech/line-bot-rich \
 done
 ```
 
-### ตัวแปรสภาพแวดล้อม
+### Environment variables
 
-คัดลอกจาก `.env.example` ของแต่ละโปรเจกต์แล้วเติมค่า — ไฟล์จริงถูก gitignore ไว้
+Copy each project's `.env.example` and fill in the values. The real files are gitignored.
 
-| ตัวแปร | ใช้ที่ | จำเป็นเมื่อ |
+| Variable | Used by | Required when |
 |---|---|---|
-| `ANTHROPIC_API_KEY` | LINE bots ทุกตัว · `s2-mcp/multi` | เรียกโมเดล |
-| `LINE_CHANNEL_ACCESS_TOKEN` | LINE bots · Marketing Console | ส่งข้อความ/ดูโควตา |
-| `LINE_CHANNEL_SECRET` | LINE bots | ตรวจลายเซ็น webhook |
-| `PORT` | LINE bots · Marketing Console | ต้องการเปลี่ยนพอร์ต (ค่าปกติ 3000 / 3100) |
-| `DEMO_API_KEY` | `s2-mcp/remote` | กันการเรียก MCP remote |
+| `ANTHROPIC_API_KEY` | all LINE bots, `s2-mcp/multi` | calling the model |
+| `LINE_CHANNEL_ACCESS_TOKEN` | LINE bots, Marketing Console | sending messages, reading quota |
+| `LINE_CHANNEL_SECRET` | LINE bots | verifying webhook signatures |
+| `PORT` | LINE bots, Marketing Console | overriding the default port (3000 / 3100) |
+| `DEMO_API_KEY` | `s2-mcp/remote` | gating access to the remote MCP endpoint |
 
-> MCP server ฝั่ง stdio (`local` · `showcase` · `security` · `multi/analytics`) **ไม่ต้องใช้ตัวแปรใดๆ** — รันได้ทันทีหลัง `npm install`
-
----
-
-## ภาพรวมสถาปัตยกรรม
-
-```
-                    ┌───────────────────── ช่องทางเข้า ─────────────────────┐
-   LINE Messaging ──┤  line-bot        context อยู่ใน system prompt         │
-                    │  line-bot-mcp    เรียก MCP tools                      │
-                    │  line-bot-rich   MCP + Flex/Quick Reply/Postback      │
-   เบราว์เซอร์ ──────┤  webchat.mjs     UI เดียวกับ LINE คนละ presentation   │
-                    │  console.mjs     หน้า operator (localhost เท่านั้น)   │
-                    └───────────────────────┬──────────────────────────────┘
-                                            │  agent.js — agentic loop ร่วม
-                                            ▼
-                    ┌──────────────── MCP servers (stdio) ─────────────────┐
-                    │  showcase    7 tools + resource + prompt             │
-                    │  local       3 tools (ตัวอย่างพื้นฐานสุด)             │
-                    │  analytics   อ่าน customer_data.csv จริง             │
-                    │  guarded     สาธิต kill switch / readonly / audit    │
-                    └──────────────────────────────────────────────────────┘
-
-                    remote/  ตัวเดียวกันแต่เป็น Streamable HTTP บน Workers
-```
-
-**หลักการที่ยึดทั้งเรโป**
-
-- **แยก logic ออกจาก presentation** — `agent.js` ตัดสินใจว่าจะเรียก tool ไหน, `render.js` ตัดสินใจว่าจะแสดงผลยังไง, `flex.js` สร้าง JSON · เปลี่ยนช่องทางไม่ต้องแตะ logic
-- **โมเดลไม่เขียน Flex JSON เอง** — ใช้เทมเพลตตายตัว เพราะ schema ซับซ้อนและพังเงียบ
-- **action ที่กระทบภายนอกต้องผ่านมนุษย์** — `create_draft_order` คืน "รออนุมัติ" · `confirm_order` ทำงานหลังผู้ใช้กดยืนยัน · broadcast ต้อง `confirm=SEND`
-- **ทุก tool call มี audit log** — `[AUDIT] เวลา actor tool verdict args`
+> The stdio MCP servers (`local`, `showcase`, `security`, `multi/analytics`) require **no environment variables**. They run immediately after `npm install`.
 
 ---
 
-## โปรเจกต์ในเรโป
+## Architecture
+
+```
+                    ┌──────────────────────── Channels ────────────────────────┐
+   LINE Messaging ──┤  line-bot        context embedded in the system prompt   │
+                    │  line-bot-mcp    calls MCP tools                         │
+                    │  line-bot-rich   MCP plus Flex, Quick Reply, Postback    │
+   Browser ─────────┤  webchat.mjs     same capabilities, different rendering  │
+                    │  console.mjs     operator console (localhost only)       │
+                    └──────────────────────────┬───────────────────────────────┘
+                                               │  agent.js — shared agentic loop
+                                               ▼
+                    ┌─────────────────── MCP servers (stdio) ──────────────────┐
+                    │  showcase    7 tools, 1 resource, 1 prompt               │
+                    │  local       3 tools — the minimal example               │
+                    │  analytics   reads the real customer_data.csv            │
+                    │  guarded     demonstrates kill switch, readonly, audit   │
+                    └──────────────────────────────────────────────────────────┘
+
+                    remote/  the same server exposed over Streamable HTTP on Workers
+```
+
+### Design principles
+
+- **Logic is separated from presentation.** `agent.js` decides which tool to call, `render.js` decides how to display the result, and `flex.js` builds the payload. Adding a channel does not require touching the agent loop.
+- **The model never authors Flex JSON.** Templates are deterministic, because the Flex schema is easy to get subtly wrong and failures are silent.
+- **Actions with external effects require a human.** `create_draft_order` returns a pending draft; `confirm_order` executes only after explicit confirmation; broadcasts require `confirm=SEND`.
+- **Every tool call is audited.** Entries follow the form `[AUDIT] timestamp actor tool verdict args`.
+
+---
+
+## Projects
 
 ### LINE bots — `s1-martech/`
 
-สามตัวนี้ใช้ `.env` หน้าตาเดียวกันและฟังพอร์ตเดียวกัน ต่างกันที่ความลึก
+All three share the same `.env` shape and bind the same port. They differ in depth.
 
-| โปรเจกต์ | ข้อมูลมาจาก | ความสามารถ |
+| Project | Data source | Capabilities |
 |---|---|---|
-| [`line-bot`](s1-martech/line-bot) | context ใน system prompt | ตอบคำถามสินค้า/โปรโมชัน |
-| [`line-bot-mcp`](s1-martech/line-bot-mcp) | MCP tools | + เช็คสต็อก · ติดตามออเดอร์ · ร่างออเดอร์ |
-| [`line-bot-rich`](s1-martech/line-bot-rich) | MCP + presentation layer | + Flex · Quick Reply · Postback · Rich Menu · VoC log |
+| [`line-bot`](s1-martech/line-bot) | context in the system prompt | answers product and promotion questions |
+| [`line-bot-mcp`](s1-martech/line-bot-mcp) | MCP tools | adds stock lookup, order tracking, draft orders |
+| [`line-bot-rich`](s1-martech/line-bot-rich) | MCP plus a presentation layer | adds Flex, Quick Reply, Postback, Rich Menu, VoC logging |
 
 ```bash
 cd s1-martech/line-bot-rich
 cp .env.example .env && npm install
-npm start                                    # :3000
-cloudflared tunnel --url http://localhost:3000   # เอา <url>/webhook ไปตั้งใน LINE Console
+npm start                                        # :3000
+cloudflared tunnel --url http://localhost:3000   # point <url>/webhook at the LINE console
 ```
 
-สลับระหว่างสามตัวบนพอร์ตเดียวกัน (ไม่ต้องแก้ webhook):
+Switch between the three on the same port, without editing the webhook:
 
 ```bash
 cd s1-martech && ./switch-bot.sh 1|2|3|status|stop
 ```
 
-**เครื่องมือรอบ `line-bot-rich`**
+**Tooling around `line-bot-rich`**
 
-| คำสั่ง | ได้อะไร |
+| Command | Purpose |
 |---|---|
-| `npm run console` | Marketing Console (:3100) — Overview · Broadcast · Segments · Restock · Analytics |
-| `npm run webchat` | Web Chat (:3200) — tools ชุดเดียวกับ LINE |
-| `npm run voc-report` | VoC dashboard — funnel + สถิติการใช้ tool |
-| `npm run broadcast` | broadcast โปรโมชัน (dry-run เป็นค่าปกติ · ต้องใส่ `--send` เอง) |
-| `npm run restock-notify GB-004` | แจ้งลูกค้าที่รอของเข้า (dry-run เป็นค่าปกติ) |
-| `npm run broadcast-segment "แชมป์ตัวจริง"` | ยิงตามกลุ่ม RFM |
-| `npm run setup-richmenu` | ติดตั้ง Rich Menu (ต้องมี `richmenu.png` 2500×843) |
+| `npm run console` | Marketing Console (:3100) — overview, broadcast, segments, restock, analytics |
+| `npm run webchat` | Web chat (:3200) — the same tools as LINE |
+| `npm run voc-report` | Voice-of-customer dashboard — funnel and tool usage |
+| `npm run broadcast` | Promotion broadcast (dry run by default; `--send` to deliver) |
+| `npm run restock-notify GB-004` | Notify customers waiting on a restock (dry run by default) |
+| `npm run broadcast-segment "แชมป์ตัวจริง"` | Target a specific RFM segment |
+| `npm run setup-richmenu` | Install the Rich Menu (requires `richmenu.png`, 2500×843) |
 
-> หน้า operator ทั้งหมด bind `127.0.0.1` เท่านั้น — อย่าเปิดผ่าน tunnel
+> Operator interfaces bind to `127.0.0.1` only. Do not expose them through a tunnel.
 
 ### MCP servers — `s2-mcp/`
 
-| โปรเจกต์ | Transport | เนื้อหา |
+| Project | Transport | Contents |
 |---|---|---|
-| [`local`](s2-mcp/local) | stdio | 3 tools — ตัวอย่างพื้นฐานสุด เหมาะกับการอ่านโค้ดครั้งแรก |
-| [`showcase`](s2-mcp/showcase) | stdio | 7 tools + resource `store://policy` + prompt `after_sales_reply` |
-| [`remote`](s2-mcp/remote) | Streamable HTTP | ตัวเดียวกันบน Cloudflare Workers + ตรวจ API key |
-| [`security`](s2-mcp/security) | stdio | สาธิต tool poisoning + สแกนเนอร์ + guarded server |
-| [`multi`](s2-mcp/multi) | stdio | analytics server ตัวที่สอง + ตัว orchestrate |
+| [`local`](s2-mcp/local) | stdio | 3 tools — the clearest starting point for reading the code |
+| [`showcase`](s2-mcp/showcase) | stdio | 7 tools, the `store://policy` resource, the `after_sales_reply` prompt |
+| [`remote`](s2-mcp/remote) | Streamable HTTP | the same server on Cloudflare Workers, with API key checks |
+| [`security`](s2-mcp/security) | stdio | tool-poisoning demonstration, description scanner, guarded server |
+| [`multi`](s2-mcp/multi) | stdio | a second analytics server plus the orchestration entry point |
 
 ```bash
-npm start --prefix s2-mcp/local        # รัน server
-npm run inspect --prefix s2-mcp/local  # เปิด MCP Inspector
+npm start --prefix s2-mcp/local        # run the server
+npm run inspect --prefix s2-mcp/local  # open the MCP Inspector
 ```
 
-**tools ใน `showcase`**
+**Tools in `showcase`**
 
-| Tool | รูปแบบที่สาธิต |
+| Tool | Pattern demonstrated |
 |---|---|
-| `recommend_for_skin` | personalization จากข้อมูลสินค้า |
-| `check_stock` | ค้นจากรหัสหรือชื่อบางส่วน (ภาษาไทยไม่เว้นวรรค → ไล่ prefix) |
-| `track_order` | อ่านทั้งออเดอร์ตายตัวและออเดอร์ที่สร้างสด |
-| `create_draft_order` → `confirm_order` | governed action — ร่างก่อน ยืนยันทีหลัง |
-| `get_bestsellers` · `get_promotions` | analytics · ข้อมูลโปรโมชัน |
+| `recommend_for_skin` | personalization from product data |
+| `check_stock` | lookup by SKU or partial name (Thai has no word spacing, so matching walks prefixes) |
+| `track_order` | reads both seeded orders and orders created at runtime |
+| `create_draft_order` → `confirm_order` | governed action — draft first, execute after confirmation |
+| `get_bestsellers`, `get_promotions` | analytics and promotion data |
 
-ออเดอร์ที่ `confirm_order` สร้างถูกเก็บใน `data/orders-live.json` (gitignore) เพื่อให้ `track_order` ตามต่อได้
-ล้างด้วย `npm run reset-orders`
+Orders created by `confirm_order` are persisted to `data/orders-live.json` (gitignored) so that `track_order` can find them. Clear them with `npm run reset-orders`.
 
-**`security`** — สแกนคำอธิบาย tool หา red flag ก่อนเชื่อมต่อ server ที่ไม่ได้เขียนเอง
+**`security`** — scans tool descriptions for red flags before you connect to a server you did not write.
 
 ```bash
-npm run scan:poisoned --prefix s2-mcp/security   # exit 1 — ใช้ใน CI ได้
-npm run scan:guarded  --prefix s2-mcp/security   # exit 0
-npm run report        --prefix s2-mcp/security   # รายงาน HTML ไฮไลต์จุดที่ฝังคำสั่ง
-READONLY=1 node guarded-server.mjs               # ปิด tool ที่เขียนข้อมูล
+npm run scan:poisoned --prefix s2-mcp/security   # exits 1 — suitable for CI gating
+npm run scan:guarded  --prefix s2-mcp/security   # exits 0
+npm run report        --prefix s2-mcp/security   # HTML report highlighting injected instructions
+READONLY=1 node guarded-server.mjs               # disable every write tool
 DISABLED_TOOLS=place_order node guarded-server.mjs
 ```
 
-**`multi`** — ให้โมเดลเลือกเรียก tool ข้าม server เองในคำสั่งเดียว
+**`multi`** — lets the model choose tools across servers within a single request.
 
 ```bash
-npm start     --prefix s2-mcp/multi     # พิมพ์ trace ว่าเรียกอะไรตามลำดับใด
-npm run trace --prefix s2-mcp/multi     # เขียน trace.html — lane ต่อ server + hop
+npm start     --prefix s2-mcp/multi     # prints the call trace in order
+npm run trace --prefix s2-mcp/multi     # writes trace.html with per-server lanes and hops
 ```
 
-### Agent-Ready storefront — `s3-economy/storefront`
+### Agent-ready storefront — `s3-economy/storefront`
 
-หน้าเว็บตัวอย่างที่ agent อ่านได้ + เครื่องให้คะแนน 4 ด้าน (Schema.org · `llms.txt` · MCP · agent card)
+A sample storefront that agents can read, plus a scorer covering four dimensions: structured data, `llms.txt`, MCP availability, and the agent card.
 
 ```bash
-node s3-economy/storefront/serve.mjs              # :8090
-node s3-economy/storefront/audit-gates.mjs        # ตรวจไฟล์ในเครื่อง
-node s3-economy/storefront/audit-gates.mjs https://example.com   # ตรวจเว็บจริง
+node s3-economy/storefront/serve.mjs                             # :8090
+node s3-economy/storefront/audit-gates.mjs                       # audit the local files
+node s3-economy/storefront/audit-gates.mjs https://example.com    # audit a live site
 ```
 
-### สตาร์ตทุกอย่างพร้อมกัน
+### Running everything at once
 
 ```bash
-./dev-all.sh                 # bot ระดับ 3 + vibe + storefront + remote MCP
-BOT=1 ./dev-all.sh           # เลือกระดับ bot
-SKIP_REMOTE=1 ./dev-all.sh   # ข้าม wrangler (ขึ้นเร็วกว่ามาก)
+./dev-all.sh                 # bot level 3, plus vibe tools, storefront, and the remote MCP
+BOT=1 ./dev-all.sh           # choose the bot level
+SKIP_REMOTE=1 ./dev-all.sh   # skip wrangler for a much faster start
 ```
-ข้ามบริการที่ยังไม่พร้อมให้เอง (ไม่มี `node_modules` / ไม่มี `.env`) แล้วบอกว่าข้ามเพราะอะไร
 
-### พอร์ตที่ใช้
+Services that are not ready — missing `node_modules` or `.env` — are skipped with an explanation rather than failing silently.
 
-| พอร์ต | บริการ |
+### Ports
+
+| Port | Service |
 |---|---|
-| `3000` | LINE bot (ตัวใดตัวหนึ่งใน 3 ตัว) |
+| `3000` | LINE bot (whichever level is active) |
 | `3100` | Marketing Console |
 | `3150` | Broadcast Console |
-| `3200` | Web Chat |
-| `8080` | เครื่องมือ static ใน `s1-martech/vibe/` |
-| `8090` | storefront |
-| `8787` | MCP remote (`wrangler dev`) |
+| `3200` | Web chat |
+| `8080` | Static tools in `s1-martech/vibe/` |
+| `8090` | Storefront |
+| `8787` | Remote MCP under `wrangler dev` |
 
 ---
 
-## เทสต์
+## Testing
 
 ```bash
-./smoke-test.sh        # 8 ด่าน ครอบคลุมทุกโปรเจกต์ · exit ≠ 0 ถ้ามีด่านพัง
+./smoke-test.sh        # 8 areas across every project; exits non-zero on any failure
 ```
 
-รวมด่าน remote เข้าไปด้วยได้ทั้งกับ `wrangler dev` ในเครื่องและ endpoint ที่ deploy แล้ว:
+The remote area can be pointed at either a local `wrangler dev` instance or a deployed endpoint:
 
 ```bash
 REMOTE_MCP_URL=http://127.0.0.1:8787/mcp DEMO_API_KEY=<key> ./smoke-test.sh
 ```
 
-เทสต์ย่อยที่ CI รันทุก PR — **ไม่ต้องมี API key และไม่มีเคสไหนส่งข้อความจริง**
+The following suites run on every pull request. They require **no API key and never send a real message**.
 
-| คำสั่ง | เคส | ครอบคลุม |
+| Command | Cases | Coverage |
 |---|---|---|
-| `npm test --prefix s1-martech/line-bot-rich` | 25 | Flex ตรงข้อจำกัด LINE · ตัวจับสินค้าหมดภาษาไทย · agentic loop ทนคำตอบผิดรูป |
-| `npm run test:console --prefix s1-martech/line-bot-rich` | 10 | ประตูยืนยันก่อนส่ง · ยืนยันว่า bind localhost |
-| `npm run test:governance --prefix s2-mcp/security` | 27 | draft ไม่ execute · zod · kill switch · readonly · audit · วงจรสั่ง→ติดตาม |
+| `npm test --prefix s1-martech/line-bot-rich` | 25 | Flex payloads against LINE limits, Thai sold-out matching, agentic loop resilience |
+| `npm run test:console --prefix s1-martech/line-bot-rich` | 10 | send confirmation gates, localhost-only binding |
+| `npm run test:governance --prefix s2-mcp/security` | 27 | drafts do not execute, schema validation, kill switch, readonly mode, audit trail, order lifecycle |
 
-เทสต์ที่ต้องใช้ API key (ไม่อยู่ใน CI):
+Suites that require an API key, and therefore run outside CI:
 
 ```bash
-npm run rehearse --prefix s1-martech/line-bot-rich          # 9 สถานการณ์ end-to-end
-npm run rehearse --prefix s1-martech/line-bot-rich -- x3    # รันซ้ำ วัดว่าโมเดลเลือก tool คงที่ไหม
+npm run rehearse --prefix s1-martech/line-bot-rich          # 9 end-to-end scenarios
+npm run rehearse --prefix s1-martech/line-bot-rich -- x3    # repeat runs to measure tool-selection stability
 ```
 
-`rehearse` วิ่ง pipeline จริงแล้ว**ตรวจทุก message ตามข้อจำกัดของ LINE ก่อนส่ง** (≤5 message · `altText` · carousel ≤12 · postback data ≤300 · รูปต้อง https) เพราะ Flex ที่ผิดโครงสร้างทำให้ LINE ตอบ 400 แล้วบอทเงียบโดยไม่มี error ฝั่งเรา
+`rehearse` exercises the real pipeline and then **validates every outgoing message against LINE's constraints** — at most 5 messages, `altText` present, carousels of 12 bubbles or fewer, postback payloads under 300 characters, HTTPS image URLs. A malformed Flex message causes LINE to return 400, after which the bot goes quiet with no error surfaced on our side.
 
 ---
 
-## Deploy MCP remote
+## Deploying the remote MCP server
 
 ```bash
 cd s2-mcp/remote
-npm start                                   # ทดสอบในเครื่องก่อน (wrangler dev :8787)
+npm start                                   # verify locally first (wrangler dev on :8787)
 
-export CLOUDFLARE_ACCOUNT_ID=<account-id>   # จำเป็นเมื่อบัญชีที่ล็อกอินมีหลายบัญชี
-npx wrangler secret put DEMO_API_KEY        # ค่าที่พิมพ์ไม่ขึ้นจอ
+export CLOUDFLARE_ACCOUNT_ID=<account-id>   # required when the logged-in user has multiple accounts
+npx wrangler secret put DEMO_API_KEY        # the value is not echoed
 npm run deploy
 ```
 
-ปัจจุบัน deploy อยู่ที่ `https://cmt2026-ex-mcp.harmonyx.co/mcp` (custom domain ตั้งไว้ใน `wrangler.jsonc`)
+The current deployment is `https://cmt2026-ex-mcp.harmonyx.co/mcp`; the custom domain is declared in `wrangler.jsonc`.
 
-ตรวจสิทธิ์ทำงานทั้ง `Authorization: Bearer <key>` และ `x-api-key: <key>` — ไม่ส่งหรือส่งผิดได้ `401`
+Authentication accepts either `Authorization: Bearer <key>` or `x-api-key: <key>`. Missing or incorrect keys receive `401`.
 
-ปิดการเข้าถึงเมื่อเลิกใช้:
+Revoke access when the deployment is no longer needed:
 
 ```bash
 yes | npx wrangler secret delete DEMO_API_KEY
@@ -253,49 +254,42 @@ yes | npx wrangler secret delete DEMO_API_KEY
 
 ---
 
-## แนวทางการพัฒนา
+## Development conventions
 
-- **ห้าม commit `.env` / `.dev.vars`** — เพิ่มตัวแปรใหม่ที่ `.env.example` เท่านั้น
-- **ห้าม hardcode API key หรือ token** ในโค้ดทุกกรณี
-- **tool MCP ใหม่ต้องมีครบ 3 อย่าง**: คำอธิบายภาษาไทยที่โมเดลเดาการใช้ได้ · zod validation · เรียก `audit()`
-- **เขียนคำอธิบาย tool เป็นคำบรรยาย ไม่ใช่คำสั่ง** — ประโยคแบบ "ต้องเรียก tool นี้เสมอ" จะโดน `scan-tools.mjs` จับว่าเข้าข่าย prompt injection
-- **action ที่กระทบภายนอกต้องมี human-in-the-loop** และ default เป็น dry-run
-- ไม่อัปเกรด dependency ข้าม major โดยไม่อธิบายเหตุผล
-- คอมเมนต์โค้ดเป็นภาษาไทย
-
----
-
-## ข้อควรระวังที่เจอมาแล้ว
-
-**`content[0]` ไม่ใช่คำตอบเสมอไป** — Sonnet 5 เปิด adaptive thinking อัตโนมัติ block แรกอาจเป็น `thinking`
-ต้องหยิบด้วย `content.find(b => b.type === 'text')` ไม่ใช่ `content[0].text`
-
-**`stop_reason` เชื่ออย่างเดียวไม่ได้** — เคยเจอ `stop_reason === 'tool_use'` แต่ไม่มี tool_use block เลย
-(โมเดลพ่น `<invoke ...>` ออกมาเป็นข้อความ) ถ้าเดินต่อจะส่ง user message ว่าง → API ตอบ 400 → บอทเงียบ
-ดูวิธีรับมือใน `planFromResponse()` ที่ [`agent.js`](s1-martech/line-bot-rich/agent.js)
-
-**ตัดคำภาษาไทยด้วย `split(' ')` ใช้ไม่ได้** — ภาษาไทยไม่เว้นวรรค ฟีเจอร์ที่พึ่งการตัดคำจะตายเงียบโดยไม่มี error
-ดูวิธีไล่ prefix ใน `matchSoldOut()` ที่ [`render.js`](s1-martech/line-bot-rich/render.js)
-
-**quick tunnel ของ cloudflared ตายเงียบได้** — process ยังรัน log ยังบอก "Registered tunnel connection"
-แต่โดเมนหายจาก DNS แล้ว (ปลายทางจะได้ `COULD_NOT_CONNECT`) ตรวจด้วยการยิงจากภายนอกเสมอ ไม่ใช่ดูจาก log
-
-**secret ของ Cloudflare ใช้เวลากระจาย ~30 วินาที** — ใส่แล้วยิงทันทีจะได้ `401` ทั้งที่ key ถูก
-
-**บอทไม่ตอบใน LINE** — ดู log ในเทอร์มินัลว่ามี `📩 webhook:` ขึ้นไหม
-ถ้าไม่ขึ้นแปลว่า event ไม่ถึงเรา (webhook URL ตาย / ปิด Use webhook / โหมด OA เป็น chat)
-ถ้าขึ้นแต่ไม่มีข้อความตอบกลับ ปัญหาอยู่ที่ pipeline ของเรา
+- **Never commit `.env` or `.dev.vars`.** Add new variables to `.env.example` only.
+- **Never hardcode API keys or tokens.**
+- **Every new MCP tool needs three things:** a Thai description precise enough for the model to infer correct usage, zod validation, and a call to `audit()`.
+- **Write tool descriptions as descriptions, not instructions.** Phrasing such as "always call this tool first" is flagged by `scan-tools.mjs` as prompt-injection shaped.
+- **Actions with external effects require human-in-the-loop confirmation** and default to dry run.
+- Do not upgrade dependencies across major versions without stating the reason.
+- Code comments are written in Thai.
 
 ---
 
-## วัสดุประกอบการสอน
+## Known pitfalls
 
-| ไฟล์ | เนื้อหา |
+**`content[0]` is not always the answer.** Sonnet 5 enables adaptive thinking automatically, so the first block may be a `thinking` block. Read the response with `content.find(b => b.type === 'text')` rather than `content[0].text`.
+
+**`stop_reason` alone is not trustworthy.** We have observed `stop_reason === 'tool_use'` on responses containing no tool-use block, where the model emitted `<invoke ...>` as plain text instead. Proceeding sends an empty user message, the API returns 400, and the bot goes silent. See `planFromResponse()` in [`agent.js`](s1-martech/line-bot-rich/agent.js) for the handling.
+
+**Thai text cannot be tokenized with `split(' ')`.** Thai does not use spaces between words, so any feature relying on naive word splitting fails silently with no error. See `matchSoldOut()` in [`render.js`](s1-martech/line-bot-rich/render.js) for the prefix-walking approach.
+
+**Cloudflare quick tunnels can die silently.** The process keeps running and the log still reports "Registered tunnel connection" after the hostname has disappeared from DNS; callers receive `COULD_NOT_CONNECT`. Always verify by making a request from outside rather than reading the log.
+
+**Cloudflare secrets take roughly 30 seconds to propagate.** A request issued immediately after `wrangler secret put` returns `401` even with the correct key.
+
+**When the bot does not reply in LINE**, check the terminal for a `📩 webhook:` line. If it is absent, the event never reached the service — inspect the webhook URL, the "Use webhook" toggle, and whether the official account is in chat mode. If it is present but no reply is sent, the failure is in our pipeline.
+
+---
+
+## Teaching materials
+
+| File | Contents |
 |---|---|
-| [decks/](decks) | สไลด์ 3 sessions + Slido setup |
-| [REHEARSAL.md](REHEARSAL.md) | run-of-show วันงาน + เช็คลิสต์ก่อนขึ้นเวที |
-| [Demo_Prep_Playbook.md](Demo_Prep_Playbook.md) | แผนเตรียมงานเต็ม |
-| [s2-mcp/EXTENDED-LAB.md](s2-mcp/EXTENDED-LAB.md) · [LAB-SECURITY](s2-mcp/LAB-SECURITY.md) · [LAB-ORCHESTRATE](s2-mcp/LAB-ORCHESTRATE.md) | แล็บ MCP |
-| [s1-martech/LAB3-RICH.md](s1-martech/LAB3-RICH.md) · [LAB-MARKETING-CONSOLE](s1-martech/LAB-MARKETING-CONSOLE.md) | แล็บ LINE |
-| [s3-economy/LAB-STOREFRONT.md](s3-economy/LAB-STOREFRONT.md) · [audit-prompts](s3-economy/audit-prompts.md) · [lab2-journey-canvas](s3-economy/lab2-journey-canvas.md) | แล็บ Agent Economy |
-| [CLAUDE.md](CLAUDE.md) | กติกาสำหรับ Claude Code ในเรโปนี้ |
+| [decks/](decks) | Slide decks for all three sessions plus Slido setup |
+| [REHEARSAL.md](REHEARSAL.md) | Run-of-show and pre-session checklist |
+| [Demo_Prep_Playbook.md](Demo_Prep_Playbook.md) | Full preparation plan |
+| [s2-mcp/EXTENDED-LAB.md](s2-mcp/EXTENDED-LAB.md), [LAB-SECURITY](s2-mcp/LAB-SECURITY.md), [LAB-ORCHESTRATE](s2-mcp/LAB-ORCHESTRATE.md) | MCP labs |
+| [s1-martech/LAB3-RICH.md](s1-martech/LAB3-RICH.md), [LAB-MARKETING-CONSOLE](s1-martech/LAB-MARKETING-CONSOLE.md) | LINE labs |
+| [s3-economy/LAB-STOREFRONT.md](s3-economy/LAB-STOREFRONT.md), [audit-prompts](s3-economy/audit-prompts.md), [lab2-journey-canvas](s3-economy/lab2-journey-canvas.md) | Agent economy labs |
+| [CLAUDE.md](CLAUDE.md) | Working agreements for Claude Code in this repository |
