@@ -1,7 +1,8 @@
 # CMT Workshop Demos — HarmonyX AI × MarTech Series
 
 โค้ดและวัสดุ live demo สำหรับ workshop 3 sessions: **AI for MarTech** · **Advanced MCP** · **Agent Economy**
-ทุก demo ผ่านการรันจริง + `smoke-test.sh` · LINE bot ทดสอบกับ LINE จริงแล้ว
+ทุก demo ผ่านการรันจริง + `smoke-test.sh` **16/16** · LINE bot ทดสอบกับ LINE จริงครบทั้ง Flex/postback/ปุ่มยืนยัน
+Remote MCP ขึ้นจริงแล้วที่ **`https://cmt2026-ex-mcp.harmonyx.co/mcp`**
 
 > แผนเต็ม: [Demo_Prep_Playbook.md](Demo_Prep_Playbook.md) · run-of-show วันงาน: [REHEARSAL.md](REHEARSAL.md) · กติกา Claude Code: [CLAUDE.md](CLAUDE.md)
 
@@ -10,8 +11,15 @@
 ## เริ่มเร็ว
 
 ```bash
-./dev-all.sh        # สตาร์ตทุก demo แยกพอร์ต (vibe :8080 · line-bot :3000 · remote MCP :8787)
-./smoke-test.sh     # ตรวจทุก demo ก่อนวันงานในคำสั่งเดียว
+./dev-all.sh                 # สตาร์ตทุก demo แยกพอร์ต (vibe :8080 · line-bot :3000 · remote MCP :8787)
+./smoke-test.sh              # ตรวจทุก demo ก่อนวันงานในคำสั่งเดียว (8 ด่าน)
+cd s1-martech && ./switch-bot.sh 3    # สลับ LINE bot เป็นระดับที่จะเดโม (1/2/3)
+```
+
+ตรวจรวม remote endpoint จริงด้วย (key ไม่ติดใน shell history):
+
+```bash
+read -s "DEMO_API_KEY?key: " && export DEMO_API_KEY REMOTE_MCP_URL=https://cmt2026-ex-mcp.harmonyx.co/mcp && ./smoke-test.sh
 ```
 
 | พอร์ต | บริการ | เปิด |
@@ -29,7 +37,9 @@
 
 ```
 cmt-workshop-demo/
+├── decks/                      # เด็ค 3 sessions (81 สไลด์) + Slido setup + index
 ├── s1-martech/                 # Session 1 · AI for MarTech
+│   ├── switch-bot.sh           #   สลับ bot 3 ระดับบนพอร์ตเดียว (tunnel/webhook ตัวเดียวตลอดงาน)
 │   ├── line-bot/               #   Lab 3 — bot พื้นฐาน (context ใน system prompt)
 │   ├── line-bot-mcp/           #   bot ที่เรียก MCP tools จริง
 │   ├── line-bot-rich/          #   ⭐ flagship — Flex/Postback/RichMenu + engagement layer + Console
@@ -38,8 +48,10 @@ cmt-workshop-demo/
 │   └── prompts.md              #   3 prompts (Explore / Analyze / Recommend)
 ├── s2-mcp/                     # Session 2 · Advanced MCP
 │   ├── local/                  #   Lab MCP-1 — stdio server (3 tools)
-│   ├── remote/                 #   Lab MCP-2 — Cloudflare Workers + API key
-│   └── showcase/               #   ⭐ MCP โลกจริง (7 tools + resource + prompt)
+│   ├── remote/                 #   Lab MCP-2 — Cloudflare Workers + API key (deploy แล้ว)
+│   ├── showcase/               #   ⭐ MCP โลกจริง (7 tools + resource + prompt)
+│   ├── security/               #   Lab Security — tool poisoning + 5 การป้องกัน + รายงาน UI
+│   └── multi/                  #   Lab Orchestrate — Claude เรียกหลาย server + trace UI
 ├── s3-economy/                 # Session 3 · Agent Economy
 │   └── storefront/             #   Agent-Ready storefront + เครื่องตรวจ 4 ประตู
 ├── dev-all.sh · smoke-test.sh  # เครื่องมือซ้อม
@@ -98,10 +110,20 @@ npm run inspect                                # MCP Inspector
 
 ### Lab MCP-2 — Deploy (Cloudflare Workers) — [`s2-mcp/remote`](s2-mcp/remote)
 ```bash
-cd s2-mcp/remote && npm install && npm start   # ทดสอบ local
-npx wrangler login && npx wrangler secret put DEMO_API_KEY && npm run deploy
+cd s2-mcp/remote && npm install && npm start   # ทดสอบ local (wrangler dev :8787)
 ```
-Streamable HTTP ที่ `/mcp` + ตรวจ API key (key ผิด → `401`)
+Streamable HTTP ที่ `/mcp` + ตรวจ API key ทั้ง `Authorization: Bearer` และ `x-api-key` (key ผิด/ไม่ส่ง → `401`)
+
+**deploy ขึ้นจริงแล้ว** → `https://cmt2026-ex-mcp.harmonyx.co/mcp` (custom domain ตั้งใน `wrangler.jsonc`)
+เครื่องนี้ล็อกอิน Cloudflare หลายบัญชี **ต้องระบุบัญชีทุกครั้ง**:
+
+```bash
+export CLOUDFLARE_ACCOUNT_ID=60b088834829272a6ee94498be2ea356   # Harmonyx
+npx wrangler secret put DEMO_API_KEY     # ใส่ key ของงาน (ไม่ขึ้นจอ)
+npm run deploy                            # เฉพาะตอนแก้โค้ด
+yes | npx wrangler secret delete DEMO_API_KEY   # ปิดการเข้าถึงหลังจบงาน
+```
+> ⏱️ secret ใช้เวลากระจาย ~30 วินาที — ใส่แล้วยิงทันทีจะได้ `401` ทั้งที่ key ถูก
 
 ### Lab Security (bonus) — ภัยเฉพาะ MCP + การป้องกัน — [`s2-mcp/security`](s2-mcp/security)
 ```bash
@@ -168,12 +190,30 @@ Schema.org JSON-LD · `llms.txt` · `/.well-known/agent-card.json` (มี `x-ne
 ## ทดสอบก่อนวันงาน
 
 ```bash
-./smoke-test.sh                                     # local ทั้งหมด
-REMOTE_MCP_URL=https://.../mcp ./smoke-test.sh      # รวม remote หลัง deploy
+./smoke-test.sh                                                        # local ทั้งหมด
+REMOTE_MCP_URL=https://cmt2026-ex-mcp.harmonyx.co/mcp DEMO_API_KEY=... ./smoke-test.sh   # รวม remote จริง
 ```
+**ผลรันจริงล่าสุด (6 ส.ค. 2026): ✅ 16 ผ่าน · 0 พัง · 0 ข้าม** — รวมด่าน remote ที่ยิงไป endpoint จริง
+
+เทสต์ย่อยที่ไม่ต้องใช้ API key (อยู่ใน CI ทุก PR):
+
+| คำสั่ง | เคส | คุมอะไร |
+|---|---|---|
+| `cd s1-martech/line-bot-rich && npm test` | 25 | Flex ผ่านข้อจำกัด LINE · ตัวจับ restock ภาษาไทย · agentic loop ทนคำตอบเพี้ยน |
+| `cd s1-martech/line-bot-rich && npm run test:console` | 10 | ประตูกันส่งจริง (ไม่มีเคสไหนส่งจริง) · bind localhost |
+| `cd s2-mcp/security && npm run test:governance` | 27 | draft ไม่ execute · zod · kill switch · readonly · audit · **วงจร สั่ง→ติดตาม** |
+| `cd s1-martech/line-bot-rich && npm run rehearse` | 9 สถานการณ์ | ซ้อมของจริง (ต้องมี API key) · `-- x3` วัดความเสถียร |
 ทดสอบด่าน remote ได้โดยไม่ต้อง deploy — สตาร์ต `wrangler dev` แล้วชี้ `REMOTE_MCP_URL=http://127.0.0.1:8787/mcp` (ดู [s2-mcp/remote/README](s2-mcp/remote/README.md))
 
 8 ด่าน: line-bot · MCP local · MCP showcase · MCP security (สแกนเนอร์ + ประตูกำกับดูแล) · MCP multi · storefront (4 ประตู) · line-bot-rich (Flex + ประตูกันส่งจริง) · MCP remote · exit ≠ 0 ถ้ามีด่านพัง
+
+### ก่อนขึ้นเวที (บทเรียนจากการซ้อมจริง)
+
+- [ ] `cd s2-mcp/showcase && npm run reset-orders` — ล้างออเดอร์จากการซ้อม ไม่ให้ ORD รอบก่อนปน
+- [ ] **กด Verify ใน LINE Developers Console ซ้ำเสมอ** — quick tunnel ของ cloudflared **ตายเงียบได้**
+      (process ยังรัน log ยังบอก "Registered" แต่โดเมนหายจาก DNS → LINE ตอบ `COULD_NOT_CONNECT`)
+- [ ] ดู terminal ต้องเห็น `📩 webhook: ...` ทุกครั้งที่มีคนทัก ถ้าไม่ขึ้น = ของไม่ถึงบอท
+- [ ] ใส่ secret ของ remote MCP แล้ว **รอ ~30 วินาที** ก่อนทดสอบ (Cloudflare ใช้เวลากระจาย — ยิงทันทีจะได้ 401 ทั้งที่ key ถูก)
 
 ---
 
