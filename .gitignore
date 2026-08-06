@@ -8,3 +8,6 @@ s1-martech/line-bot-rich/data/
 s1-martech/line-bot-rich/voc-dashboard.html
 s2-mcp/security/scan-report.html
 s2-mcp/multi/trace.html
+
+# ออเดอร์ที่เกิดระหว่างเดโม (ข้อมูลชั่วคราว)
+s2-mcp/showcase/data/

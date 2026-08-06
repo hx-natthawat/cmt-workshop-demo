@@ -80,6 +80,25 @@ for (const [label, args] of [
   t(label + ' → ถูกปฏิเสธด้วย validation', rejected && !/ร่างคำสั่งซื้อ/.test(res.text || ''), (res.text || res.error || '').slice(0, 100));
 }
 
+console.log('\n▌2b. showcase · วงจร สั่ง → ติดตาม ต้องครบ');
+// บั๊กจริงจากเดโม LINE: confirm_order สร้างเลขออเดอร์แล้วทิ้ง → ลูกค้าเช็คสถานะแล้ว "ไม่พบออเดอร์"
+r = await call(shop.mcp, 'confirm_order', { items: [{ sku: 'GB-003', qty: 1 }] });
+const ordNo = (String(r.text || '').match(/ORD-\d+/) || [])[0];
+t('confirm_order คืนเลขออเดอร์', Boolean(ordNo), (r.text || '').slice(0, 80));
+if (ordNo) {
+  r = await call(shop.mcp, 'track_order', { order_id: ordNo });
+  t(`เอาเลขที่เพิ่งได้ (${ordNo}) ไปเช็คสถานะต้องเจอ`, !/ไม่พบ/.test(r.text || ''), (r.text || '').slice(0, 80));
+  r = await call(shop.mcp, 'track_order', { order_id: `  ${ordNo.toLowerCase()} ` });
+  t('พิมพ์ตัวพิมพ์เล็ก/มีช่องว่าง ก็ต้องเจอ', !/ไม่พบ/.test(r.text || ''), (r.text || '').slice(0, 80));
+  const r2 = await call(shop.mcp, 'confirm_order', { items: [{ sku: 'GB-003', qty: 1 }] });
+  const ord2 = (String(r2.text || '').match(/ORD-\d+/) || [])[0];
+  t('สั่งซ้ำยอดเท่ากัน เลขออเดอร์ต้องไม่ซ้ำ', Boolean(ord2) && ord2 !== ordNo, `${ordNo} vs ${ord2}`);
+}
+r = await call(shop.mcp, 'track_order', { order_id: 'ORD-1001' });
+t('ออเดอร์เดิมในไฟล์ตายตัวยังเจอ', /ORD-1001/.test(r.text || ''), (r.text || '').slice(0, 60));
+r = await call(shop.mcp, 'track_order', { order_id: 'ORD-0000' });
+t('เลขที่ไม่มีจริงต้องตอบว่าไม่พบ', /ไม่พบ/.test(r.text || ''), (r.text || '').slice(0, 60));
+
 console.log('\n▌3. showcase · ไฟล์ข้อมูลต้องไม่ถูกแก้');
 r = await call(shop.mcp, 'confirm_order', { items: [{ sku: 'GB-001', qty: 1 }] });
 t('confirm_order คืนเลขออเดอร์', /ORD-/.test(r.text || ''), (r.text || '').slice(0, 80));

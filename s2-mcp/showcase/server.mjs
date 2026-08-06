@@ -17,6 +17,23 @@ import fs from 'node:fs';
 const products = JSON.parse(fs.readFileSync(new URL('./products.json', import.meta.url), 'utf-8'));
 const orders = JSON.parse(fs.readFileSync(new URL('./orders.json', import.meta.url), 'utf-8'));
 
+// ── ออเดอร์ที่เกิดระหว่างเดโม (confirm_order เขียน · track_order อ่าน) ──
+// ก่อนหน้านี้ confirm_order สร้างเลขออเดอร์แล้วทิ้ง → ลูกค้าเอาเลขไปเช็คสถานะแล้ว "ไม่พบออเดอร์"
+// ซึ่งเป็นสิ่งแรกที่คนจะลองหน้างาน · เก็บลงไฟล์เพื่อให้วงจร สั่ง → ติดตาม ครบจริง
+const LIVE_ORDERS = new URL('./data/orders-live.json', import.meta.url);
+function readLive() {
+  try { return JSON.parse(fs.readFileSync(LIVE_ORDERS, 'utf-8')); } catch { return { orders: [] }; }
+}
+function saveLive(db) {
+  fs.mkdirSync(new URL('./data/', import.meta.url), { recursive: true });
+  fs.writeFileSync(LIVE_ORDERS, JSON.stringify(db, null, 2));
+}
+// เลขออเดอร์ต้องไม่ซ้ำ — ของเดิมคำนวณจากยอดเงิน ทำให้สั่งของราคาเท่ากันได้เลขเดิม
+function nextOrderNo(db) {
+  const used = db.orders.map((o) => Number(String(o.order_id).replace(/\D/g, ''))).filter(Number.isFinite);
+  return 'ORD-' + String(Math.max(9000, ...used, 9000) + 1);
+}
+
 // ── Governance ในโค้ด: audit log ทุก tool call (สไลด์ 13) ──
 function audit(tool, args) {
   console.error(`[AUDIT] ${new Date().toISOString()} tool=${tool} args=${JSON.stringify(args)}`);
@@ -56,7 +73,9 @@ server.registerTool('track_order', {
   inputSchema: { order_id: z.string().describe('เลขออเดอร์ เช่น ORD-1001') },
 }, async ({ order_id }) => {
   audit('track_order', { order_id });
-  const o = orders.orders.find((x) => x.order_id === order_id.toUpperCase());
+  const key = order_id.trim().toUpperCase();
+  const o = orders.orders.find((x) => x.order_id === key)
+    || readLive().orders.find((x) => x.order_id === key);   // ออเดอร์ที่เพิ่งสั่งในเดโมต้องเจอด้วย
   if (!o) return { content: [{ type: 'text', text: `ไม่พบออเดอร์ ${order_id} — กรุณาตรวจเลขออเดอร์อีกครั้ง หรือพิมพ์ "ติดต่อเจ้าหน้าที่"` }] };
   const track = o.tracking_no ? `\nเลขพัสดุ: ${o.tracking_no} (${o.carrier})` : '';
   return { content: [{ type: 'text',
@@ -177,10 +196,24 @@ server.registerTool('confirm_order', {
     subtotal += p.price_thb * it.qty;
     lines.push(`${p.name} × ${it.qty}`);
   }
-  // เลขออเดอร์จำลอง (demo) — production เชื่อมระบบออเดอร์จริง + ตัดสต็อกใน transaction
-  const orderNo = 'ORD-' + (9000 + Math.floor((subtotal + items.length) % 1000));
+  // บันทึกออเดอร์ลงไฟล์ เพื่อให้ track_order ตามต่อได้จริง
+  // (demo — production เชื่อมระบบออเดอร์จริง + ตัดสต็อกใน transaction เดียวกัน)
+  const db = readLive();
+  const orderNo = nextOrderNo(db);
+  db.orders.push({
+    order_id: orderNo,
+    customer: 'ลูกค้าจากแชท',
+    items,
+    total_thb: subtotal,
+    status: 'กำลังจัดเตรียมสินค้า',
+    tracking_no: null,
+    carrier: null,
+    eta: 'จัดส่งภายใน 1-2 วันทำการ',
+    created_at: new Date().toISOString(),
+  });
+  saveLive(db);
   return { content: [{ type: 'text',
-    text: `✅ ยืนยันคำสั่งซื้อแล้ว!\nเลขออเดอร์: ${orderNo}\nรายการ: ${lines.join(', ')}\nยอดรวม: ${subtotal} บาท\nสถานะ: กำลังจัดเตรียมสินค้า — จะแจ้งเลขพัสดุเมื่อจัดส่งค่ะ` }] };
+    text: `✅ ยืนยันคำสั่งซื้อแล้ว!\nเลขออเดอร์: ${orderNo}\nรายการ: ${lines.join(', ')}\nยอดรวม: ${subtotal} บาท\nสถานะ: กำลังจัดเตรียมสินค้า — จะแจ้งเลขพัสดุเมื่อจัดส่งค่ะ\n\nเช็คสถานะได้โดยพิมพ์เลขออเดอร์ ${orderNo} ได้เลยค่ะ` }] };
 });
 
 // ══════════════════════════════════════════════════════════════════
