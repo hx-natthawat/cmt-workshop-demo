@@ -22,7 +22,7 @@ npm start                      # บูตแล้วเชื่อม MCP sho
 
 เห็น log:
 ```
-🔌 เชื่อม MCP showcase ได้ · 4 tools: recommend_for_skin, track_order, create_draft_order, get_bestsellers
+🔌 เชื่อม MCP showcase ได้ · 7 tools
 ✅ Bot × MCP running on port 3000
 ```
 

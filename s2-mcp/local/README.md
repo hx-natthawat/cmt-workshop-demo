@@ -67,5 +67,5 @@ npm run inspect
 
 ## ข้อกำหนด
 
-Node.js 18+ · Claude Desktop (Lab 1) · บัญชี Cloudflare ฟรี (Lab 2)
+Node.js 18+ สำหรับ server ตัวนี้ · **Lab 2 (Cloudflare/wrangler) ต้อง 22+** · Claude Desktop · บัญชี Cloudflare ฟรี
 SDK: [@modelcontextprotocol/sdk](https://github.com/modelcontextprotocol/typescript-sdk) — ตรวจสอบเวอร์ชันล่าสุดก่อนวันงาน (spec 2026-07-28 เพิ่ง final)

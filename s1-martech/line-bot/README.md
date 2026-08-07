@@ -6,7 +6,7 @@
 ## สิ่งที่ต้องเตรียม
 
 1. บัญชี [LINE Developers](https://developers.line.biz/) (ฟรี)
-2. Node.js 18 ขึ้นไป
+2. Node.js 22 ขึ้นไป (`@line/bot-sdk` 11 กำหนด `>=22`)
 3. Anthropic API key (หรือใช้ key กลางที่วิทยากรแจก)
 
 ## ขั้นตอน
